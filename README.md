@@ -35,7 +35,7 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 
 ## Example of BIOM Metadata ## 
 
-## Features ##
+### Features 
 
 - Utilizes BIOM file to minimize data manipulation steps
 - Experimental group selections automatically render 
@@ -44,7 +44,7 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 - All tables and graphics are interactive
 
 
-## Analyses ## 
+### Analyses 
 
 - Summary statistics before and after filters:
    * Sample prevalence
@@ -57,5 +57,3 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
    * Graphics are rendered with the highcharter package
    * Tables are rendered with the DT package
    * All data is downloadable
-
-
