@@ -33,4 +33,6 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 –process-obs-metadata taxonomy
 ```
 
-https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/www/MetadataPic.png
+![Metadata Example]https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/www/MetadataPic.png)
+
+
