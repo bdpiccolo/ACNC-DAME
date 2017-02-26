@@ -33,6 +33,29 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 –process-obs-metadata taxonomy
 ```
 
-![Metadata Example](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/www/MetadataPic.png)
+## Example of BIOM Metadata ## 
+
+## Features ##
+
+- Utilizes BIOM file to minimize data manipulation steps
+- Experimental group selections automatically render 
+- Allows user to filter data based on meta-data and/or low abundant sequence reads
+- Utilizes Shiny for interactive inputs and reactive tables and graphics
+- All tables and graphics are interactive
+
+
+## Analyses ## 
+
+- Summary statistics before and after filters:
+   * Sample prevalence
+   * Total Reads
+   * Total OTUs 
+   
+- α-diversity statistics by taxonomic levels:
+   * Calculates observed, chao1, ACE, Shannon, Simpson, Inverse Simpson, Fisher indices
+   * Calculates 1-way or multifactor ANOVAs based on meta-data  
+   * Graphics are rendered with the highcharter package
+   * Tables are rendered with the DT package
+   * All data is downloadable
 
 
