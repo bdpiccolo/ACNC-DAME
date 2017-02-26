@@ -1,0 +1,105 @@
+#selector, 
+.container
+.navbar-inner .navbar-brand .container #navbar_title {
+    background-color: #c41e3a;
+
+  border-bottom:0 solid transparent;
+  font-family: Palatino;
+  font-size: 16px;
+   color:#ffffff;
+} 
+
+..nav.navbar-nav.navbar-right li a {
+    color: blue;
+}
+
+.navbar-static-top {
+  position: static;
+  margin-bottom: 0px;
+  background-color: #c41e3a;
+}
+
+#navbar_title{
+	  color:#ffffff;
+	 }
+
+/* Sets the color for hovering over the sidebar toggle button */
+.skin-blue .main-header .navbar .sidebar-toggle:hover{
+  color:#F0163A;
+  background:#FFFFFF;
+}
+
+#nomatch{
+  font-size: 20px;	
+}
+
+#phylodesc{
+  font-size: 15px;	
+}
+
+#filterheader{
+  font-size: 15px;	
+}
+
+/* Title color */
+.navbar-default .navbar-brand{
+  color:#fff;
+    font-family: Impact, Charcoal, sans-serif;
+  font-size: 35px;
+}
+
+.navbar-default .navbar-nav>li>a{
+  color:#fff;
+    font-family: Palatino;
+  font-size: 20px;
+}
+
+.navbar-default .navbar-brand:focus,.navbar-default .navbar-brand:hover{
+  color:#fff;
+  background-color:#c41e3a;
+}
+
+.navbar-default .navbar-nav>li>a:focus,.navbar-default .navbar-nav>li>a:hover{
+  color:#fff;
+  background-color:#696969;
+}
+
+.col-sm-2 { 
+
+    width: 265px;
+}
+
+.input-small {
+	width: 175px;
+}
+
+..floating-box {
+    float: left;
+    width: 150px;
+    height: 75px;
+    margin: 10px;
+    border: 3px solid #696969;
+}
+
+.big{
+  font-size: 20px;
+}
+
+.nav li a.disabled {
+  background-color: #aaa !important;
+  color: #333 !important;
+  cursor: not-allowed !important;
+  border-color: #aaa !important;
+}
+
+.PLSDAmetabselect {
+  background-color: #f0f0f0;
+}
+
+hr.hr_PLSDA_sep { 
+  border-top: 1px solid #8c8b8b;
+} 
+
+hr.hr_SINGLE_sep {
+	border-top: 5px double #8c8b8b;
+}
