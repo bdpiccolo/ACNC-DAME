@@ -101,7 +101,7 @@
 	Example_BIOMmetad_IMPORT <- reactive({
 		if (is.null(input$biomINPUT) & is.null(input$biommetaINPUT) & is.null(input$treINPUT)) {
 			if(as.numeric(input$loadexample) == 2){		
-				metaD <- read.csv("./Example/map_KITTEST_infantfeces_v2_DAME.csv", header=TRUE, comment.char = "", check.names = FALSE)
+				metaD <- read.csv("./Example/Example_BIOM_Metadata_csv.csv", header=TRUE, comment.char = "", check.names = FALSE)
 				metaD		
 			} else {
 				return(NULL)

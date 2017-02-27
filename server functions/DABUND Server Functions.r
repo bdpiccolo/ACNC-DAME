@@ -809,6 +809,7 @@
 					nbmord						
 				})
 				## Bind list into a single data frame, remove unused columns, set row names, and return
+				DF <- do.call("rbind", LISTord)
 				FinalDF <- DF[,!(colnames(DF) %in% c("Class", "Order", "Family", "Genus"))]
 				rownames(FinalDF) <- c(1:nrow(FinalDF))
 				FinalDF
@@ -816,6 +817,29 @@
 				NULL
 			}
 		}
+	})	
+		
+	output$dabundTEXT <- renderPrint({
+		# if(is.null(dabundNBM())) {
+			# NULL
+		# } else {
+			# Extract NBM based on TAXA 
+			# if("Phylum" %in% names(dabundNBM())) {
+				# LIST <- dabundNBM()[[which(names(dabundNBM()) %in% "Phylum")]]
+				# Extract results by Pairwise Comparisons	
+				# LISTord <- lapply(names(LIST), function(x) {
+					# nbm <- LIST[[x]]
+					# Order by adjusted pvalue, add new column with pairwise comparison, and return
+					# nbmord <- nbm[order(nbm$padj),]
+					# nbmord$Comparison <- rep(x, nrow(nbm))
+					# nbmord						
+				# })
+				# DF <- do.call("rbind", LISTord)
+				# DF
+			# } else {
+				# NULL
+			# }
+		# }
 	})	
 
 	########################################################################			
@@ -1163,10 +1187,6 @@
 				NULL
 			}
 		}
-	})	
-		
-	output$dabundTEXT <- renderPrint({
-	
 	})	
 
 	########################################################################				
