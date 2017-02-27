@@ -85,8 +85,8 @@ University of Arkansas for Medical Sciences
 
 #### Special thanks to:
 
-  [Kartik Shankar](http://acnc.uamsweb.com/home/faculty-listing/kartik-shankar/)
-  [Sree Chintapalli](http://acnc.uamsweb.com/home/faculty-listing/sree-v-chintapalli/)
+  [Kartik Shankar](http://acnc.uamsweb.com/home/faculty-listing/kartik-shankar/)  
+  [Sree Chintapalli](http://acnc.uamsweb.com/home/faculty-listing/sree-v-chintapalli/)  
 
 The following R packages were utilized in no particular order of importance:
 
