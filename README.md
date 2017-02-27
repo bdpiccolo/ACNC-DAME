@@ -35,6 +35,8 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 
 ## Example of BIOM Metadata 
 
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/Additions/www/MetadataPic.png)
+
 ### Features 
 
 - Utilizes BIOM file to minimize data manipulation steps
@@ -75,52 +77,33 @@ This web application was built using [Shiny](http://shiny.rstudio.com/) by [RStu
 
 Created by: 
 
-[Brian Piccolo](https://www.ncbi.nlm.nih.gov/myncbi/browse/collection/47610545/?sort=date&direction=descending)
-
-Assistant Professor
-
-[Arkansas Nutrition Research Center](http://acnc.uamsweb.com/home/faculty-listing/brian-piccolo/)
-
-University of Arkansas for Medical Sciences
+  [Brian Piccolo](https://www.ncbi.nlm.nih.gov/myncbi/browse/collection/47610545/?sort=date&direction=descending)  
+  Assistant Professor  
+  [Arkansas Nutrition Research Center](http://acnc.uamsweb.com/home/faculty-listing/brian-piccolo/)  
+  University of Arkansas for Medical Sciences  
 
 #### Special thanks to:
 
-[Kartik Shankar](http://acnc.uamsweb.com/home/faculty-listing/kartik-shankar/)
-
-[Sree Chintapalli](http://acnc.uamsweb.com/home/faculty-listing/sree-v-chintapalli/)
+  [Kartik Shankar](http://acnc.uamsweb.com/home/faculty-listing/kartik-shankar/)  
+  [Sree Chintapalli](http://acnc.uamsweb.com/home/faculty-listing/sree-v-chintapalli/)  
 
 The following R packages were utilized in no particular order of importance:
 
-[shiny](http://shiny.rstudio.com/)
-
-[shinyjs](https://github.com/daattali/shinyjs)
-
-[DT](https://rstudio.github.io/DT/)
-
-[highcharter](http://jkunst.com/highcharter/)*
-
-[V8](https://cran.r-project.org/web/packages/V8/vignettes/v8_intro.html)
-
-[biomformat](https://www.bioconductor.org/packages/release/bioc/html/biomformat.html)
-
-[ape](http://ape-package.ird.fr/)
-
-[pbapply](https://github.com/psolymos/pbapply)
-
-[tibble](https://github.com/tidyverse/tibble)
-
-[reshape2](https://github.com/hadley/reshape)
-
-[phyloseq](https://joey711.github.io/phyloseq/)
-
-[dplyr](https://github.com/hadley/dplyr)
-
-[vegan](https://github.com/vegandevs/vegan)
-
-[DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)
-
-[scatterD3](https://github.com/juba/scatterD3)
-
-[RColorBrewer](http://colorbrewer2.org/)
+  [shiny](http://shiny.rstudio.com/)  
+  [shinyjs](https://github.com/daattali/shinyjs)  
+  [DT](https://rstudio.github.io/DT/)  
+  [highcharter](http://jkunst.com/highcharter/)*  
+  [V8](https://cran.r-project.org/web/packages/V8/vignettes/v8_intro.html)  
+  [biomformat](https://www.bioconductor.org/packages/release/bioc/html/biomformat.html)  
+  [ape](http://ape-package.ird.fr/)  
+  [pbapply](https://github.com/psolymos/pbapply)  
+  [tibble](https://github.com/tidyverse/tibble)  
+  [reshape2](https://github.com/hadley/reshape)  
+  [phyloseq](https://joey711.github.io/phyloseq/)  
+  [dplyr](https://github.com/hadley/dplyr)  
+  [vegan](https://github.com/vegandevs/vegan)  
+  [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)  
+  [scatterD3](https://github.com/juba/scatterD3)  
+  [RColorBrewer](http://colorbrewer2.org/)  
 						
-* This app uses [Highsoft](https://shop.highsoft.com/faq/non-commercial) software with non-commercial packages.  Highsoft software product is not free for commercial use.
+\* This app uses [Highsoft](https://shop.highsoft.com/faq/non-commercial) software with non-commercial packages.  Highsoft software product is not free for commercial use.
