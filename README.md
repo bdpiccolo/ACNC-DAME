@@ -75,7 +75,7 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 
 This web application was built using [Shiny](http://shiny.rstudio.com/) by [RStudio](https://www.rstudio.com/) using open source software.  It heavily relies upon functions from [phyloseq](https://joey711.github.io/phyloseq/), [vegan](https://github.com/vegandevs/vegan), and [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html).  We highly endorse and encourage visiting the websites associated with these packages.
 
-Created by: 
+#### Created by: 
 
   [Brian Piccolo](https://www.ncbi.nlm.nih.gov/myncbi/browse/collection/47610545/?sort=date&direction=descending)  
   Assistant Professor  
