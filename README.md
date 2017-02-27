@@ -6,7 +6,7 @@ The current release (v0.1) assesses α- and β-Diversity measurements, and diffe
 
 ---
 
-## Getting Started ##
+## Getting Started
 
 *DAME* requires two files to operate:
 
@@ -33,7 +33,7 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 –process-obs-metadata taxonomy
 ```
 
-## Example of BIOM Metadata ## 
+## Example of BIOM Metadata 
 
 ### Features 
 
@@ -52,8 +52,20 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
    * Total OTUs 
    
 - α-diversity statistics by taxonomic levels:
-   * Calculates observed, chao1, ACE, Shannon, Simpson, Inverse Simpson, Fisher indices
-   * Calculates 1-way or multifactor ANOVAs based on meta-data  
-   * Graphics are rendered with the highcharter package
+   * Calculates observed, chao1, ACE, Shannon, Simpson, Inverse Simpson, Fisher indices.
+   * Calculates 1-way or multifactor ANOVAs based on meta-data.
+   * Output tables are rendered with the DT package.
+   * Barplots rendered with the highcharter package.
+   * All data (α-diversity calculations and statistics) are downloadable.
+   
+- β-diversity statistics by taxonomic levels:
+   * Calculates multiple dissimilarity, distance, and tree based parameters.
+   * Calculates several ordination methods, including Principal Co-ordinate Analysis, Non-Metric Multidimensional Scaling, and others.
+   * Ordination plots rendered with the scatterD3 package
    * Tables are rendered with the DT package
-   * All data is downloadable
+   
+- Differential abundance analysis using Negative Binomial Regression by taxonomic levels:
+   * Pairwise comparisons of meta-data using DESeq2 workflow.
+   * DESeq2 result table rendered with DT package.
+   * Boxplots displayed with either Total Reads or Percent Abundance and rendered with highcharter package
+   * All results are downloadable
