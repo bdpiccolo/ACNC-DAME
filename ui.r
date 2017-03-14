@@ -4,6 +4,7 @@ library(DT)
 library(highcharter)
 library(shinyjs)
 library(V8) 
+library(markdown)
 
 
 jscode <- "
