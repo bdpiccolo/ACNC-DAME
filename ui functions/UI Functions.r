@@ -166,7 +166,7 @@ adivTAB <- function() {
 							
 						)
 					),
-					verbatimTextOutput("adivTEXT"),
+					# verbatimTextOutput("adivTEXT"),
 					uiOutput("ADIVdownloadRENDER"),
 					
 					uiOutput("ADIVphylumgraphicsRENDER"),
