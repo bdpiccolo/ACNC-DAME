@@ -10,7 +10,6 @@ library(dplyr)
 library(vegan)
 library(DESeq2)
 library(RColorBrewer)
-library(markdown)
 
 ## Functions
 
