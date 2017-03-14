@@ -35,7 +35,7 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 
 ## Example of BIOM Metadata 
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/Additions/www/MetadataPic.png)
+![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/www/MetadataPic.png?raw=true)
 
 ### Features 
 
