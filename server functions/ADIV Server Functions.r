@@ -616,35 +616,19 @@
 	output$PHYLUMadivHC_RENDER <- renderHighchart({
 		if(input$goADIV){
 			if("Phylum" %in% adivTAXA()){	
-				hcDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "Phylum")]])
-				colnames(hcDF)[which(colnames(hcDF) %in% "variable")[2]] <- "groupvar"
-				hcDF <- as_tibble(hcDF %>% mutate(y = value) %>% dplyr::select(variable, stat, groupvar, y))
+				phylumDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "Phylum")]])
+				colnames(phylumDF)[which(colnames(phylumDF) %in% "variable")[2]] <- "groupvar"
 				
-				# hc <- hchart(hcDF, "column", hcaes(x = variable, y = value, group = groupvar)) %>% 
+				hc <- hchart(phylumDF, "column", hcaes(x = variable, y = value, group = groupvar)) %>% 
 
-				  # hc_legend(verticalAlign = "top") %>% 
-				  # hc_exporting(enabled = TRUE) %>% 
-				  # hc_xAxis(title = NULL) %>%
-				  # hc_yAxis(title = list(text = "Phylum alpha-Diversity")) %>%
-				  # hc_chart(type = input$type)			
-				
-				hc <- highchart()
-				hc <- hc_chart(hc, zoomType = "x", type = "column")
-				for(lvl in levels(hcDF$groupvar)) {
-				  hcDFloop <- list_parse(hcDF %>% filter(groupvar==lvl) %>% dplyr::select(y, groupvar = groupvar))
-				  hc <- hc_add_series(hc, data = hcDFloop, name = lvl)
-				}
-				hc <- hc_legend(hc, verticalAlign = "top")
-				hc <- hc_exporting(hc, enabled = TRUE)
-				hc <- hc_xAxis(hc, title = NULL)
-				hc <- hc_yAxis(hc, title = list(text = "OTU Level Alpha Diversity"))
-				if (input$type == "bar") {				
-					hc <- hc_chart(hc, type = "bar")
-				} else {
-					NULL
-				}
-				  
-				  
+				  hc_legend(verticalAlign = "top") %>% 
+				  hc_exporting(enabled = TRUE) %>% 
+				  # hc_title(text = "Phylum",
+						   # margin = 20, align = "left",
+						   # style = list(color = "#000000", useHTML = TRUE)) %>% 
+				  hc_xAxis(title = NULL) %>%
+				  hc_yAxis(title = list(text = "Phylum alpha-Diversity")) %>%
+				  hc_chart(type = input$type)	
 				if (input$theme != "default") {
 					theme <- switch(input$theme,
 							  null = hc_theme_null(),
@@ -670,26 +654,7 @@
 			
 			
 	output$adivTEXT <- renderPrint({
-		if(input$goADIV){
-			if("Phylum" %in% adivTAXA()){	
-				hcDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "Phylum")]])
-				colnames(hcDF)[which(colnames(hcDF) %in% "variable")[2]] <- "groupvar"
-				hcDF <- as_tibble(hcDF %>% mutate(y = value) %>% dplyr::select(variable, stat, groupvar, y))
-				# hcdflist<- list()
-				for(lvl in levels(hcDF$groupvar)) {
-				  # list_parse(
-				  hcDFloop <- list_parse(hcDF %>% filter(groupvar==lvl) %>% dplyr::select(y, groupvar = groupvar))
-				  # %>% dplyr::select(y, groupvar = groupvar)) 
-				 }
-				# hcDF %>% filter(groupvar == "mo18")				
-				# list_parse(hcDF %>% filter(groupvar=="mo18") %>% dplyr::select(y, groupvar = groupvar))  
-				list(input$type, hcDF, hcDFloop)
-			} else {
-				return(NULL)
-			}
-		} else {
-			NULL
-		}					
+		adivTAXA()
 	})	
 
 	########################################################################		
@@ -783,33 +748,19 @@
 	output$CLASSadivHC_RENDER <- renderHighchart({
 		if(input$goADIV){
 			if("Class" %in% adivTAXA()){	
-				hcDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "Class")]])
-				colnames(hcDF)[which(colnames(hcDF) %in% "variable")[2]] <- "groupvar"
-				hcDF <- as_tibble(hcDF %>% mutate(y = value) %>% dplyr::select(variable, stat, groupvar, y))
-				# hc <- hchart(hcDF, "column", hcaes(x = variable, y = value, group = groupvar)) %>% 
+				phylumDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "Class")]])
+				colnames(phylumDF)[which(colnames(phylumDF) %in% "variable")[2]] <- "groupvar"
+				hc <- hchart(phylumDF, "column", hcaes(x = variable, y = value, group = groupvar)) %>% 
 
-				  # hc_legend(verticalAlign = "top") %>% 
-				  # hc_exporting(enabled = TRUE) %>% 
-				 
-				  # hc_xAxis(title = NULL) %>%
-				  # hc_yAxis(title = list(text = "Class Alpha Diversity")) %>%
-				  # hc_chart(type = input$type)						
-				
-				hc <- highchart()
-				hc <- hc_chart(hc, zoomType = "x", type = "column")
-				for(lvl in levels(hcDF$groupvar)) {
-				  hcDFloop <- list_parse(hcDF %>% filter(groupvar==lvl) %>% dplyr::select(y, groupvar = groupvar))
-				  hc <- hc_add_series(hc, data = hcDFloop, name = lvl)
-				}
-				hc <- hc_legend(hc, verticalAlign = "top")
-				hc <- hc_exporting(hc, enabled = TRUE)
-				hc <- hc_xAxis(hc, title = NULL)
-				hc <- hc_yAxis(hc, title = list(text = "OTU Level Alpha Diversity"))
-				if (input$type == "bar") {				
-					hc <- hc_chart(hc, type = "bar")
-				} else {
-					NULL
-				}
+				  hc_legend(verticalAlign = "top") %>% 
+				  hc_exporting(enabled = TRUE) %>% 
+				  # hc_title(text = "Class",
+						   # margin = 20, align = "left",
+						   # style = list(color = "#000000", useHTML = TRUE)) %>% 
+				  hc_xAxis(title = NULL) %>%
+				  hc_yAxis(title = list(text = "Class Alpha Diversity")) %>%
+				  hc_chart(type = input$type)		
+				  
 				if (input$theme != "default") {
 					theme <- switch(input$theme,
 							  null = hc_theme_null(),
@@ -824,8 +775,8 @@
 					hc <- hc %>% hc_add_theme(theme)		  
 				}
 				hc  
-
-
+				
+				
 			} else {
 				return(NULL)
 			}
@@ -933,32 +884,18 @@
 	output$ORDERadivHC_RENDER <- renderHighchart({
 		if(input$goADIV){
 			if("Order" %in% adivTAXA()){	
-				hcDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "Order")]])
-				colnames(hcDF)[which(colnames(hcDF) %in% "variable")[2]] <- "groupvar"
-				hcDF <- as_tibble(hcDF %>% mutate(y = value) %>% dplyr::select(variable, stat, groupvar, y))
-				# hc <- hchart(hcDF, "column", hcaes(x = variable, y = value, group = groupvar)) %>% 
+				phylumDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "Order")]])
+				colnames(phylumDF)[which(colnames(phylumDF) %in% "variable")[2]] <- "groupvar"
+				hc <- hchart(phylumDF, "column", hcaes(x = variable, y = value, group = groupvar)) %>% 
 
-				  # hc_legend(verticalAlign = "top") %>% 
-				  # hc_exporting(enabled = TRUE) %>% 
-				  # hc_xAxis(title = NULL) %>%
-				  # hc_yAxis(title = list(text = "Order Alpha Diversity")) %>%
-				  # hc_chart(type = input$type)					
-				
-				hc <- highchart()
-				hc <- hc_chart(hc, zoomType = "x", type = "column")
-				for(lvl in levels(hcDF$groupvar)) {
-				  hcDFloop <- list_parse(hcDF %>% filter(groupvar==lvl) %>% dplyr::select(y, groupvar = groupvar))
-				  hc <- hc_add_series(hc, data = hcDFloop, name = lvl)
-				}
-				hc <- hc_legend(hc, verticalAlign = "top")
-				hc <- hc_exporting(hc, enabled = TRUE)
-				hc <- hc_xAxis(hc, title = NULL)
-				hc <- hc_yAxis(hc, title = list(text = "OTU Level Alpha Diversity"))
-				if (input$type == "bar") {				
-					hc <- hc_chart(hc, type = "bar")
-				} else {
-					NULL
-				}
+				  hc_legend(verticalAlign = "top") %>% 
+				  hc_exporting(enabled = TRUE) %>% 
+				  # hc_title(text = "Order",
+						   # margin = 20, align = "left",
+						   # style = list(color = "#000000", useHTML = TRUE)) %>% 
+				  hc_xAxis(title = NULL) %>%
+				  hc_yAxis(title = list(text = "Order Alpha Diversity")) %>%
+				  hc_chart(type = input$type)	
 				  
 				if (input$theme != "default") {
 					theme <- switch(input$theme,
@@ -1075,32 +1012,18 @@
 	output$FAMILYadivHC_RENDER <- renderHighchart({
 		if(input$goADIV){
 			if("Family" %in% adivTAXA()){	
-				hcDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "Family")]])
-				colnames(hcDF)[which(colnames(hcDF) %in% "variable")[2]] <- "groupvar"
-				hcDF <- as_tibble(hcDF %>% mutate(y = value) %>% dplyr::select(variable, stat, groupvar, y))
-				# hc <- hchart(hcDF, "column", hcaes(x = variable, y = value, group = groupvar)) %>% 
+				phylumDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "Family")]])
+				colnames(phylumDF)[which(colnames(phylumDF) %in% "variable")[2]] <- "groupvar"
+				hc <- hchart(phylumDF, "column", hcaes(x = variable, y = value, group = groupvar)) %>% 
 
-				  # hc_legend(verticalAlign = "top") %>% 
-				  # hc_exporting(enabled = TRUE) %>% 
-				  # hc_xAxis(title = NULL) %>%
-				  # hc_yAxis(title = list(text = "Family Alpha Diversity")) %>%
-				  # hc_chart(type = input$type)					
-				
-				hc <- highchart()
-				hc <- hc_chart(hc, zoomType = "x", type = "column")
-				for(lvl in levels(hcDF$groupvar)) {
-				  hcDFloop <- list_parse(hcDF %>% filter(groupvar==lvl) %>% dplyr::select(y, groupvar = groupvar))
-				  hc <- hc_add_series(hc, data = hcDFloop, name = lvl)
-				}
-				hc <- hc_legend(hc, verticalAlign = "top")
-				hc <- hc_exporting(hc, enabled = TRUE)
-				hc <- hc_xAxis(hc, title = NULL)
-				hc <- hc_yAxis(hc, title = list(text = "OTU Level Alpha Diversity"))
-				if (input$type == "bar") {				
-					hc <- hc_chart(hc, type = "bar")
-				} else {
-					NULL
-				}
+				  hc_legend(verticalAlign = "top") %>% 
+				  hc_exporting(enabled = TRUE) %>% 
+				  # hc_title(text = "Family",
+						   # margin = 20, align = "left",
+						   # style = list(color = "#000000", useHTML = TRUE)) %>% 
+				  hc_xAxis(title = NULL) %>%
+				  hc_yAxis(title = list(text = "Family Alpha Diversity")) %>%
+				  hc_chart(type = input$type)	
 				  
 				if (input$theme != "default") {
 					theme <- switch(input$theme,
@@ -1217,33 +1140,20 @@
 	output$GENUSadivHC_RENDER <- renderHighchart({
 		if(input$goADIV){
 			if("Genus" %in% adivTAXA()){	
-				hcDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "Genus")]])
-				colnames(hcDF)[which(colnames(hcDF) %in% "variable")[2]] <- "groupvar"		
-				hcDF <- as_tibble(hcDF %>% mutate(y = value) %>% dplyr::select(variable, stat, groupvar, y))	
+				phylumDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "Genus")]])
+				colnames(phylumDF)[which(colnames(phylumDF) %in% "variable")[2]] <- "groupvar"
 				
-				# hc<- hchart(hcDF, "column", hcaes(x = variable, y = value, group = groupvar)) %>% 
+				
+				hc<- hchart(phylumDF, "column", hcaes(x = variable, y = value, group = groupvar)) %>% 
 
-				  # hc_legend(verticalAlign = "top") %>% 
-				  # hc_exporting(enabled = TRUE) %>% 
-				  # hc_xAxis(title = NULL) %>%
-				  # hc_yAxis(title = list(text = "Genus Alpha Diversity")) %>%
-				  # hc_chart(type = input$type)					
-				
-				hc <- highchart()
-				hc <- hc_chart(hc, zoomType = "x", type = "column")
-				for(lvl in levels(hcDF$groupvar)) {
-				  hcDFloop <- list_parse(hcDF %>% filter(groupvar==lvl) %>% dplyr::select(y, groupvar = groupvar))
-				  hc <- hc_add_series(hc, data = hcDFloop, name = lvl)
-				}
-				hc <- hc_legend(hc, verticalAlign = "top")
-				hc <- hc_exporting(hc, enabled = TRUE)
-				hc <- hc_xAxis(hc, title = NULL)
-				hc <- hc_yAxis(hc, title = list(text = "OTU Level Alpha Diversity"))
-				if (input$type == "bar") {				
-					hc <- hc_chart(hc, type = "bar")
-				} else {
-					NULL
-				}
+				  hc_legend(verticalAlign = "top") %>% 
+				  hc_exporting(enabled = TRUE) %>% 
+				  # hc_title(text = "Genus",
+						   # margin = 20, align = "left",
+						   # style = list(color = "#000000", useHTML = TRUE)) %>% 
+				  hc_xAxis(title = NULL) %>%
+				  hc_yAxis(title = list(text = "Genus Alpha Diversity")) %>%
+				  hc_chart(type = input$type)	
 				  
 				if (input$theme != "default") {
 					theme <- switch(input$theme,
@@ -1360,33 +1270,20 @@
 	output$OTUadivHC_RENDER <- renderHighchart({
 		if(input$goADIV){
 			if("OTU" %in% adivTAXA()){	
-				hcDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "OTU")]])
-				colnames(hcDF)[which(colnames(hcDF) %in% "variable")[2]] <- "groupvar"		
-				hcDF <- as_tibble(hcDF %>% mutate(y = value) %>% dplyr::select(variable, stat, groupvar, y))	
+				phylumDF <- melt(phylo_TAX_aDIV_plotDAT()[[which(names(phylo_TAX_aDIV_plotDAT()) %in% "OTU")]])
+				colnames(phylumDF)[which(colnames(phylumDF) %in% "variable")[2]] <- "groupvar"
 				
-				# hc<- hchart(hcDF, "column", hcaes(x = variable, y = value, group = groupvar)) %>% 
+				
+				hc<- hchart(phylumDF, "column", hcaes(x = variable, y = value, group = groupvar)) %>% 
 
-				  # hc_legend(verticalAlign = "top") %>% 
-				  # hc_exporting(enabled = TRUE) %>% 
-				  # hc_xAxis(title = NULL) %>%
-				  # hc_yAxis(title = list(text = "OTU Level Alpha Diversity")) %>%
-				  # hc_chart(type = input$type)					
-				
-				hc <- highchart()
-				hc <- hc_chart(hc, zoomType = "x", type = "column")
-				for(lvl in levels(hcDF$groupvar)) {
-				  hcDFloop <- list_parse(hcDF %>% filter(groupvar==lvl) %>% dplyr::select(y, groupvar = groupvar))
-				  hc <- hc_add_series(hc, data = hcDFloop, name = lvl)
-				}
-				hc <- hc_legend(hc, verticalAlign = "top")
-				hc <- hc_exporting(hc, enabled = TRUE)
-				hc <- hc_xAxis(hc, title = NULL)
-				hc <- hc_yAxis(hc, title = list(text = "OTU Level Alpha Diversity"))
-				if (input$type == "bar") {				
-					hc <- hc_chart(hc, type = "bar")
-				} else {
-					NULL
-				}
+				  hc_legend(verticalAlign = "top") %>% 
+				  hc_exporting(enabled = TRUE) %>% 
+				  # hc_title(text = "OTU",
+						   # margin = 20, align = "left",
+						   # style = list(color = "#000000", useHTML = TRUE)) %>% 
+				  hc_xAxis(title = NULL) %>%
+				  hc_yAxis(title = list(text = "OTU Level Alpha Diversity")) %>%
+				  hc_chart(type = input$type)	
 				  
 				if (input$theme != "default") {
 					theme <- switch(input$theme,

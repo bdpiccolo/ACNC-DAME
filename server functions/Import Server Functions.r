@@ -92,9 +92,6 @@
 		}
 	})	
 
-	# output$importTEXT <- renderPrint({
-	# })	
-	
 	######################################################################
 	## Import Example .CSV Metadata file
 	######################################################################
@@ -533,20 +530,20 @@
 					singleLEVELS <- list(levels(meta1FL))
 					# Get name of remaining column
 					# Metacolumns <- colnames(meta)
-					Metacolumns <- colnames(meta)[sapply(meta, nlevels) != nrow(meta)]
+					Metacolumns <- colnames(metaALLROWS)[sapply(metaALLROWS, nlevels) != 1]
 					# update name of list with name of remaining column
-					names(singleLEVELS) <- colnames(meta)[sapply(meta, nlevels) != nrow(meta)]
-					# print("single columns after nrow filter")					
+					names(singleLEVELS) <- colnames(metaALLROWS)[sapply(metaALLROWS, nlevels) != 1]
+					# print("single columns after nrow filter")			
 				} else {		
 				
 					
 					# Get names of remaining columns 
-					# Metacolumns <- colnames(meta)
+					Metacolumns <- colnames(meta1FL)
 					# Metacolumns <- colnames(meta)[sapply(meta, nlevels) != nrow(meta)]
-					Metacolumns <- colnames(meta1FL)[sapply(meta1FL, nlevels) != nrow(meta1FL)]
+					# Metacolumns <- colnames(meta1FL)[sapply(meta1FL, nlevels) != nrow(meta1FL)]
 					# Get factor levesl across all columns and turn it into a list
-					singleLEVELS <- lapply(meta1FL[,sapply(meta1FL, nlevels) != nrow(meta1FL)], levels)
-					# print("multiple columns after key and nrow filter")
+					singleLEVELS <- lapply(meta1FL, levels)
+					# list(print("multiple columns after key and nrow filter"),meta1FL)	
 				}
 			}
 			
@@ -781,6 +778,13 @@
 
 	})
 
+	output$importTEXT <- renderPrint({
+		lapply(metaselections()$Groups, function(x) {
+			metaselections()$Levels[[x]]
+		})
+
+	})	
+	
 	######################################################################
 	## Render read filter text
 	######################################################################		
