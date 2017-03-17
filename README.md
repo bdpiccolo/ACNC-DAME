@@ -86,6 +86,7 @@ This web application was built using [Shiny](http://shiny.rstudio.com/) by [RStu
 
   [Kartik Shankar](http://acnc.uamsweb.com/home/faculty-listing/kartik-shankar/)  
   [Sree Chintapalli](http://acnc.uamsweb.com/home/faculty-listing/sree-v-chintapalli/)  
+  Umesh Wankhade
 
 The following R packages were utilized in no particular order of importance:
 
