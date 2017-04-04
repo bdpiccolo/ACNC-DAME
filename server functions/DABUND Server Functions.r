@@ -809,6 +809,7 @@
 					nbmord						
 				})
 				## Bind list into a single data frame, remove unused columns, set row names, and return
+				DF <- do.call("rbind", LISTord)
 				FinalDF <- DF[,!(colnames(DF) %in% c("Class", "Order", "Family", "Genus"))]
 				rownames(FinalDF) <- c(1:nrow(FinalDF))
 				FinalDF
