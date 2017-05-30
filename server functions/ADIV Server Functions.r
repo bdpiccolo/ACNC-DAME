@@ -509,7 +509,12 @@
 			})
 		)	
 	})		
-	
+			
+	# output$adivTEXT <- renderPrint({
+		
+		
+	# })	
+
 	########################################################################
 	## Set ANOVA data for DataTable
 	########################################################################						
@@ -563,12 +568,22 @@
 					MeanW2[[i]] <- rep(NA, nrow(MeanW))
 					MeanW2
 				}
+				## If spaces in factor levels
+				if(grepl(" ", yvars)){
+					## Remove spaces from list names
+					names(MeanW2) <- gsub(" ", "", names(MeanW2))
+					## Remove spaces from factor name vector
+					yvarsnopace <- gsub(" ", "", yvars)
+				} else {
+					yvarsnopace <- yvars
+				}
+								
 				## Set new list elements with experimental group names
-				names(MeanW2)[(1:length(yvars)) + ncol(MeanW)] <- yvars
+				names(MeanW2)[(1:length(yvars)) + ncol(MeanW)] <- yvarsnopace
 				## Coerce list back into a data frame
 				MeanFINAL <- as.data.frame(MeanW2)
 				## For each experimental group
-				for(i in yvars) {
+				for(i in yvarsnopace) {
 					## Determine the data frame column positions needed to extract mean and dispersion data
 					## Based on groups
 					colsLOGIC <- captureCN(colnames(MeanFINAL), i)
@@ -585,10 +600,20 @@
 				}
 				## Subset variable and experimental group columns presented as 'MEAN (SEM)'
 				## Leave MEAN and SEM data behind...
-				MF <- MeanFINAL[,c("variable", yvars)]
+				MF <- MeanFINAL[,c("variable", yvarsnopace)]
+				# MF
+				## If spaces in factor levels
+				if(grepl(" ", yvars)){
+					# Replace column names without spaces to original
+					colnames(MF)[!(colnames(MF) %in% "variable")] <- yvars
+				} else {
+					NULL
+				}
 				## merge mean/sem data with anova return by TAXA
 				MFaov <- merge(MF, phylo_TAX_aDIVaovDOWN()[[x]], by="variable")
 				MFaov
+				
+				
 			})
 		})	
 		## set names and return
@@ -652,10 +677,6 @@
 		}				
 	})
 			
-			
-	output$adivTEXT <- renderPrint({
-		adivTAXA()
-	})	
 
 	########################################################################		
 	## Create DataTable object with Phylum alpha diversity data

@@ -48,9 +48,6 @@ taxaconvert <- function(phyloO, label_UNK=FALSE) {
 	taxT
 }
 
-taxaL <- c("Phylum", "Class","Order","Family","Genus")
-adivL <- c("Observed", "Chao1", "ACE", "Shannon", "Simpson", "InvSimpson", "Fisher")
-
 phylotreeDIST <- c("Unweighted Unifrac" = "unifrac", "Weighted Unifrac"	= "wunifrac", "DPCOA" = "dpcoa")
 Dissimilarity <- c("Bray-Curtis" = "bray", "Jaccard" = "jaccard", "Jensen-Shannon" = "jsd", "Mountford" = "mountford", "Gower" = "gower",
 	"Morisita" = "morisita", "Horn" = "horn", "Kulczynski" = "kulczynski", "Horn" = "horn", "Raup" = "raup", "Binomial" = "binomial", 

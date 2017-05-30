@@ -715,6 +715,74 @@
 		}
 	})
 	
+	IMPORTrawdata <- reactive({
+		req(PHYLOSEQ())	
+			pdata <- PHYLOSEQ()
+			pdglom <- tax_glom(pdata, input$PHYLOSEQtabletaxa)
+			if(input$IMPORTrawdatadowntype == "PA") {
+				pdglomtransf <- transform_sample_counts(pdglom, function(x) 100 * (x / sum(x)))
+			} else {
+				pdglomtransf <- pdglom
+			}
+			otu <- otu_table(pdglomtransf)@.Data
+			taxa <- tax_table(pdglomtransf)@.Data
+
+			data.frame(taxa, otu)
+	})
+
+	# output$importTEXT <- renderPrint({
+		
+	# })	
+		
+	######################################################################
+	## Render raw data download
+	######################################################################			
+	output$PHYLOSEQrawdatadown <- renderUI({
+		req(PHYLOSEQ())	
+		list(
+			a(id = "toggleIMPORTraw_DataDownload", "Show/hide Differential Abundance Downloading Options", href = "#"),
+			p(), 
+			shinyjs::hidden(
+				div(id = "IMPORTraw_DataDownload",	
+					
+					textInput("IMPORTraw_Datafilename", label = HTML("<p id=\"filterheader\"><strong>Choose File Name</strong></p>"), 
+						value = paste(input$PHYLOSEQtabletaxa, "Table")
+					),
+					radioButtons("IMPORTrawdatadowntype", label = "Select Data Type",
+								choices = list("Total Reads" = "reads", "Percent Abundance" = "PA"), selected = "reads"
+							),
+					tags$p(
+						tags$a(id = "IMPORTrawData_download", href = "#", class = "shiny-download-link", target="_blank",
+							style="color: #fff; background-color: #2c2cad; border-color: #000; padding-top: 8px;
+							padding-right: 8px; padding-bottom: 8px; padding-left: 8px; border-radius: 5px;",
+							HTML("<span class='glyphicon glyphicon-save' aria-hidden='true'></span> Download Raw Data")
+						)
+					)	
+				)
+			)
+		)
+	})
+
+	########################################################################
+	## Toggle hidden RAW data download options
+	########################################################################	
+	shinyjs::onclick("toggleIMPORTraw_DataDownload",
+        shinyjs::toggle(id = "IMPORTraw_DataDownload", anim = TRUE)
+	)  	
+
+	########################################################################
+	## Download RAW data download options
+	########################################################################	
+	output$IMPORTrawData_download <- downloadHandler(
+		
+		filename = function() { 
+			paste(input$IMPORTraw_Datafilename, '.csv', sep='') 
+		},
+		content = function(file) {
+			write.csv(IMPORTrawdata(), file)
+		}
+	)
+	
 	######################################################################
 	## Render phyloseq description text
 	######################################################################		
@@ -723,18 +791,6 @@
 		HTML("
 				<h3>Original Data Description</h3>
 
-			"
-		)
-	})
-
-	######################################################################
-	## Render import text
-	######################################################################	
-	output$PHYLOSEQtabledescTEXT <- renderUI({
-		req(PHYLOSEQ())
-		HTML("
-			<h4><strong><em>Description of Imported Data.</em></strong></h4>
-			<br></br>
 			"
 		)
 	})
@@ -764,6 +820,25 @@
 		)
 		
 	})
+
+	######################################################################
+	## Render filter header text
+	######################################################################	
+	output$PHYLOSEQidTEXT <- renderUI({
+		req(PHYLOSEQ())
+		ids <- rownames(sample_data(PHYLOSEQ()))
+		list(
+			HTML("
+				<p id=\"filterheader\"><strong>Choose Sample ID(s) to Filter</strong></p>
+				<p>Unselect checked boxes to remove group</p>
+				"
+			), 
+			checkboxGroupInput(inputId="PHYLOSEQids",
+				label = "", choices = ids, inline=TRUE,
+				selected = ids)
+		
+		)
+	})
 	
 	######################################################################
 	## Render selection boxes for metadata
@@ -778,13 +853,6 @@
 
 	})
 
-	output$importTEXT <- renderPrint({
-		lapply(metaselections()$Groups, function(x) {
-			metaselections()$Levels[[x]]
-		})
-
-	})	
-	
 	######################################################################
 	## Render read filter text
 	######################################################################		
@@ -865,7 +933,7 @@
 			style="color: #fff; background-color: #2c2cad; border-color: #000")
 
 	})	
-
+	
 	######################################################################
 	## Create final phyloseq object
 	######################################################################	
@@ -903,10 +971,12 @@
 				filteredIDs <- rownames(metaDAT)
 				# Filter OTU object and data into phyloseq otu_table class
 				OTU <- phyloseq::otu_table(BIOM_OTU_import[,colnames(BIOM_OTU_import) %in% filteredIDs], taxa_are_rows = TRUE)
+				OTU <- OTU[,colnames(OTU) %in% input$PHYLOSEQids]
 				# Convert taxa data into phyloseq taxonomyTable class
 				TAXA <- phyloseq::tax_table(TAXA_import)
 				# Convert filtered Sample Metadata data frame into phyloseq sample_data class
 				SAMP <- phyloseq::sample_data(metaDAT)	
+				SAMP <- SAMP[rownames(SAMP) %in% input$PHYLOSEQids,]
 				## If no tree data
 				if(is.null(TRE_DAT())){	
 					## create phyloseq data
@@ -1028,7 +1098,71 @@
 			)	
 		}
 	})
+	
+	IMPORTfiltereddata <- reactive({
+		req(phyloseqFINAL())	
+			filtpdata <- phyloseqFINAL()
+			filtpdglom <- tax_glom(filtpdata, input$PHYLOSEQtable2taxa)
+			if(input$IMPORTFILTdatadowntype == "PA") {
+				filtpdglomtransf <- transform_sample_counts(filtpdglom, function(x) 100 * (x / sum(x)))
+			} else {
+				filtpdglomtransf <- filtpdglom
+			}
+			filtotu <- otu_table(filtpdglomtransf)@.Data
+			filttaxa <- tax_table(filtpdglomtransf)@.Data
 
+			data.frame(filttaxa, filtotu)
+	})
+		
+	######################################################################
+	## Render FILTERED data download
+	######################################################################			
+	output$PHYLOSEQFILTdatadown <- renderUI({
+		req(PHYLOSEQ())	
+		list(
+			a(id = "toggleIMPORTFILT_DataDownload", "Show/hide Differential Abundance Downloading Options", href = "#"),
+			p(), 
+			shinyjs::hidden(
+				div(id = "IMPORTFILT_DataDownload",	
+					
+					textInput("IMPORTFILT_Datafilename", label = HTML("<p id=\"filterheader\"><strong>Choose File Name</strong></p>"), 
+						value = paste(input$PHYLOSEQtable2taxa, "Table")
+					),
+					radioButtons("IMPORTFILTdatadowntype", label = "Select Data Type",
+								choices = list("Total Reads" = "reads", "Percent Abundance" = "PA"), selected = "reads"
+							),
+					tags$p(
+						tags$a(id = "IMPORTFILTData_download", href = "#", class = "shiny-download-link", target="_blank",
+							style="color: #fff; background-color: #2c2cad; border-color: #000; padding-top: 8px;
+							padding-right: 8px; padding-bottom: 8px; padding-left: 8px; border-radius: 5px;",
+							HTML("<span class='glyphicon glyphicon-save' aria-hidden='true'></span> Download FILTERED Data")
+						)
+					)	
+				)
+			)
+		)
+	})
+
+	########################################################################
+	## Toggle hidden FILTERED data download options
+	########################################################################	
+	shinyjs::onclick("toggleIMPORTFILT_DataDownload",
+        shinyjs::toggle(id = "IMPORTFILT_DataDownload", anim = TRUE)
+	)  	
+
+	########################################################################
+	## Download FILTERED data download options
+	########################################################################	
+	output$IMPORTFILTData_download <- downloadHandler(
+		
+		filename = function() { 
+			paste(input$IMPORTFILT_Datafilename, '.csv', sep='') 
+		},
+		content = function(file) {
+			write.csv(IMPORTfiltereddata(), file)
+		}
+	)
+	
 	######################################################################
 	## Create object with final data description	
 	######################################################################		
@@ -1158,3 +1292,131 @@
 		## Return a list with name of the final Experimental groups and their respective factor levels
 		list(Groups = Metacolumns, Levels=sdLEVELS)	
 	})
+
+	
+
+	######################################################################
+	## Render import text
+	######################################################################	
+	output$PHYLOSEQtabledescTEXT <- renderUI({
+		req(PHYLOSEQ())
+		list(
+			fluidPage(
+				column(12,
+					HTML("
+						<h4><strong><em>Description of Imported Data.</em></strong></h4>
+						<br></br>
+						"
+					)
+				)
+			)
+		)
+	})
+	
+	######################################################################
+	## Render raw data characteristics
+	######################################################################	
+	output$PHYLOSEQrawoutputRENDER <- renderUI({
+		req(PHYLOSEQ())
+		list(
+			fluidPage(
+				column(3,
+					uiOutput("PHYLOSEQtaxaselectTEXT"),
+					uiOutput("tableTAXAselection_RENDER"),
+					uiOutput("PHYLOSEQdesctitle"),
+					uiOutput("PHYLOSEQdescription"),
+					uiOutput("PHYLOSEQrawdatadown")
+				),
+				column(9,
+					DT::dataTableOutput("PHYLOSEQinitialdescRENDER")
+				)
+			),
+			hr()
+		)
+	})
+	
+	######################################################################
+	## Render filter options
+	######################################################################	
+	output$PHYLOSEQrawfilterRENDER <- renderUI({
+		req(PHYLOSEQ())
+		list(
+			fluidPage(
+				column(12,
+					uiOutput("PHYLOSEQfilterinstructionTEXT")
+				)
+			),
+			fluidPage(
+				column(12, 
+					uiOutput("PHYLOSEQidTEXT")
+				)
+			),
+			br(),
+			fluidPage(
+				column(3,
+					uiOutput("PHYLOSEQmetaTEXT"),
+					uiOutput("metaselection_RENDER")
+				),
+				column(3,
+					uiOutput("PHYLOSEQminotuTEXT"),
+					uiOutput("minimumOTU_RENDER")
+				),
+				column(3,
+					uiOutput("PHYLOSEQpccutTEXT"),
+					uiOutput("pccut_RENDER")
+				),
+				column(3,
+					uiOutput("PHYLOSEQdomainTEXT"),
+					uiOutput("domain_RENDER")
+				)
+			),
+			hr(),
+			fluidPage(
+				column(3,
+					uiOutput("finalizeimportBUTTON_RENDER")
+							
+				)
+			), 
+			hr()
+		)
+	})
+
+		
+	######################################################################
+	## Render filtered data charactersitics
+	######################################################################	
+	output$PHYLOSEQfiltereddataRENDER <- renderUI({
+		req(phyloseqFINAL())
+		list(
+			fluidPage(
+				column(3,
+					uiOutput("PHYLOSEQtaxaselect2TEXT"),
+					uiOutput("tableTAXAselection2_RENDER"),
+					uiOutput("PHYLOSEQFINALdesctitle"),
+					uiOutput("PHYLOSEQFINALdescription"),
+					uiOutput("PHYLOSEQFILTdatadown")
+				),
+				column(9,
+					DT::dataTableOutput("PHYLOSEQFINALinitialdescRENDER")
+						
+				)
+			), 
+			hr()
+		)
+	})
+
+			
+	######################################################################
+	## Render data download options
+	######################################################################	
+	# output$PHYLOSEQdatadownloandRENDER <- renderUI({
+		# req(PHYLOSEQ())
+		# list(
+			
+		# )
+	# })
+
+	
+	
+	
+	

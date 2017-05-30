@@ -49,74 +49,20 @@ importTAB <- function() {
 
 					# fluidPage(
 						# column(12,
-					# verbatimTextOutput("importTEXT")
+							# verbatimTextOutput("importTEXT")
 						# )
 					# ),
 
-					fluidPage(
-						column(12,
-							uiOutput("PHYLOSEQtabledescTEXT")
-						)
-					),
+					
+					uiOutput("PHYLOSEQtabledescTEXT"),
+					uiOutput("PHYLOSEQrawoutputRENDER"),
+					uiOutput("PHYLOSEQrawfilterRENDER"),
+					uiOutput("PHYLOSEQfiltereddataRENDER")
 
-					fluidPage(
-						column(3,
-							uiOutput("PHYLOSEQtaxaselectTEXT"),
-							uiOutput("tableTAXAselection_RENDER"),
-							uiOutput("PHYLOSEQdesctitle"),
-							uiOutput("PHYLOSEQdescription")
-						),
-						column(9,
-							DT::dataTableOutput("PHYLOSEQinitialdescRENDER")
-						)
-					),
-					hr(),
+					
 
-					fluidPage(
-						column(12,
-							uiOutput("PHYLOSEQfilterinstructionTEXT")
-						)
-					),
-					fluidPage(
-						column(3,
-							uiOutput("PHYLOSEQmetaTEXT"),
-							uiOutput("metaselection_RENDER")
-						),
-						column(3,
-							uiOutput("PHYLOSEQminotuTEXT"),
-							uiOutput("minimumOTU_RENDER")
-						),
-						column(3,
-							uiOutput("PHYLOSEQpccutTEXT"),
-							uiOutput("pccut_RENDER")
-						),
-						column(3,
-							uiOutput("PHYLOSEQdomainTEXT"),
-							uiOutput("domain_RENDER")
-						)
-						# ,
-						# verbatimTextOutput("importTEXT")
-					),
-					hr(),
-					fluidPage(
-						column(3,
-							uiOutput("finalizeimportBUTTON_RENDER")
-							
-						)
-					), 
-					hr(),
-					fluidPage(
-						column(3,
-							uiOutput("PHYLOSEQtaxaselect2TEXT"),
-							uiOutput("tableTAXAselection2_RENDER"),
-							uiOutput("PHYLOSEQFINALdesctitle"),
-							uiOutput("PHYLOSEQFINALdescription")
-						),
-						column(9,
-							DT::dataTableOutput("PHYLOSEQFINALinitialdescRENDER")
-						
-						)
-					)
+
+					
 				)
 			)
 
@@ -131,6 +77,12 @@ adivTAB <- function() {
 						<h4><strong><em>Select the desired inputs and press the \"Finalize &#945;-Diversity\" button.</em></strong></h4>
 						"
 					),
+					# fluidPage(
+						# column(12,
+							# verbatimTextOutput("adivTEXT")						
+						# )
+					# ),					
+					
 					fluidPage(
 						column(3,
 							HTML("
@@ -166,7 +118,6 @@ adivTAB <- function() {
 							
 						)
 					),
-					# verbatimTextOutput("adivTEXT"),
 					uiOutput("ADIVdownloadRENDER"),
 					
 					uiOutput("ADIVphylumgraphicsRENDER"),
