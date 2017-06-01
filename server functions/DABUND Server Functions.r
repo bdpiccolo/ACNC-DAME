@@ -130,7 +130,7 @@
 		if(input$goDABUND){
 			isolate({
 				list(
-					column(3,
+					# column(3,
 						HTML("
 							<h4><strong>Select Group(s) for Differential Abundance Analyses:</strong></h4>
 							"
@@ -138,7 +138,7 @@
 
 						selectInput(inputId="dabundGROUPselect", label="", choices=CompGroups()$Groups, 
 							selected=CompGroups()$Groups[1])
-					)
+					# )
 				)
 			})
 		} else {
@@ -174,16 +174,19 @@
 				if(is.null(daTAXALEVEL())) {
 					NULL
 				} else {
-					list(
-						column(3,
-							HTML("
-								<h4><strong>Select Pairwise Comparison for Differential Abundance Analyses:</strong></h4>
-								"
-							),	
-							selectInput(inputId="dabundPAIRCOMPselect", label="", choices=DABUNDpaircomp(), 
-								selected=DABUNDpaircomp()[1])
+					if(input$dabundNBMtest == "Wald") {
+						list(
+								HTML("
+									<h4><strong>Select Pairwise Comparison for Differential Abundance Analyses:</strong></h4>
+									"
+								),	
+								selectInput(inputId="dabundPAIRCOMPselect", label="", choices=DABUNDpaircomp(), 
+									selected=DABUNDpaircomp()[1])
+						
 						)
-					)
+					} else {
+						NULL
+					}
 				} 	
 	})
 
@@ -230,34 +233,56 @@
 				deseqob_GM = apply(counts(deseqob), 1, gm_mean)
 				## Estimate size factors
 				deseqobESF = estimateSizeFactors(deseqob, geoMeans = deseqob_GM)
-				## Calculate Negative Binomial GLM fitting with LRT
-				deseqob_NB = DESeq(deseqobESF, fitType="local", test="LRT",reduced=~1)
-				## Extract results from DESeq analysis across all pairwise comparisons
-				NBM_paircomps <- lapply(1:ncol(DABUNDpaircompNBM()), function(pair) {
-					## Isolate pairs and then set vector for comparison extraction
-					Cpair1 <- DABUNDpaircompNBM()[1,pair]
-					Cpair2 <- DABUNDpaircompNBM()[2,pair]				
-					NBMcontrasts <- c(input$dabundGROUPselect, Cpair1, Cpair2)
-					
+				
+				fullMODEL <- paste0("~ ", input$dabundGROUPselect)
+				reducedMODEL <- "~ 1"
+				
+				if(input$dabundNBMtest == "Wald"){
+					## Calculate Negative Binomial GLM fitting with LRT
+					# deseqob_NB = DESeq(deseqobESF, fitType="local", test="LRT",reduced=~1)
+					## Calculate Negative Binomial GLM fitting with Wald Test
+					deseqob_NB <- DESeq(deseqobESF, fitType="local", test=input$dabundNBMtest)
+					## Extract results from DESeq analysis across all pairwise comparisons
+					NBM_paircomps <- lapply(1:ncol(DABUNDpaircompNBM()), function(pair) {
+						## Isolate pairs and then set vector for comparison extraction
+						Cpair1 <- DABUNDpaircompNBM()[1,pair]
+						Cpair2 <- DABUNDpaircompNBM()[2,pair]				
+						NBMcontrasts <- c(input$dabundGROUPselect, Cpair1, Cpair2)
+						
+						## Extract comparison from DESeq object
+						deseqob_pairres <- results(deseqob_NB, contrast=NBMcontrasts, test="Wald")
+						## Bind DESeq results and Taxonomic data into data frame
+						deseqob_pairresDF <- cbind(as(deseqob_pairres, "data.frame"), as(tax_table(pob)[rownames(deseqob_pairres), ], "matrix"))
+						## Import OTUs into 'Species' column, change column name to 'OTU', and return
+						deseqob_pairresDF$Species <- rownames(deseqob_pairresDF)
+						colnames(deseqob_pairresDF)[which(colnames(deseqob_pairresDF) %in% "Species")] <- "OTU"
+						deseqob_pairresDF
+					})
+					## Set list element names and return
+					names(NBM_paircomps) <- DABUNDpaircomp()
+					NBM_paircomps
+				} else {
+					# deseqob_NB <- DESeq(deseqobESF, test=input$dabundNBMtest, fitType="local", full=as.formula(fullMODEL), reduced=as.formula(reducedMODEL))
+					deseqob_NB = DESeq(deseqobESF, fitType="local", test="LRT",full=as.formula(fullMODEL), reduced=as.formula(reducedMODEL))
 					## Extract comparison from DESeq object
-					deseqob_pairres <- results(deseqob_NB, contrast=NBMcontrasts, test="Wald")
+					deseqob_pairres <- results(deseqob_NB)
 					## Bind DESeq results and Taxonomic data into data frame
 					deseqob_pairresDF <- cbind(as(deseqob_pairres, "data.frame"), as(tax_table(pob)[rownames(deseqob_pairres), ], "matrix"))
 					## Import OTUs into 'Species' column, change column name to 'OTU', and return
 					deseqob_pairresDF$Species <- rownames(deseqob_pairresDF)
 					colnames(deseqob_pairresDF)[which(colnames(deseqob_pairresDF) %in% "Species")] <- "OTU"
-					deseqob_pairresDF
-				})
-				## Set list element names and return
-				names(NBM_paircomps) <- DABUNDpaircomp()
-				NBM_paircomps
+					NBM_paircomps <- deseqob_pairresDF
+					NBM_paircomps
+					
+					NBM_paircomps
+				}
 			})
 		})
 		## Set list element names and return
 		names(deseq2ob) <- DABUNDtaxa()
 		deseq2ob
 	})	
-
+	
 	########################################################################
 	## Create DataTable object with Phylum NBM data
 	########################################################################	
@@ -268,8 +293,13 @@
 			## If phylum TAXA is selected run:
 			if("Phylum" %in% names(dabundNBM())) {
 				## Extract TAXA and remove relevant columns
-				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Phylum")]][[input$dabundPAIRCOMPselect]]
-				t1DF <- t1[,c("OTU","Phylum", "baseMean", "log2FoldChange", "pvalue", "padj")]
+				if(input$dabundNBMtest == "Wald"){
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Phylum")]][[input$dabundPAIRCOMPselect]]
+					t1DF <- t1[,c("OTU","Phylum", "baseMean", "log2FoldChange", "pvalue", "padj")]
+				} else {
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Phylum")]]
+					t1DF <- t1[,c("OTU","Phylum", "baseMean", "pvalue", "padj")]					
+				}
 				## Remove excess characters from OTU labels and reset into DF
 				OTU <- as.character(t1DF$OTU)
 				OTU <- gsub("New.CleanUp.ReferenceOTU", "", OTU)
@@ -283,29 +313,54 @@
 				t1DF[,!(colnames(t1DF) %in% c("OTU","Phylum"))] <- 
 					apply(t1DF[,!(colnames(t1DF) %in% c("OTU","Phylum"))], 2, as.numeric)	
 				## Create DataTable
-				datatable(t1DF, extensions='Buttons', rownames = FALSE,
-						container = htmltools::withTags(table(
-							class = 'display',
-								thead(
-								tr(
-									th(colspan = 1, 'ID'),
-									th(colspan = 1, 'Phylum'),
-									th(colspan = 1, 'Base Mean'),
-									th(colspan = 1, 'Log2 Fold Change'),
-									th(colspan = 1, 'P'),
-									th(colspan = 1, 'P-adjusted')
+				if(input$dabundNBMtest == "Wald"){				
+					datatable(t1DF, extensions='Buttons', rownames = FALSE,
+							container = htmltools::withTags(table(
+								class = 'display',
+									thead(
+									tr(
+										th(colspan = 1, 'ID'),
+										th(colspan = 1, 'Phylum'),
+										th(colspan = 1, 'Base Mean'),
+										th(colspan = 1, 'Log2 Fold Change'),
+										th(colspan = 1, 'P'),
+										th(colspan = 1, 'P-adjusted')
+									)
 								)
 							)
+						),
+							options = list(
+								dom = 'lf<"floatright"B>rtip',
+								buttons = c('excel', 'pdf', 'csv'),
+								searching = TRUE,
+								pageLength = 5,
+								lengthMenu = c(5, nrow(t1DF))
+							)
+						) 
+				} else {		
+					datatable(t1DF, extensions='Buttons', rownames = FALSE,
+							container = htmltools::withTags(table(
+								class = 'display',
+									thead(
+									tr(
+										th(colspan = 1, 'ID'),
+										th(colspan = 1, 'Phylum'),
+										th(colspan = 1, 'Base Mean'),
+										th(colspan = 1, 'P'),
+										th(colspan = 1, 'P-adjusted')
+									)
+								)
+							)
+						),
+							options = list(
+								dom = 'lf<"floatright"B>rtip',
+								buttons = c('excel', 'pdf', 'csv'),
+								searching = TRUE,
+								pageLength = 5,
+								lengthMenu = c(5, nrow(t1DF))
+							)
 						)
-					),
-						options = list(
-							dom = 'lf<"floatright"B>rtip',
-							buttons = c('excel', 'pdf', 'csv'),
-							searching = TRUE,
-							pageLength = 5,
-							lengthMenu = c(5, nrow(t1DF))
-						)
-					) 
+					}
 			} else {
 				NULL
 			}
@@ -322,8 +377,15 @@
 			if("Class" %in% names(dabundNBM())) {
 			## If class TAXA is selected run:
 				## Extract TAXA and remove relevant columns
-				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Class")]][[input$dabundPAIRCOMPselect]]
-				t1DF <- t1[,c("OTU","Phylum", "Class", "baseMean", "log2FoldChange", "pvalue", "padj")]
+				# t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Class")]][[input$dabundPAIRCOMPselect]]
+				# t1DF <- t1[,c("OTU","Phylum", "Class", "baseMean", "log2FoldChange", "pvalue", "padj")]
+				if(input$dabundNBMtest == "Wald"){
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Class")]][[input$dabundPAIRCOMPselect]]
+					t1DF <- t1[,c("OTU","Phylum","Class", "baseMean", "log2FoldChange", "pvalue", "padj")]
+				} else {
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Class")]]
+					t1DF <- t1[,c("OTU","Phylum","Class", "baseMean", "pvalue", "padj")]					
+				}				
 				## Remove excess characters from OTU labels and reset into DF
 				OTU <- as.character(t1DF$OTU)
 				OTU <- gsub("New.CleanUp.ReferenceOTU", "", OTU)
@@ -338,30 +400,56 @@
 				t1DF[,!(colnames(t1DF) %in% c("OTU","Phylum","Class"))] <- 
 					apply(t1DF[,!(colnames(t1DF) %in% c("OTU","Phylum","Class"))], 2, as.numeric)
 				## Create DataTable	
-				datatable(t1DF, extensions='Buttons', rownames = FALSE,
-						container = htmltools::withTags(table(
-							class = 'display',
-								thead(
-								tr(
-									th(colspan = 1, 'ID'),
-									th(colspan = 1, 'Phylum'),
-									th(colspan = 1, 'Class'),
-									th(colspan = 1, 'Base Mean'),
-									th(colspan = 1, 'Log2 Fold Change'),
-									th(colspan = 1, 'P'),
-									th(colspan = 1, 'P-adjusted')
+				if(input$dabundNBMtest == "Wald"){		
+					datatable(t1DF, extensions='Buttons', rownames = FALSE,
+							container = htmltools::withTags(table(
+								class = 'display',
+									thead(
+									tr(
+										th(colspan = 1, 'ID'),
+										th(colspan = 1, 'Phylum'),
+										th(colspan = 1, 'Class'),
+										th(colspan = 1, 'Base Mean'),
+										th(colspan = 1, 'Log2 Fold Change'),
+										th(colspan = 1, 'P'),
+										th(colspan = 1, 'P-adjusted')
+									)
 								)
 							)
+						),
+							options = list(
+								dom = 'lf<"floatright"B>rtip',
+								buttons = c('excel', 'pdf', 'csv'),
+								searching = TRUE,
+								pageLength = 5,
+								lengthMenu = c(5, nrow(t1DF))
+							)
 						)
-					),
-						options = list(
-							dom = 'lf<"floatright"B>rtip',
-							buttons = c('excel', 'pdf', 'csv'),
-							searching = TRUE,
-							pageLength = 5,
-							lengthMenu = c(5, nrow(t1DF))
+				} else {		
+					datatable(t1DF, extensions='Buttons', rownames = FALSE,
+							container = htmltools::withTags(table(
+								class = 'display',
+									thead(
+									tr(
+										th(colspan = 1, 'ID'),
+										th(colspan = 1, 'Phylum'),
+										th(colspan = 1, 'Class'),
+										th(colspan = 1, 'Base Mean'),
+										th(colspan = 1, 'P'),
+										th(colspan = 1, 'P-adjusted')
+									)
+								)
+							)
+						),
+							options = list(
+								dom = 'lf<"floatright"B>rtip',
+								buttons = c('excel', 'pdf', 'csv'),
+								searching = TRUE,
+								pageLength = 5,
+								lengthMenu = c(5, nrow(t1DF))
+							)
 						)
-					) 
+				} 
 			} else {
 				NULL
 			}
@@ -378,8 +466,15 @@
 			## If order TAXA is selected run:
 			if("Order" %in% names(dabundNBM())) {
 				## Extract TAXA and remove relevant columns
-				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Order")]][[input$dabundPAIRCOMPselect]]
-				t1DF <- t1[,c("OTU","Class", "Order","baseMean", "log2FoldChange", "pvalue", "padj")]
+				# t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Order")]][[input$dabundPAIRCOMPselect]]
+				# t1DF <- t1[,c("OTU","Class", "Order","baseMean", "log2FoldChange", "pvalue", "padj")]
+				if(input$dabundNBMtest == "Wald"){
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Order")]][[input$dabundPAIRCOMPselect]]
+					t1DF <- t1[,c("OTU","Class","Order", "baseMean", "log2FoldChange", "pvalue", "padj")]
+				} else {
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Order")]]
+					t1DF <- t1[,c("OTU","Class","Order", "baseMean", "pvalue", "padj")]					
+				}				
 				## Remove excess characters from OTU labels and reset into DF
 				OTU <- as.character(t1DF$OTU)
 				OTU <- gsub("New.CleanUp.ReferenceOTU", "", OTU)
@@ -394,30 +489,56 @@
 				t1DF[,!(colnames(t1DF) %in% c("OTU","Class", "Order"))] <- 
 					apply(t1DF[,!(colnames(t1DF) %in% c("OTU","Phylum","Class", "Order"))], 2, as.numeric)	
 				## Create DataTable
-				datatable(t1DF, extensions='Buttons', rownames = FALSE,
-						container = htmltools::withTags(table(
-							class = 'display',
-								thead(
-								tr(
-									th(colspan = 1, 'ID'),
-									th(colspan = 1, 'Class'),
-									th(colspan = 1, 'Order'),
-									th(colspan = 1, 'Base Mean'),
-									th(colspan = 1, 'Log2 Fold Change'),
-									th(colspan = 1, 'P'),
-									th(colspan = 1, 'P-adjusted')
+				if(input$dabundNBMtest == "Wald"){		
+					datatable(t1DF, extensions='Buttons', rownames = FALSE,
+							container = htmltools::withTags(table(
+								class = 'display',
+									thead(
+									tr(
+										th(colspan = 1, 'ID'),
+										th(colspan = 1, 'Class'),
+										th(colspan = 1, 'Order'),
+										th(colspan = 1, 'Base Mean'),
+										th(colspan = 1, 'Log2 Fold Change'),
+										th(colspan = 1, 'P'),
+										th(colspan = 1, 'P-adjusted')
+									)
 								)
 							)
-						)
-					),
-						options = list(
-							dom = 'lf<"floatright"B>rtip',
-							buttons = c('excel', 'pdf', 'csv'),
-							searching = TRUE,
-							pageLength = 5,
-							lengthMenu = c(5, nrow(t1DF))
-						)
+						),
+							options = list(
+								dom = 'lf<"floatright"B>rtip',
+								buttons = c('excel', 'pdf', 'csv'),
+								searching = TRUE,
+								pageLength = 5,
+								lengthMenu = c(5, nrow(t1DF))
+							)
 					)
+				} else {		
+					datatable(t1DF, extensions='Buttons', rownames = FALSE,
+							container = htmltools::withTags(table(
+								class = 'display',
+									thead(
+									tr(
+										th(colspan = 1, 'ID'),
+										th(colspan = 1, 'Class'),
+										th(colspan = 1, 'Order'),
+										th(colspan = 1, 'Base Mean'),
+										th(colspan = 1, 'P'),
+										th(colspan = 1, 'P-adjusted')
+									)
+								)
+							)
+						),
+							options = list(
+								dom = 'lf<"floatright"B>rtip',
+								buttons = c('excel', 'pdf', 'csv'),
+								searching = TRUE,
+								pageLength = 5,
+								lengthMenu = c(5, nrow(t1DF))
+							)
+						)
+				} 
 			} else {
 				NULL
 			}
@@ -434,8 +555,15 @@
 			## If family TAXA is selected run:
 			if("Family" %in% names(dabundNBM())) {
 				## Extract TAXA and remove relevant columns
-				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Family")]][[input$dabundPAIRCOMPselect]]
-				t1DF <- t1[,c("OTU", "Order", "Family","baseMean", "log2FoldChange", "pvalue", "padj")]
+				# t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Family")]][[input$dabundPAIRCOMPselect]]
+				# t1DF <- t1[,c("OTU", "Order", "Family","baseMean", "log2FoldChange", "pvalue", "padj")]
+				if(input$dabundNBMtest == "Wald"){
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Family")]][[input$dabundPAIRCOMPselect]]
+					t1DF <- t1[,c("OTU","Order","Family", "baseMean", "log2FoldChange", "pvalue", "padj")]
+				} else {
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Family")]]
+					t1DF <- t1[,c("OTU","Order","Family", "baseMean", "pvalue", "padj")]					
+				}				
 				## Remove excess characters from OTU labels and reset into DF
 				OTU <- as.character(t1DF$OTU)
 				OTU <- gsub("New.CleanUp.ReferenceOTU", "", OTU)
@@ -450,30 +578,56 @@
 				t1DF[,!(colnames(t1DF) %in% c("OTU","Order", "Family"))] <- 
 					apply(t1DF[,!(colnames(t1DF) %in% c("OTU","Order", "Family"))], 2, as.numeric)	
 				## Create DataTable
-				datatable(t1DF, extensions='Buttons', rownames = FALSE,
-						container = htmltools::withTags(table(
-							Order = 'display',
-								thead(
-								tr(
-									th(colspan = 1, 'ID'),
-									th(colspan = 1, 'Order'),
-									th(colspan = 1, 'Family'),
-									th(colspan = 1, 'Base Mean'),
-									th(colspan = 1, 'Log2 Fold Change'),
-									th(colspan = 1, 'P'),
-									th(colspan = 1, 'P-adjusted')
+				if(input$dabundNBMtest == "Wald"){		
+					datatable(t1DF, extensions='Buttons', rownames = FALSE,
+							container = htmltools::withTags(table(
+								Order = 'display',
+									thead(
+									tr(
+										th(colspan = 1, 'ID'),
+										th(colspan = 1, 'Order'),
+										th(colspan = 1, 'Family'),
+										th(colspan = 1, 'Base Mean'),
+										th(colspan = 1, 'Log2 Fold Change'),
+										th(colspan = 1, 'P'),
+										th(colspan = 1, 'P-adjusted')
+									)
 								)
 							)
+						),
+							options = list(
+								dom = 'lf<"floatright"B>rtip',
+								buttons = c('excel', 'pdf', 'csv'),
+								searching = TRUE,
+								pageLength = 5,
+								lengthMenu = c(5, 10, 20, 50, nrow(t1DF))
+							)
+					)
+				} else {		
+					datatable(t1DF, extensions='Buttons', rownames = FALSE,
+							container = htmltools::withTags(table(
+								class = 'display',
+									thead(
+									tr(
+										th(colspan = 1, 'ID'),
+										th(colspan = 1, 'Order'),
+										th(colspan = 1, 'Family'),
+										th(colspan = 1, 'Base Mean'),
+										th(colspan = 1, 'P'),
+										th(colspan = 1, 'P-adjusted')
+									)
+								)
+							)
+						),
+							options = list(
+								dom = 'lf<"floatright"B>rtip',
+								buttons = c('excel', 'pdf', 'csv'),
+								searching = TRUE,
+								pageLength = 5,
+								lengthMenu = c(5, nrow(t1DF))
+							)
 						)
-					),
-						options = list(
-							dom = 'lf<"floatright"B>rtip',
-							buttons = c('excel', 'pdf', 'csv'),
-							searching = TRUE,
-							pageLength = 5,
-							lengthMenu = c(5, 10, 20, 50, nrow(t1DF))
-						)
-				) 
+				}  
 			} else {
 				NULL
 			}
@@ -490,8 +644,15 @@
 			## If genus TAXA is selected run:
 			if("Genus" %in% names(dabundNBM())) {
 				## Extract TAXA and remove relevant columns
-				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]][[input$dabundPAIRCOMPselect]]
-				t1DF <- t1[,c("OTU", "Family", "Genus","baseMean", "log2FoldChange", "pvalue", "padj")]
+				# t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]][[input$dabundPAIRCOMPselect]]
+				# t1DF <- t1[,c("OTU", "Family", "Genus","baseMean", "log2FoldChange", "pvalue", "padj")]
+				if(input$dabundNBMtest == "Wald"){
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]][[input$dabundPAIRCOMPselect]]
+					t1DF <- t1[,c("OTU","Family","Genus", "baseMean", "log2FoldChange", "pvalue", "padj")]
+				} else {
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]]
+					t1DF <- t1[,c("OTU","Family","Genus", "baseMean", "pvalue", "padj")]					
+				}				
 				## Remove excess characters from OTU labels and reset into DF
 				OTU <- as.character(t1DF$OTU)
 				OTU <- gsub("New.CleanUp.ReferenceOTU", "", OTU)
@@ -506,30 +667,56 @@
 				t1DF[,!(colnames(t1DF) %in% c("OTU","Family", "Genus"))] <- 
 					apply(t1DF[,!(colnames(t1DF) %in% c("OTU","Family", "Genus"))], 2, as.numeric)
 				## Create DataTable	
-				datatable(t1DF, extensions='Buttons', rownames = FALSE,
-						container = htmltools::withTags(table(
-							Order = 'display',
-								thead(
-								tr(
-									th(colspan = 1, 'OTU'),
-									th(colspan = 1, 'Family'),
-									th(colspan = 1, 'Genus'),
-									th(colspan = 1, 'Base Mean'),
-									th(colspan = 1, 'Log2 Fold Change'),
-									th(colspan = 1, 'P'),
-									th(colspan = 1, 'P-adjusted')
+				if(input$dabundNBMtest == "Wald"){		
+					datatable(t1DF, extensions='Buttons', rownames = FALSE,
+							container = htmltools::withTags(table(
+								Order = 'display',
+									thead(
+									tr(
+										th(colspan = 1, 'OTU'),
+										th(colspan = 1, 'Family'),
+										th(colspan = 1, 'Genus'),
+										th(colspan = 1, 'Base Mean'),
+										th(colspan = 1, 'Log2 Fold Change'),
+										th(colspan = 1, 'P'),
+										th(colspan = 1, 'P-adjusted')
+									)
 								)
 							)
+						),
+							options = list(
+								dom = 'lf<"floatright"B>rtip',
+								buttons = c('excel', 'pdf', 'csv'),
+								searching = TRUE,
+								pageLength = 5,
+								lengthMenu = c(5, 10, 20, 50, nrow(t1DF))
+							)
+					)
+				} else {		
+					datatable(t1DF, extensions='Buttons', rownames = FALSE,
+							container = htmltools::withTags(table(
+								class = 'display',
+									thead(
+									tr(
+										th(colspan = 1, 'ID'),
+										th(colspan = 1, 'Family'),
+										th(colspan = 1, 'Genus'),
+										th(colspan = 1, 'Base Mean'),
+										th(colspan = 1, 'P'),
+										th(colspan = 1, 'P-adjusted')
+									)
+								)
+							)
+						),
+							options = list(
+								dom = 'lf<"floatright"B>rtip',
+								buttons = c('excel', 'pdf', 'csv'),
+								searching = TRUE,
+								pageLength = 5,
+								lengthMenu = c(5, nrow(t1DF))
+							)
 						)
-					),
-						options = list(
-							dom = 'lf<"floatright"B>rtip',
-							buttons = c('excel', 'pdf', 'csv'),
-							searching = TRUE,
-							pageLength = 5,
-							lengthMenu = c(5, 10, 20, 50, nrow(t1DF))
-						)
-				) 
+				}  
 			} else {
 				NULL
 			}
@@ -546,8 +733,15 @@
 			## If otu TAXA is selected run:
 			if("OTU" %in% names(dabundNBM())) {
 				## Extract TAXA and remove relevant columns
-				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]][[input$dabundPAIRCOMPselect]]
-				t1DF <- t1[,c("OTU","Family", "Genus", "baseMean", "log2FoldChange", "pvalue", "padj")]
+				# t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]][[input$dabundPAIRCOMPselect]]
+				# t1DF <- t1[,c("OTU","Family", "Genus", "baseMean", "log2FoldChange", "pvalue", "padj")]
+				if(input$dabundNBMtest == "Wald"){
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]][[input$dabundPAIRCOMPselect]]
+					t1DF <- t1[,c("OTU","Family","Genus", "baseMean", "log2FoldChange", "pvalue", "padj")]
+				} else {
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]]
+					t1DF <- t1[,c("OTU","Family","Genus", "baseMean", "pvalue", "padj")]					
+				}				
 				## Remove excess characters from OTU labels and reset into DF
 				OTU <- as.character(t1DF$OTU)
 				OTU <- gsub("New.CleanUp.ReferenceOTU", "", OTU)
@@ -562,30 +756,56 @@
 				t1DF[,!(colnames(t1DF) %in% c("OTU", "Family","Genus"))] <- 
 					apply(t1DF[,!(colnames(t1DF) %in% c("OTU", "Family","Genus"))], 2, as.numeric)
 				## Create DataTable	
-				datatable(t1DF, extensions='Buttons', rownames = FALSE,
-						container = htmltools::withTags(table(
-							Order = 'display',
-								thead(
-								tr(
-									th(colspan = 1, 'OTU'),
-									th(colspan = 1, 'Family'),
-									th(colspan = 1, 'Genus'),
-									th(colspan = 1, 'Base Mean'),
-									th(colspan = 1, 'Log2 Fold Change'),
-									th(colspan = 1, 'P'),
-									th(colspan = 1, 'P-adjusted')
+				if(input$dabundNBMtest == "Wald"){		
+					datatable(t1DF, extensions='Buttons', rownames = FALSE,
+							container = htmltools::withTags(table(
+								Order = 'display',
+									thead(
+									tr(
+										th(colspan = 1, 'OTU'),
+										th(colspan = 1, 'Family'),
+										th(colspan = 1, 'Genus'),
+										th(colspan = 1, 'Base Mean'),
+										th(colspan = 1, 'Log2 Fold Change'),
+										th(colspan = 1, 'P'),
+										th(colspan = 1, 'P-adjusted')
+									)
 								)
 							)
+						),
+							options = list(
+								dom = 'lf<"floatright"B>rtip',
+								buttons = c('excel', 'pdf', 'csv'),
+								searching = TRUE,
+								pageLength = 5,
+								lengthMenu = c(5, 10, 20, 50, 100)
+							)
+					) 
+				} else {		
+					datatable(t1DF, extensions='Buttons', rownames = FALSE,
+							container = htmltools::withTags(table(
+								class = 'display',
+									thead(
+									tr(
+										th(colspan = 1, 'ID'),
+										th(colspan = 1, 'Family'),
+										th(colspan = 1, 'Genus'),
+										th(colspan = 1, 'Base Mean'),
+										th(colspan = 1, 'P'),
+										th(colspan = 1, 'P-adjusted')
+									)
+								)
+							)
+						),
+							options = list(
+								dom = 'lf<"floatright"B>rtip',
+								buttons = c('excel', 'pdf', 'csv'),
+								searching = TRUE,
+								pageLength = 5,
+								lengthMenu = c(5, nrow(t1DF))
+							)
 						)
-					),
-						options = list(
-							dom = 'lf<"floatright"B>rtip',
-							buttons = c('excel', 'pdf', 'csv'),
-							searching = TRUE,
-							pageLength = 5,
-							lengthMenu = c(5, 10, 20, 50, 100)
-						)
-				) 
+				} 
 			} else {
 				NULL
 			}
@@ -602,7 +822,11 @@
 		} else {
 			if("Phylum" %in% names(dabundNBM())) {
 				## Extract NBM based on TAXA and Pairwise comparison
-				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Phylum")]][[input$dabundPAIRCOMPselect]]
+				if(input$dabundNBMtest == "Wald"){
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Phylum")]][[input$dabundPAIRCOMPselect]]
+				} else {
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Phylum")]]			
+				}	
 				## Remove excess characters from OTU labels and reset into DF
 				OTU <- as.character(t1$OTU)
 				OTU <- gsub("New.CleanUp.ReferenceOTU", "", OTU)
@@ -635,7 +859,12 @@
 		} else {
 			if("Class" %in% names(dabundNBM())) {
 				## Extract NBM based on TAXA and Pairwise comparison
-				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Class")]][[input$dabundPAIRCOMPselect]]
+				# t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Class")]][[input$dabundPAIRCOMPselect]]
+				if(input$dabundNBMtest == "Wald"){
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Class")]][[input$dabundPAIRCOMPselect]]
+				} else {
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Class")]]				
+				}	
 				## Remove excess characters from OTU labels and reset into DF
 				OTU <- as.character(t1$OTU)
 				OTU <- gsub("New.CleanUp.ReferenceOTU", "", OTU)
@@ -668,7 +897,12 @@
 		} else {
 			if("Order" %in% names(dabundNBM())) {
 				## Extract NBM based on TAXA and Pairwise comparison
-				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Order")]][[input$dabundPAIRCOMPselect]]
+				# t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Order")]][[input$dabundPAIRCOMPselect]]
+				if(input$dabundNBMtest == "Wald"){
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Order")]][[input$dabundPAIRCOMPselect]]
+				} else {
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Order")]]					
+				}	
 				## Remove excess characters from OTU labels and reset into DF
 				OTU <- as.character(t1$OTU)
 				OTU <- gsub("New.CleanUp.ReferenceOTU", "", OTU)
@@ -701,7 +935,12 @@
 		} else {
 			if("Family" %in% names(dabundNBM())) {
 				## Extract NBM based on TAXA and Pairwise comparison
-				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Family")]][[input$dabundPAIRCOMPselect]]
+				# t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Family")]][[input$dabundPAIRCOMPselect]]
+				if(input$dabundNBMtest == "Wald"){
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Family")]][[input$dabundPAIRCOMPselect]]
+				} else {
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Family")]]				
+				}	
 				## Remove excess characters from OTU labels and reset into DF
 				OTU <- as.character(t1$OTU)
 				OTU <- gsub("New.CleanUp.ReferenceOTU", "", OTU)
@@ -734,7 +973,12 @@
 		} else {
 			if("Genus" %in% names(dabundNBM())) {
 				## Extract NBM based on TAXA and Pairwise comparison
-				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]][[input$dabundPAIRCOMPselect]]
+				# t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]][[input$dabundPAIRCOMPselect]]
+				if(input$dabundNBMtest == "Wald"){
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]][[input$dabundPAIRCOMPselect]]
+				} else {
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]]					
+				}	
 				## Remove excess characters from OTU labels and reset into DF
 				OTU <- as.character(t1$OTU)
 				OTU <- gsub("New.CleanUp.ReferenceOTU", "", OTU)
@@ -768,6 +1012,11 @@
 			if("OTU" %in% names(dabundNBM())) {
 				## Extract NBM based on TAXA and Pairwise comparison
 				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]][[input$dabundPAIRCOMPselect]]
+				if(input$dabundNBMtest == "Wald"){
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]][[input$dabundPAIRCOMPselect]]
+				} else {
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]]				
+				}	
 				## Remove excess characters from OTU labels and reset into DF
 				OTU <- as.character(t1$OTU)
 				OTU <- gsub("New.CleanUp.ReferenceOTU", "", OTU)
@@ -801,22 +1050,37 @@
 			if("Phylum" %in% names(dabundNBM())) {
 				LIST <- dabundNBM()[[which(names(dabundNBM()) %in% "Phylum")]]
 				## Extract results by Pairwise Comparisons	
-				LISTord <- lapply(names(LIST), function(x) {
-					nbm <- LIST[[x]]
-					## Order by adjusted pvalue, add new column with pairwise comparison, and return
-					nbmord <- nbm[order(nbm$padj),]
-					nbmord$Comparison <- rep(x, nrow(nbm))
-					nbmord						
-				})
-				## Bind list into a single data frame, remove unused columns, set row names, and return
-				DF <- do.call("rbind", LISTord)
+				if(input$dabundNBMtest == "Wald"){				
+					LISTord <- lapply(names(LIST), function(x) {
+						nbm <- LIST[[x]]
+						## Order by adjusted pvalue, add new column with pairwise comparison, and return
+						nbmord <- nbm[order(nbm$padj),]
+						
+						nbmord$Comparison <- rep(input$dabundNBMtest, nrow(nbm))
+						nbmord$Group <- rep(input$dabundGROUPselect, nrow(nbm))
+						nbmord$Pair <- rep(x, nrow(nbm))
+						nbmord						
+					})
+					## Bind list into a single data frame, remove unused columns, set row names, and return
+					DF <- do.call("rbind", LISTord)
+				} else {
+					DF <- LIST[order(LIST$padj),]
+							
+				}
 				FinalDF <- DF[,!(colnames(DF) %in% c("Class", "Order", "Family", "Genus"))]
+				
 				rownames(FinalDF) <- c(1:nrow(FinalDF))
+				if(input$dabundNBMtest == "Wald"){	
+					FinalDF$Reference <- factorSPLIT(FinalDF$Pair, " vs ", 2)
+				} else {
+					FinalDF$Comparison <- rep(input$dabundNBMtest, nrow(FinalDF))
+					FinalDF$Group <- rep(input$dabundGROUPselect, nrow(FinalDF))
+				}
 				FinalDF
 			} else {
 				NULL
 			}
-		}
+		}	
 	})	
 
 	########################################################################			
@@ -829,18 +1093,32 @@
 			## Extract NBM based on TAXA 
 			if("Class" %in% names(dabundNBM())) {
 				LIST <- dabundNBM()[[which(names(dabundNBM()) %in% "Class")]]
-				## Extract results by Pairwise Comparisons						
-				LISTord <- lapply(names(LIST), function(x) {
-					nbm <- LIST[[x]]
-					## Order by adjusted pvalue, add new column with pairwise comparison, and return
-					nbmord <- nbm[order(nbm$padj),]
-					nbmord$Comparison <- rep(x, nrow(nbm))
-					nbmord						
-				})
-				## Bind list into a single data frame, remove unused columns, set row names, and return
-				DF <- do.call("rbind", LISTord)
+				## Extract results by Pairwise Comparisons	
+				if(input$dabundNBMtest == "Wald"){				
+					LISTord <- lapply(names(LIST), function(x) {
+						nbm <- LIST[[x]]
+						## Order by adjusted pvalue, add new column with pairwise comparison, and return
+						nbmord <- nbm[order(nbm$padj),]
+						
+						nbmord$Comparison <- rep(input$dabundNBMtest, nrow(nbm))
+						nbmord$Group <- rep(input$dabundGROUPselect, nrow(nbm))
+						nbmord$Pair <- rep(x, nrow(nbm))
+						nbmord						
+					})
+					## Bind list into a single data frame, remove unused columns, set row names, and return
+					DF <- do.call("rbind", LISTord)
+				} else {
+					DF <- LIST[order(LIST$padj),]
+							
+				}
 				FinalDF <- DF[,!(colnames(DF) %in% c("Order", "Family", "Genus"))]
 				rownames(FinalDF) <- c(1:nrow(FinalDF))
+				if(input$dabundNBMtest == "Wald"){	
+					FinalDF$Reference <- factorSPLIT(FinalDF$Pair, " vs ", 2)
+				} else {
+					FinalDF$Comparison <- rep(input$dabundNBMtest, nrow(FinalDF))
+					FinalDF$Group <- rep(input$dabundGROUPselect, nrow(FinalDF))
+				}
 				FinalDF
 			} else {
 				NULL
@@ -858,18 +1136,32 @@
 			## Extract NBM based on TAXA 
 			if("Order" %in% names(dabundNBM())) {
 				LIST <- dabundNBM()[[which(names(dabundNBM()) %in% "Order")]]
-				## Extract results by Pairwise Comparisons						
-				LISTord <- lapply(names(LIST), function(x) {
-					nbm <- LIST[[x]]
-					## Order by adjusted pvalue, add new column with pairwise comparison, and return
-					nbmord <- nbm[order(nbm$padj),]
-					nbmord$Comparison <- rep(x, nrow(nbm))
-					nbmord						
-				})
-				## Bind list into a single data frame, remove unused columns, set row names, and return
-				DF <- do.call("rbind", LISTord)
+				## Extract results by Pairwise Comparisons	
+				if(input$dabundNBMtest == "Wald"){				
+					LISTord <- lapply(names(LIST), function(x) {
+						nbm <- LIST[[x]]
+						## Order by adjusted pvalue, add new column with pairwise comparison, and return
+						nbmord <- nbm[order(nbm$padj),]
+						
+						nbmord$Comparison <- rep(input$dabundNBMtest, nrow(nbm))
+						nbmord$Group <- rep(input$dabundGROUPselect, nrow(nbm))
+						nbmord$Pair <- rep(x, nrow(nbm))
+						nbmord						
+					})
+					## Bind list into a single data frame, remove unused columns, set row names, and return
+					DF <- do.call("rbind", LISTord)
+				} else {
+					DF <- LIST[order(LIST$padj),]
+							
+				}
 				FinalDF <- DF[,!(colnames(DF) %in% c("Family", "Genus"))]
 				rownames(FinalDF) <- c(1:nrow(FinalDF))
+				if(input$dabundNBMtest == "Wald"){	
+					FinalDF$Reference <- factorSPLIT(FinalDF$Pair, " vs ", 2)
+				} else {
+					FinalDF$Comparison <- rep(input$dabundNBMtest, nrow(FinalDF))
+					FinalDF$Group <- rep(input$dabundGROUPselect, nrow(FinalDF))
+				}
 				FinalDF
 			} else {
 				NULL
@@ -888,18 +1180,32 @@
 			## Extract NBM based on TAXA 
 			if("Family" %in% names(dabundNBM())) {
 				LIST <- dabundNBM()[[which(names(dabundNBM()) %in% "Family")]]
-				## Extract results by Pairwise Comparisons						
-				LISTord <- lapply(names(LIST), function(x) {
-					nbm <- LIST[[x]]
-					## Order by adjusted pvalue, add new column with pairwise comparison, and return
-					nbmord <- nbm[order(nbm$padj),]
-					nbmord$Comparison <- rep(x, nrow(nbm))
-					nbmord						
-				})
-				## Bind list into a single data frame, remove unused columns, set row names, and return
-				DF <- do.call("rbind", LISTord)
+				## Extract results by Pairwise Comparisons	
+				if(input$dabundNBMtest == "Wald"){				
+					LISTord <- lapply(names(LIST), function(x) {
+						nbm <- LIST[[x]]
+						## Order by adjusted pvalue, add new column with pairwise comparison, and return
+						nbmord <- nbm[order(nbm$padj),]
+						
+						nbmord$Comparison <- rep(input$dabundNBMtest, nrow(nbm))
+						nbmord$Group <- rep(input$dabundGROUPselect, nrow(nbm))
+						nbmord$Pair <- rep(x, nrow(nbm))
+						nbmord						
+					})
+					## Bind list into a single data frame, remove unused columns, set row names, and return
+					DF <- do.call("rbind", LISTord)
+				} else {
+					DF <- LIST[order(LIST$padj),]
+							
+				}
 				FinalDF <- DF[,!(colnames(DF) %in% c("Genus"))]
 				rownames(FinalDF) <- c(1:nrow(FinalDF))
+				if(input$dabundNBMtest == "Wald"){	
+					FinalDF$Reference <- factorSPLIT(FinalDF$Pair, " vs ", 2)
+				} else {
+					FinalDF$Comparison <- rep(input$dabundNBMtest, nrow(FinalDF))
+					FinalDF$Group <- rep(input$dabundGROUPselect, nrow(FinalDF))
+				}
 				FinalDF
 			} else {
 				NULL
@@ -917,18 +1223,32 @@
 			## Extract NBM based on TAXA 
 			if("Genus" %in% names(dabundNBM())) {
 				LIST <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]]
-				## Extract results by Pairwise Comparisons						
-				LISTord <- lapply(names(LIST), function(x) {
-					nbm <- LIST[[x]]
-					## Order by adjusted pvalue, add new column with pairwise comparison, and return
-					nbmord <- nbm[order(nbm$padj),]
-					nbmord$Comparison <- rep(x, nrow(nbm))
-					nbmord						
-				})
-				## Bind list into a single data frame, remove unused columns, set row names, and return
-				DF <- do.call("rbind", LISTord)
+				## Extract results by Pairwise Comparisons	
+				if(input$dabundNBMtest == "Wald"){				
+					LISTord <- lapply(names(LIST), function(x) {
+						nbm <- LIST[[x]]
+						## Order by adjusted pvalue, add new column with pairwise comparison, and return
+						nbmord <- nbm[order(nbm$padj),]
+						
+						nbmord$Comparison <- rep(input$dabundNBMtest, nrow(nbm))
+						nbmord$Group <- rep(input$dabundGROUPselect, nrow(nbm))
+						nbmord$Pair <- rep(x, nrow(nbm))
+						nbmord						
+					})
+					## Bind list into a single data frame, remove unused columns, set row names, and return
+					DF <- do.call("rbind", LISTord)
+				} else {
+					DF <- LIST[order(LIST$padj),]
+							
+				}
 				FinalDF <- DF
 				rownames(FinalDF) <- c(1:nrow(FinalDF))
+				if(input$dabundNBMtest == "Wald"){	
+					FinalDF$Reference <- factorSPLIT(FinalDF$Pair, " vs ", 2)
+				} else {
+					FinalDF$Comparison <- rep(input$dabundNBMtest, nrow(FinalDF))
+					FinalDF$Group <- rep(input$dabundGROUPselect, nrow(FinalDF))
+				}
 				FinalDF
 			} else {
 				NULL
@@ -946,18 +1266,32 @@
 			## Extract NBM based on TAXA 
 			if("OTU" %in% names(dabundNBM())) {
 				LIST <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]]
-				## Extract results by Pairwise Comparisons						
-				LISTord <- lapply(names(LIST), function(x) {
-					nbm <- LIST[[x]]
-					## Order by adjusted pvalue, add new column with pairwise comparison, and return
-					nbmord <- nbm[order(nbm$padj),]
-					nbmord$Comparison <- rep(x, nrow(nbm))
-					nbmord						
-				})
-				## Bind list into a single data frame, remove unused columns, set row names, and return
-				DF <- do.call("rbind", LISTord)
+				## Extract results by Pairwise Comparisons	
+				if(input$dabundNBMtest == "Wald"){				
+					LISTord <- lapply(names(LIST), function(x) {
+						nbm <- LIST[[x]]
+						## Order by adjusted pvalue, add new column with pairwise comparison, and return
+						nbmord <- nbm[order(nbm$padj),]
+						
+						nbmord$Comparison <- rep(input$dabundNBMtest, nrow(nbm))
+						nbmord$Group <- rep(input$dabundGROUPselect, nrow(nbm))
+						nbmord$Pair <- rep(x, nrow(nbm))
+						nbmord						
+					})
+					## Bind list into a single data frame, remove unused columns, set row names, and return
+					DF <- do.call("rbind", LISTord)
+				} else {
+					DF <- LIST[order(LIST$padj),]
+							
+				}
 				FinalDF <- DF
 				rownames(FinalDF) <- c(1:nrow(FinalDF))
+				if(input$dabundNBMtest == "Wald"){	
+					FinalDF$Reference <- factorSPLIT(FinalDF$Pair, " vs ", 2)
+				} else {
+					FinalDF$Comparison <- rep(input$dabundNBMtest, nrow(FinalDF))
+					FinalDF$Group <- rep(input$dabundGROUPselect, nrow(FinalDF))
+				}
 				FinalDF
 			} else {
 				NULL
@@ -1089,16 +1423,21 @@
 	## ie, there are > 2 factor levels in Experimental Group selection
 	########################################################################	
 	RABUNDnumbcompRENDER <- reactive({ 
-
-			req(DABUNDpaircomp())
+		req(DABUNDpaircomp())
+		if(input$dabundNBMtest == "Wald") {	
 			if(length(DABUNDpaircomp()) > 1) {
 				"More than one levels in group factor"
 			} else {
 				NULL
 			}
-
-	
+		} else {
+			NULL
+		}
 	})
+	
+	# output$dabundTEXT <- renderPrint({
+
+	# })	
 
 	########################################################################				
 	## Set data for Phylum Boxplots
@@ -1148,26 +1487,26 @@
 				## selected pairwise comparison.
 				## If there is only 1 set of pairwise comparisons, then there will not be
 				## an option to expand the data to show more than two groups
-				if(is.null(input$RABUNDphylumbpgroup)){
-					plotDATA <- plotDATA
-				} else {
-					if(input$RABUNDphylumbpgroup == 1) {
-						## If > 1 pairwise comparison and only want to show 2 groups
-						plotDATA <- droplevels(plotDATA[plotDATA[,input$dabundGROUPselect] %in% strsplit(input$dabundPAIRCOMPselect, " vs ")[[1]],])
-					} else {
-						## If > 1 pairwise comparison and want to show all groups
+				if(input$dabundNBMtest == "Wald") {
+					if(is.null(input$RABUNDphylumbpgroup)){
 						plotDATA <- plotDATA
+					} else {
+						if(input$RABUNDphylumbpgroup == 1) {
+							## If > 1 pairwise comparison and only want to show 2 groups
+							plotDATA <- droplevels(plotDATA[plotDATA[,input$dabundGROUPselect] %in% strsplit(input$dabundPAIRCOMPselect, " vs ")[[1]],])
+						} else {
+							## If > 1 pairwise comparison and want to show all groups
+							plotDATA <- plotDATA
+						}
 					}
+				} else {
+					plotDATA <- plotDATA
 				}
-				plotDATA	
+				plotDATA		
 			} else {
 				NULL
 			}
 		}
-	})	
-		
-	output$dabundTEXT <- renderPrint({
-	
 	})	
 
 	########################################################################				
@@ -1218,18 +1557,23 @@
 				## selected pairwise comparison.
 				## If there is only 1 set of pairwise comparisons, then there will not be
 				## an option to expand the data to show more than two groups
-				if(is.null(input$RABUNDclassbpgroup)){
-					plotDATA <- plotDATA
-				} else {
-					if(input$RABUNDclassbpgroup == 1) {
-						## If > 1 pairwise comparison and only want to show 2 groups
-						plotDATA <- droplevels(plotDATA[plotDATA[,input$dabundGROUPselect] %in% strsplit(input$dabundPAIRCOMPselect, " vs ")[[1]],])
-					} else {
-						## If > 1 pairwise comparison and want to show all groups
+				if(input$dabundNBMtest == "Wald") {
+					if(is.null(input$RABUNDclassbpgroup)){
 						plotDATA <- plotDATA
+					} else {
+						if(input$RABUNDclassbpgroup == 1) {
+							## If > 1 pairwise comparison and only want to show 2 groups
+							plotDATA <- droplevels(plotDATA[plotDATA[,input$dabundGROUPselect] %in% strsplit(input$dabundPAIRCOMPselect, " vs ")[[1]],])
+						} else {
+							## If > 1 pairwise comparison and want to show all groups
+							plotDATA <- plotDATA
+						}
 					}
+				} else {
+					plotDATA <- plotDATA
 				}
-				plotDATA
+				plotDATA		
+
 			} else {
 				NULL
 			}
@@ -1284,18 +1628,23 @@
 				## selected pairwise comparison.
 				## If there is only 1 set of pairwise comparisons, then there will not be
 				## an option to expand the data to show more than two groups
-				if(is.null(input$RABUNDorderbpgroup)){
-					plotDATA <- plotDATA
-				} else {
-					if(input$RABUNDorderbpgroup == 1) {
-						## If > 1 pairwise comparison and only want to show 2 groups
-						plotDATA <- droplevels(plotDATA[plotDATA[,input$dabundGROUPselect] %in% strsplit(input$dabundPAIRCOMPselect, " vs ")[[1]],])
-					} else {
-						## If > 1 pairwise comparison and want to show all groups
+				if(input$dabundNBMtest == "Wald") {
+					if(is.null(input$RABUNDorderbpgroup)){
 						plotDATA <- plotDATA
+					} else {
+						if(input$RABUNDorderbpgroup == 1) {
+							## If > 1 pairwise comparison and only want to show 2 groups
+							plotDATA <- droplevels(plotDATA[plotDATA[,input$dabundGROUPselect] %in% strsplit(input$dabundPAIRCOMPselect, " vs ")[[1]],])
+						} else {
+							## If > 1 pairwise comparison and want to show all groups
+							plotDATA <- plotDATA
+						}
 					}
+				} else {
+					plotDATA <- plotDATA
 				}
-				plotDATA
+				plotDATA		
+
 			} else {
 				NULL
 			}
@@ -1350,18 +1699,23 @@
 				## selected pairwise comparison.
 				## If there is only 1 set of pairwise comparisons, then there will not be
 				## an option to expand the data to show more than two groups
-				if(is.null(input$RABUNDfamilybpgroup)){
-					plotDATA <- plotDATA
-				} else {
-					if(input$RABUNDfamilybpgroup == 1) {
-						## If > 1 pairwise comparison and only want to show 2 groups
-						plotDATA <- droplevels(plotDATA[plotDATA[,input$dabundGROUPselect] %in% strsplit(input$dabundPAIRCOMPselect, " vs ")[[1]],])
-					} else {
-						## If > 1 pairwise comparison and want to show all groups
+				if(input$dabundNBMtest == "Wald") {
+					if(is.null(input$RABUNDfamilybpgroup)){
 						plotDATA <- plotDATA
+					} else {
+						if(input$RABUNDfamilybpgroup == 1) {
+							## If > 1 pairwise comparison and only want to show 2 groups
+							plotDATA <- droplevels(plotDATA[plotDATA[,input$dabundGROUPselect] %in% strsplit(input$dabundPAIRCOMPselect, " vs ")[[1]],])
+						} else {
+							## If > 1 pairwise comparison and want to show all groups
+							plotDATA <- plotDATA
+						}
 					}
+				} else {
+					plotDATA <- plotDATA
 				}
-				plotDATA
+				plotDATA		
+
 			} else {
 				NULL
 			}
@@ -1416,18 +1770,23 @@
 				## selected pairwise comparison.
 				## If there is only 1 set of pairwise comparisons, then there will not be
 				## an option to expand the data to show more than two groups
-				if(is.null(input$RABUNDgenusbpgroup)){
-					plotDATA <- plotDATA
-				} else {
-					if(input$RABUNDgenusbpgroup == 1) {
-						## If > 1 pairwise comparison and only want to show 2 groups
-						plotDATA <- droplevels(plotDATA[plotDATA[,input$dabundGROUPselect] %in% strsplit(input$dabundPAIRCOMPselect, " vs ")[[1]],])
-					} else {
-						## If > 1 pairwise comparison and want to show all groups
+				if(input$dabundNBMtest == "Wald") {
+					if(is.null(input$RABUNDgenusbpgroup)){
 						plotDATA <- plotDATA
+					} else {
+						if(input$RABUNDgenusbpgroup == 1) {
+							## If > 1 pairwise comparison and only want to show 2 groups
+							plotDATA <- droplevels(plotDATA[plotDATA[,input$dabundGROUPselect] %in% strsplit(input$dabundPAIRCOMPselect, " vs ")[[1]],])
+						} else {
+							## If > 1 pairwise comparison and want to show all groups
+							plotDATA <- plotDATA
+						}
 					}
+				} else {
+					plotDATA <- plotDATA
 				}
-				plotDATA
+				plotDATA		
+
 			} else {
 				NULL
 			}
@@ -1482,18 +1841,23 @@
 				## selected pairwise comparison.
 				## If there is only 1 set of pairwise comparisons, then there will not be
 				## an option to expand the data to show more than two groups
-				if(is.null(input$RABUNDotubpgroup)){
-					plotDATA <- plotDATA
-				} else {
-					if(input$RABUNDotubpgroup == 1) {
-						## If > 1 pairwise comparison and only want to show 2 groups
-						plotDATA <- droplevels(plotDATA[plotDATA[,input$dabundGROUPselect] %in% strsplit(input$dabundPAIRCOMPselect, " vs ")[[1]],])
-					} else {
-						## If > 1 pairwise comparison and want to show all groups
+				if(input$dabundNBMtest == "Wald") {
+					if(is.null(input$RABUNDotubpgroup)){
 						plotDATA <- plotDATA
+					} else {
+						if(input$RABUNDotubpgroup == 1) {
+							## If > 1 pairwise comparison and only want to show 2 groups
+							plotDATA <- droplevels(plotDATA[plotDATA[,input$dabundGROUPselect] %in% strsplit(input$dabundPAIRCOMPselect, " vs ")[[1]],])
+						} else {
+							## If > 1 pairwise comparison and want to show all groups
+							plotDATA <- plotDATA
+						}
 					}
+				} else {
+					plotDATA <- plotDATA
 				}
-				plotDATA
+				plotDATA		
+
 			} else {
 				NULL
 			}
@@ -1572,6 +1936,29 @@
 
 	})
 
+	output$DABUNDtesttabletextRENDER <- renderUI({
+		if(input$goDABUND){
+			isolate({
+				if(input$dabundNBMtest == "Wald") {
+					list(
+						HTML("
+							<p>Assessing pairwise comparisons with Wald Test</p>
+							<p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
+							 "
+						)
+					)
+				} else {
+						HTML("
+							<p>Assessing overall group effect using Likelihood Ratio Test</p>
+							 "
+						)					
+				}
+			})
+		} else {
+			NULL
+		}					
+	})
+
 	########################################################################
 	## Render Phylum UI after goDABUND observed
 	########################################################################	
@@ -1639,7 +2026,8 @@
 					),
 					fluidPage(
 						column(6,				
-							DT::dataTableOutput("DABUNDphylumNBMtableRENDER")
+							DT::dataTableOutput("DABUNDphylumNBMtableRENDER"),
+							uiOutput("DABUNDtesttabletextRENDER")
 							
 						),
 						column(6,
@@ -1723,7 +2111,11 @@
 					),
 					fluidPage(
 						column(6,				
-							DT::dataTableOutput("DABUNDclassNBMtableRENDER")
+							DT::dataTableOutput("DABUNDclassNBMtableRENDER"),
+							HTML("
+								 <p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
+								 "
+							)
 							
 						),
 						column(6,
@@ -1808,7 +2200,11 @@
 					
 					fluidPage(
 						column(6,				
-							DT::dataTableOutput("DABUNDorderNBMtableRENDER")
+							DT::dataTableOutput("DABUNDorderNBMtableRENDER"),
+							HTML("
+								 <p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
+								 "
+							)
 							
 						),
 						column(6,
@@ -1892,7 +2288,11 @@
 					),
 					fluidPage(
 						column(6,				
-							DT::dataTableOutput("DABUNDfamilyNBMtableRENDER")
+							DT::dataTableOutput("DABUNDfamilyNBMtableRENDER"),
+							HTML("
+								 <p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
+								 "
+							)
 							
 						),
 						column(6,
@@ -1976,7 +2376,11 @@
 					),
 					fluidPage(
 						column(6,		
-							DT::dataTableOutput("DABUNDgenusNBMtableRENDER")
+							DT::dataTableOutput("DABUNDgenusNBMtableRENDER"),
+							HTML("
+								 <p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
+								 "
+							)
 							
 						),
 						column(6,
@@ -2060,7 +2464,11 @@
 					),
 					fluidPage(
 						column(6,				
-							DT::dataTableOutput("DABUNDotuNBMtableRENDER")
+							DT::dataTableOutput("DABUNDotuNBMtableRENDER"),
+							HTML("
+								 <p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
+								 "
+							)
 							
 						),
 						column(6,

@@ -174,6 +174,11 @@ bdivTAB <- function() {
 						)
 					),
 					hr(),
+					# fluidPage(
+						# column(12,
+							# verbatimTextOutput("bdivTEXT")						
+						# )
+					# ),						
 					
 					uiOutput("BDIVordinateselectRENDER"),
 					uiOutput("BDIVplottableRENDER")
@@ -202,13 +207,29 @@ rabundTAB <- function() {
 								"
 							)
 						),
+						column(3,
+							HTML("
+								<h4><strong>Select Test for Differential Abundance Analyses:</strong></h4>
+								"
+							),			
+
+							selectInput(inputId="dabundNBMtest", label="", choices=c("Wald Test" = "Wald", "Likelihood Ratio Test" = "LRT"), 
+								selected="Wald")
+						),
 						column(2,
 							actionButton("goDABUND", label=HTML("Select Taxa"),
 							icon("bicycle"), 
 								style="color: #fff; background-color: #2c2cad; border-color: #000")
 						),
-						uiOutput("DABUNDgroupselectRENDER"),
-						uiOutput("DABUNDpaircompRENDER")
+						# column(3,
+							# uiOutput("DABUNDtestselectRENDER")					
+						# ),
+						column(3,
+							uiOutput("DABUNDgroupselectRENDER"),
+							uiOutput("DABUNDpaircompRENDER")
+						)
+						
+						
 					),
 					# hr(),
 					# fluidPage(

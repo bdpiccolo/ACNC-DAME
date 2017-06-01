@@ -740,7 +740,7 @@
 	output$PHYLOSEQrawdatadown <- renderUI({
 		req(PHYLOSEQ())	
 		list(
-			a(id = "toggleIMPORTraw_DataDownload", "Show/hide Differential Abundance Downloading Options", href = "#"),
+			a(id = "toggleIMPORTraw_DataDownload", "Show/hide Raw OTU Table Downloading Options", href = "#"),
 			p(), 
 			shinyjs::hidden(
 				div(id = "IMPORTraw_DataDownload",	
@@ -1120,7 +1120,7 @@
 	output$PHYLOSEQFILTdatadown <- renderUI({
 		req(PHYLOSEQ())	
 		list(
-			a(id = "toggleIMPORTFILT_DataDownload", "Show/hide Differential Abundance Downloading Options", href = "#"),
+			a(id = "toggleIMPORTFILT_DataDownload", "Show/hide Filtered OTU Table Downloading Options", href = "#"),
 			p(), 
 			shinyjs::hidden(
 				div(id = "IMPORTFILT_DataDownload",	

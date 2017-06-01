@@ -195,6 +195,10 @@
 		names(ordDF) <- BDIVtaxa()
 		ordDF		
 	})
+		
+	# output$bdivTEXT <- renderPrint({
+
+	# })	
 
 	########################################################################
 	## Create ScatterD3 object with Phylum Ordination data
@@ -203,6 +207,7 @@
 		if(input$goBDIV){
 			if("Phylum" %in% BDIVtaxa()){	
 				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "Phylum")]]
+				scatD3_DF$IDs <- rownames(scatD3_DF)
 				col_var <- if (input$bdiv_PCA_col == "None") {
 					NULL 
 				} else {
@@ -212,10 +217,15 @@
 					NULL 
 				} else {
 					scatD3_DF[,input$bdiv_PCA_shape]
+				}				
+				lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
+					NULL 
+				} else {
+					scatD3_DF[,input$bdiv_PCA_labeltype]
 				}
 				scatterD3(x = scatD3_DF[,"Component1"],
 						  y = scatD3_DF[,"Component2"],
-						  lab = NULL,
+						  lab = lab_var,
 						  xlab = "Component1",
 						  ylab = "Component2",
 						  col_var = col_var,
@@ -228,7 +238,7 @@
 						  ####size_lab = input$bdiv_PCA_size,
 						  ####key_var = rownames(scatterD3_DAT()),
 						  point_opacity = input$bdiv_PCA_opacity,
-						  ####labels_size = input$scatterD3_labsize,
+						  labels_size = input$bdiv_PCA_labsize,
 						  transitions = input$bdiv_PCA_transitions,
 						  dom_id_svg_export = "PHYLUMscatD3export",
 						  dom_id_reset_zoom = "PHYLUMscatD3resetzoom",
@@ -251,6 +261,7 @@
 		if(input$goBDIV){
 			if("Class" %in% BDIVtaxa()){	
 				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "Class")]]
+				scatD3_DF$IDs <- rownames(scatD3_DF)
 				col_var <- if (input$bdiv_PCA_col == "None") {
 					NULL 
 				} else {
@@ -260,10 +271,15 @@
 					NULL 
 				} else {
 					scatD3_DF[,input$bdiv_PCA_shape]
+				}			
+				lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
+					NULL 
+				} else {
+					scatD3_DF[,input$bdiv_PCA_labeltype]
 				}
 				scatterD3(x = scatD3_DF[,"Component1"],
 						  y = scatD3_DF[,"Component2"],
-						  lab = NULL,
+						  lab = lab_var,
 						  xlab = "Component1",
 						  ylab = "Component2",
 						  col_var = col_var,
@@ -276,7 +292,7 @@
 						  # size_lab = input$bdiv_PCA_size,
 						  # key_var = rownames(scatterD3_DAT()),
 						  point_opacity = input$bdiv_PCA_opacity,
-						  # labels_size = input$scatterD3_labsize,
+						  labels_size = input$bdiv_PCA_labsize,
 						  transitions = input$bdiv_PCA_transitions,
 						  dom_id_svg_export = "CLASSscatD3export",
 						  dom_id_reset_zoom = "CLASSscatD3resetzoom"
@@ -299,6 +315,7 @@
 		if(input$goBDIV){
 			if("Order" %in% BDIVtaxa()){	
 				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "Order")]]
+				scatD3_DF$IDs <- rownames(scatD3_DF)
 				col_var <- if (input$bdiv_PCA_col == "None") {
 					NULL 
 				} else {
@@ -308,10 +325,15 @@
 					NULL 
 				} else {
 					scatD3_DF[,input$bdiv_PCA_shape]
+				}			
+				lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
+					NULL 
+				} else {
+					scatD3_DF[,input$bdiv_PCA_labeltype]
 				}
 				scatterD3(x = scatD3_DF[,"Component1"],
 						  y = scatD3_DF[,"Component2"],
-						  lab = NULL,
+						  lab = lab_var,
 						  xlab = "Component1",
 						  ylab = "Component2",
 						  col_var = col_var,
@@ -324,7 +346,7 @@
 						  # size_lab = input$bdiv_PCA_size,
 						  # key_var = rownames(scatterD3_DAT()),
 						  point_opacity = input$bdiv_PCA_opacity,
-						  # labels_size = input$scatterD3_labsize,
+						  labels_size = input$bdiv_PCA_labsize,
 						  transitions = input$bdiv_PCA_transitions,
 						  dom_id_svg_export = "ORDERscatD3export",
 						  dom_id_reset_zoom = "ORDERscatD3resetzoom"
@@ -347,6 +369,7 @@
 		if(input$goBDIV){
 			if("Family" %in% BDIVtaxa()){	
 				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "Family")]]
+				scatD3_DF$IDs <- rownames(scatD3_DF)
 				col_var <- if (input$bdiv_PCA_col == "None") {
 					NULL 
 				} else {
@@ -356,10 +379,15 @@
 					NULL 
 				} else {
 					scatD3_DF[,input$bdiv_PCA_shape]
+				}			
+				lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
+					NULL 
+				} else {
+					scatD3_DF[,input$bdiv_PCA_labeltype]
 				}
 				scatterD3(x = scatD3_DF[,"Component1"],
 						  y = scatD3_DF[,"Component2"],
-						  lab = NULL,
+						  lab = lab_var,
 						  xlab = "Component1",
 						  ylab = "Component2",
 						  col_var = col_var,
@@ -372,7 +400,7 @@
 						  # size_lab = input$bdiv_PCA_size,
 						  # key_var = rownames(scatterD3_DAT()),
 						  point_opacity = input$bdiv_PCA_opacity,
-						  # labels_size = input$scatterD3_labsize,
+						  labels_size = input$bdiv_PCA_labsize,
 						  transitions = input$bdiv_PCA_transitions,
 						  dom_id_svg_export = "FAMILYscatD3export",
 						  dom_id_reset_zoom = "FAMILYscatD3resetzoom"
@@ -395,6 +423,7 @@
 		if(input$goBDIV){
 			if("Genus" %in% BDIVtaxa()){	
 				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "Genus")]]
+				scatD3_DF$IDs <- rownames(scatD3_DF)
 				col_var <- if (input$bdiv_PCA_col == "None") {
 					NULL 
 				} else {
@@ -404,10 +433,15 @@
 					NULL 
 				} else {
 					scatD3_DF[,input$bdiv_PCA_shape]
+				}			
+				lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
+					NULL 
+				} else {
+					scatD3_DF[,input$bdiv_PCA_labeltype]
 				}
 				scatterD3(x = scatD3_DF[,"Component1"],
 						  y = scatD3_DF[,"Component2"],
-						  lab = NULL,
+						  lab = lab_var,
 						  xlab = "Component1",
 						  ylab = "Component2",
 						  col_var = col_var,
@@ -420,7 +454,7 @@
 						  # size_lab = input$bdiv_PCA_size,
 						  # key_var = rownames(scatterD3_DAT()),
 						  point_opacity = input$bdiv_PCA_opacity,
-						  # labels_size = input$scatterD3_labsize,
+						  labels_size = input$bdiv_PCA_labsize,
 						  transitions = input$bdiv_PCA_transitions,
 						  dom_id_svg_export = "GENUSscatD3export",
 						  dom_id_reset_zoom = "GENUSscatD3resetzoom"
@@ -443,6 +477,7 @@
 		if(input$goBDIV){
 			if("OTU" %in% BDIVtaxa()){	
 				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "OTU")]]
+				scatD3_DF$IDs <- rownames(scatD3_DF)
 				if (input$bdiv_PCA_col == "None") {
 					col_var <- NULL 
 				} else {
@@ -452,10 +487,15 @@
 					symbol_var <- NULL 
 				} else {
 					symbol_var <- scatD3_DF[,input$bdiv_PCA_shape]
+				}			
+				lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
+					NULL 
+				} else {
+					scatD3_DF[,input$bdiv_PCA_labeltype]
 				}
 				scatterD3(x = scatD3_DF[,"Component1"],
 						  y = scatD3_DF[,"Component2"],
-						  lab = NULL,
+						  lab = lab_var,
 						  xlab = "Component1",
 						  ylab = "Component2",
 						  col_var = col_var,
@@ -468,7 +508,7 @@
 						  # size_lab = input$bdiv_PCA_size,
 						  # key_var = rownames(scatterD3_DAT()),
 						  point_opacity = input$bdiv_PCA_opacity,
-						  # labels_size = input$scatterD3_labsize,
+						  labels_size = input$bdiv_PCA_labsize,
 						  transitions = input$bdiv_PCA_transitions,
 						  dom_id_svg_export = "OTUscatD3export",
 						  dom_id_reset_zoom = "OTUscatD3resetzoom"
@@ -557,10 +597,6 @@
 		
 	})	
 
-		
-	# output$bdivTEXT <- renderPrint({
-	
-	# })	
 
 	########################################################################
 	## Create DataTable object with Phylum PERMANOVA results
@@ -1128,21 +1164,31 @@
 						div(id = "BDIV_SCATD3advanced",	
 							column(3, 
 								HTML("
-									<h4><strong>Size mapping variable:</strong></h4>
+									<h4><strong>Size Mapping Variable:</strong></h4>
 									"
 								),
 								sliderInput("bdiv_PCA_size", "", min=0, max=500, value=100, step=20)
 							),
 							column(3, 
 								HTML("
-									<h4><strong>Points opacity:</strong></h4>
+									<h4><strong>Points Opacity:</strong></h4>
 									"
 								),
 								sliderInput("bdiv_PCA_opacity", label="", min = 0, max = 1, value = 1, step = 0.05)
 							),
 							column(3, 
 								HTML("
-									<h4><strong>Use transitions:</strong></h4>
+									<h4><strong>Add Labels:</strong></h4>
+									"
+								),
+								checkboxInput("bdiv_PCA_labels", "Label Points", value = FALSE),
+								selectInput(inputId="bdiv_PCA_labeltype", label = HTML("<h4><strong>Labels:</strong></h4>"), 
+										choices = c("IDs", CompGroups()$Groups), selected = "IDs"),
+								sliderInput("bdiv_PCA_labsize", HTML("<h4><strong>Label Size:</strong></h4>"), min = 5, max = 25, value = 11)		
+							),
+							column(3, 
+								HTML("
+									<h4><strong>Use Transitions:</strong></h4>
 									"
 								),
 								checkboxInput("bdiv_PCA_transitions", "Smooth transitions", value = TRUE)
@@ -1152,12 +1198,7 @@
 				),
 
 				hr(),
-				# fluidPage(
-					# column(12,
-						
-						# verbatimTextOutput("bdivTEXT")
-					# )
-				# ), 
+
 				uiOutput("BDIVphylumgraphicsRENDER"), 
 				uiOutput("BDIVclassgraphicsRENDER"), 
 				uiOutput("BDIVordergraphicsRENDER"), 
