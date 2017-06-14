@@ -123,7 +123,11 @@
 			NULL
 		}
 	})
+	
+	# output$importTEXT <- renderPrint({
 
+	# })	
+	
 	######################################################################
 	## Assess whether all labels in OTU are found in metadata
 	######################################################################		
@@ -329,7 +333,7 @@
 		req(BIOMmetad_DAT())		
 		colnames(BIOM_OTU())
 	})
-
+	
 	######################################################################
 	## Finalize metadata object
 	######################################################################		
@@ -394,9 +398,16 @@
 					} else {
 						## Subset metadata to match column IDs
 						BIOMmetad_DAT <- metaDAT[rownames(metaDAT) %in% colnames(BIOM_OTU()),]
-						## Coerce all metadata columns into factors
-						BIOMmetad_DAT <- data.frame(sapply(BIOMmetad_DAT, as.factor))
+
+						## Remove excess whitespaces from .csv file and coerce all metadata columns into factors
 						## Set names and return
+						BIOMmetad_DAT <- data.frame(
+							sapply(BIOMmetad_DAT, function(x) {
+								metavec <- x
+								as.factor(trimws(metavec, "r"))
+							})
+						)
+						
 						rownames(BIOMmetad_DAT) <- colnames(BIOM_OTU())
 						BIOMmetad_DAT
 					}
@@ -730,10 +741,6 @@
 			data.frame(taxa, otu)
 	})
 
-	# output$importTEXT <- renderPrint({
-		
-	# })	
-		
 	######################################################################
 	## Render raw data download
 	######################################################################			
@@ -1293,7 +1300,7 @@
 		list(Groups = Metacolumns, Levels=sdLEVELS)	
 	})
 
-	
+
 
 	######################################################################
 	## Render import text
