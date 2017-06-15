@@ -152,22 +152,22 @@ shinyUI(
 						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:350px;left:300px;">The following R packages were utilized in
 						no particular order of importance</p>
 						
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:375px;left:300px;"> <a href="http://shiny.rstudio.com/", target="_blank"> shiny </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:400px;left:300px;"> <a href="https://github.com/daattali/shinyjs", target="_blank"> shinyjs </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:425px;left:300px;"> <a href="https://rstudio.github.io/DT/", target="_blank"> DT </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:450px;left:300px;"> <a href="http://jkunst.com/highcharter/", target="_blank"> highcharter </a> *</p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:475px;left:300px;"> <a href="https://cran.r-project.org/web/packages/V8/vignettes/v8_intro.html", target="_blank"> V8 </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:500px;left:300px;"> <a href="https://www.bioconductor.org/packages/release/bioc/html/biomformat.html", target="_blank"> biomformat </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:525px;left:300px;"> <a href="http://ape-package.ird.fr/", target="_blank"> ape </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:550px;left:300px;"> <a href="https://github.com/psolymos/pbapply", target="_blank"> pbapply </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:575px;left:300px;"> <a href="https://github.com/tidyverse/tibble", target="_blank"> tibble </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:600px;left:300px;"> <a href="https://github.com/hadley/reshape", target="_blank"> reshape2 </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:625px;left:300px;"> <a href="https://joey711.github.io/phyloseq/", target="_blank"> phyloseq </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:650px;left:300px;"> <a href="https://github.com/hadley/dplyr", target="_blank"> dplyr </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:675px;left:300px;"> <a href="https://github.com/vegandevs/vegan", target="_blank"> vegan </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:700px;left:300px;"> <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html", target="_blank"> DESeq2 </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:725px;left:300px;"> <a href="https://github.com/juba/scatterD3", target="_blank"> scatterD3 </a> </p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:750px;left:300px;"> <a href="http://colorbrewer2.org/", target="_blank"> RColorBrewer </a> </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:375px;left:300px;"> <a href="http://shiny.rstudio.com/", target="_blank"> shiny </a> (>= 0.14.2) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:400px;left:300px;"> <a href="https://github.com/daattali/shinyjs", target="_blank"> shinyjs </a> (>= 0.8) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:425px;left:300px;"> <a href="https://rstudio.github.io/DT/", target="_blank"> DT </a> (>= 0.2) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:450px;left:300px;"> <a href="http://jkunst.com/highcharter/", target="_blank"> highcharter </a>(>= 0.5.0)*</p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:475px;left:300px;"> <a href="https://cran.r-project.org/web/packages/V8/vignettes/v8_intro.html", target="_blank"> V8 </a> (>= 1.2) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:500px;left:300px;"> <a href="https://www.bioconductor.org/packages/release/bioc/html/biomformat.html", target="_blank"> biomformat </a> (>= 1.0.2) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:525px;left:300px;"> <a href="http://ape-package.ird.fr/", target="_blank"> ape </a> (>= 3.5) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:550px;left:300px;"> <a href="https://github.com/psolymos/pbapply", target="_blank"> pbapply </a> (>= 1.3-1) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:575px;left:300px;"> <a href="https://github.com/tidyverse/tibble", target="_blank"> tibble </a> (>= 1.1) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:600px;left:300px;"> <a href="https://github.com/hadley/reshape", target="_blank"> reshape2 </a> (>= 1.4.1) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:625px;left:300px;"> <a href="https://joey711.github.io/phyloseq/", target="_blank"> phyloseq </a> (>= 1.16.2) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:650px;left:300px;"> <a href="https://github.com/hadley/dplyr", target="_blank"> dplyr </a> (>= 0.5.0) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:675px;left:300px;"> <a href="https://github.com/vegandevs/vegan", target="_blank"> vegan </a> (>= 2.4-1) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:700px;left:300px;"> <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html", target="_blank"> DESeq2 </a> (>= 1.12.4) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:725px;left:300px;"> <a href="https://github.com/juba/scatterD3", target="_blank"> scatterD3 </a> (>= 0.8) </p>
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:750px;left:300px;"> <a href="http://colorbrewer2.org/", target="_blank"> RColorBrewer </a> (>= 1.1-2) </p>
 						
 						
 						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:800px;left:300px;"> *This app uses 
