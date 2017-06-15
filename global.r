@@ -1,3 +1,16 @@
+ 
+install_packages <- c("shiny","shinyjs","DT", "highcharter", "V8","ape","pbapply",
+            "tibble","reshape2", "dplyr", "vegan", "scatterD3","RColorBrewer", "markdown")
+if (length(setdiff(install_packages, rownames(installed.packages()))) > 0) {
+            install.packages(setdiff(install_packages, rownames(installed.packages())))
+}
+ 
+bioconductor_packages <- c("biomformat", "phyloseq", "DESeq2")
+if (length(setdiff(bioconductor_packages, rownames(installed.packages()))) > 0) {
+            source("https://bioconductor.org/biocLite.R")
+            biocLite(setdiff(bioconductor_packages, rownames(installed.packages())), suppressUpdates = TRUE)
+}
+ 
 
 library(biomformat)
 library(ape)
@@ -90,100 +103,6 @@ gm_mean = function(x, na.rm=TRUE){
 
 
 options(shiny.maxRequestSize=5000*1024^2)
-
-hcboxplot.2 <- function (x = NULL, var = NULL, var2 = NULL, outliers = TRUE, 
-    ...) 
-{
-    stopifnot(is.numeric(x))
-    if (is.null(var)) 
-        var <- NA
-    if (is.null(var2)) 
-        var2 <- NA
-    df <- data_frame(x, g1 = var, g2 = var2)
-    get_box_values <- function(x) {
-        boxplot.stats(x)$stats %>% t() %>% as.data.frame() %>% 
-            setNames(c("low", "q1", "median", "q3", "high"))
-    }
-    get_outliers_values <- function(x) {
-        boxplot.stats(x)$out
-    }
-    series_box <- df %>% group_by_("g1", "g2") %>% do(data = get_box_values(.$x)) %>% 
-        tidyr::unnest() %>% group_by_("g2") %>% do(data = list_parse(rename_(select_(., 
-        "-g2"), name = "g1"))) %>% mutate(type = "boxplot") %>% 
-        mutate_(id = "as.character(g2)")
-    # if (length(list(...)) > 0) 
-        # series_box <- add_arg_to_df(series_box, ...)
-    series_out <- df %>% group_by_("g1", "g2") %>% do(data = get_outliers_values(.$x)) %>% 
-        tidyr::unnest() %>% group_by_("g2") %>% do(data = list_parse(select_(., 
-        name = "g1", y = "data"))) %>% mutate(type = "scatter") %>% 
-        mutate(linkedTo = "as.character(g2)")
-    # if (length(list(...)) > 0) 
-        # series_out <- add_arg_to_df(series_out, ...)
-    if (!has_name(list(...), "color")) {
-        colors <- colorize(seq(1, nrow(series_box)))
-        colors <- hex_to_rgba(colors, alpha = 0.75)
-    }
-    if (!has_name(list(...), "name")) {
-        series_box <- rename_(series_box, name = "g2")
-        series_out <- rename_(series_out, name = "g2")
-    }
-	
-	
-    hc <- highchart() %>% hc_chart(type = "bar") %>% hc_xAxis(type = "category") %>% 
-        hc_plotOptions(series = list(marker = list(symbol = "circle")))
-    hc <- hc_add_series_list(hc, list_parse(series_box))
-    if (is.na(var2) || is.na(var)) {
-        hc <- hc %>% hc_xAxis(categories = "") %>% hc_plotOptions(series = list(showInLegend = FALSE))
-    }
-    if (outliers) 
-        hc <- hc_add_series_list(hc, list_parse(series_out))
-    hc
-}
-
-MS <- function() {
-	metaselections <- reactive({ 
-		req(PHYLOSEQ())
-		meta <- BIOMmetad_DAT()
-		## Remove KEY column
-		# metakey <- meta[,!(colnames(meta) %in% KEY())]
-		## Remove columns that have the same number of factor levels as number of rows in data frame
-		# if object is still a data frame, ie, multiple columns remain
-		if(class(meta) != "data.frame") {
-			## make a list with factor levels
-			singleLEVELS <- list(levels(meta))
-			## Get name of remaining column
-			# Metacolumns <- colnames(meta)[!(colnames(meta) %in% KEY())]
-			## update name of list with name of remaining column
-			names(singleLEVELS) <- colnames(meta)				
-			# names(singleLEVELS) <- colnames(meta)[!(colnames(meta) %in% KEY())]				
-			# print("single columns after key filter")
-		} else {
-			metaFINAL <- meta[,sapply(meta, nlevels) != nrow(meta)]
-			if(class(metaFINAL) != "data.frame") {
-			# If not a data frame, ie, only one column left
-				# make a list with factor levels
-				singleLEVELS <- list(levels(metaFINAL))
-				# Get name of remaining column
-				# Metacolumns <- colnames(meta)
-				Metacolumns <- colnames(meta)[sapply(meta, nlevels) != nrow(meta)]
-				# update name of list with name of remaining column
-				names(singleLEVELS) <- colnames(meta)[sapply(meta, nlevels) != nrow(meta)]
-				# print("single columns after nrow filter")
-			} else {
-				# Get names of remaining columns 
-				# Metacolumns <- colnames(meta)
-				Metacolumns <- colnames(meta)[sapply(meta, nlevels) != nrow(meta)]
-				# Get factor levesl across all columns and turn it into a list
-				singleLEVELS <- lapply(metaFINAL[,sapply(metaFINAL, nlevels) != nrow(metaFINAL)], levels)
-				# print("multiple columns after key and nrow filter")
-			}
-			
-		}
-		list(Groups = Metacolumns, Levels=singleLEVELS)
-		# metaFINAL
-
-	})
-}	
 
 
 hcboxplot.2 <- function (x = NULL, var = NULL, var2 = NULL, outliers = TRUE, 
