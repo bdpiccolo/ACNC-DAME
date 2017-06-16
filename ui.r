@@ -60,7 +60,7 @@ shinyUI(
 							  to perform microbial ecology data analyses. It was specifically designed to work directly with output files from the 
 							  <a href=\"http://qiime.org/\" target=\"_blank\">QIIME 1</a> with as minimal file processing as possible.</p>
 							  <p></p>
-							  <p> The current release (v0.1) assesses &#945;-Diversity and &#946;-Diversity measurements, and differential expression analyses 
+							  <p> The current release (v0.1.3) assesses &#945;-Diversity and &#946;-Diversity measurements, and differential expression analyses 
 							  of count data.  DAME requires the .BIOM file from QIIME and a .CSV file containing the .BIOM sample labels and metadata (experimental 
 							  grouping data) associated with each sample.  This app utilizes the <a href=\"http://shiny.rstudio.com/\" target=\"_blank\">Shiny</a> 
 							  framework to allow for dynamic and real-time interaction with virtually all aspects of the data workflow.  Where possible, table and 
@@ -136,7 +136,7 @@ shinyUI(
 						</a>
 						
 						<p><p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:125px;left:300px;"> This web application was built using 
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:125px;left:300px;"> DAME version 0.1.3 was built using 
 						<a href="http://shiny.rstudio.com/", target="_blank"> Shiny </a> by 
 						<a href="https://www.rstudio.com/", target="_blank"> RStudio, </a> using open source software.  It heavily relies upon functions from 
 						<a href="https://joey711.github.io/phyloseq/", target="_blank"> phyloseq, </a> 

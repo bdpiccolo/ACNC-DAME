@@ -49,11 +49,11 @@ importTAB <- function() {
 					),
 					hr(),
 
-					fluidPage(
-						column(12,
-							verbatimTextOutput("importTEXT")
-						)
-					),
+					# fluidPage(
+						# column(12,
+							# verbatimTextOutput("importTEXT")
+						# )
+					# ),
 
 					
 					uiOutput("PHYLOSEQtabledescTEXT"),
