@@ -897,8 +897,9 @@
 	output$PHYLOSEQfilterinstructionTEXT <- renderUI({
 		req(PHYLOSEQ())
 		HTML("
-			<h4><strong><em>Choose data filters, if necessary.  Press the \"Finalize Import and Filters\" button when 
-			the desired filters are selected.</em></strong></h4>
+			<h3><strong><em>Choose data filters, if necessary.  Press the \"Finalize Import and Filters\" button when 
+			the desired filters are selected. The \"Finalize Import and Filters\" button must be pressed when future selections 
+			are required, e.g. updating or selecting another set of filters after the initial selection(s).</em></strong></h3>
 			<br></br>
 			"
 		)
@@ -1448,7 +1449,7 @@
 			fluidPage(
 				column(12,
 					HTML("
-						<h4><strong><em>Description of Imported Data.</em></strong></h4>
+						<h3><strong><em>Description of Imported Data.</em></strong></h3>
 						<br></br>
 						"
 					)
@@ -1537,6 +1538,16 @@
 		req(phyloseqFINAL())
 		list(
 			fluidPage(
+				column(12,
+					HTML("
+						<h3><strong><em>Description of Final Data.</em></strong></h3>
+						<br></br>
+						"
+					)
+				)
+			),
+			fluidPage(
+				
 				column(3,
 					uiOutput("PHYLOSEQtaxaselect2TEXT"),
 					uiOutput("tableTAXAselection2_RENDER"),

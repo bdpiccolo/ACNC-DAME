@@ -120,8 +120,56 @@
 		}				
 	})	
 
+	########################################################################
+	## Render header text for NBR group and pairwise comparisons.
+	## Loads after goDABUND observed so control of NBM and boxplots will be 
+	## updated based on selection.
 	########################################################################	
-	## Render select input for Experimental Group selection.
+	output$DABUNDnbrtestexplanRENDER <- renderUI({
+		if(input$dabundNBMtest == "Wald") {
+			HTML("
+				<p>Runs Negative Binomial Regression - pairwise group comparisons.</p>
+				"
+			)
+		} else {
+			HTML("
+				<p>Runs Negative Binomial Regression - overall group effect.</p>
+				"
+			)			
+		} 	
+	})
+
+	########################################################################
+	## Render header text for NBR group and pairwise comparisons.
+	## Loads after goDABUND observed so control of NBM and boxplots will be 
+	## updated based on selection.
+	########################################################################	
+	output$DABUNDgrouppairtextRENDER <- renderUI({
+				if(is.null(daTAXALEVEL())) {
+					NULL
+				} else {
+					if(input$dabundNBMtest == "Wald") {
+						list(
+							HTML("
+								<h3><em><strong>Select the comparison group and pairwise comparison. The \"Finalize Differential Abundance\" does NOT 
+								have to be pressed to update group and pairwise selections.</em></strong></h3></strong></em></h3>
+								"
+							)
+						)
+					} else {
+						list(
+							HTML("
+								<h3><em><strong>Select the comparison group. The \"Finalize Differential Abundance\" does NOT 
+								have to be pressed to update group selections.</em></strong></h3></strong></em></h3>
+								"
+							)
+						)
+					}
+				} 	
+	})
+
+	########################################################################	
+	## Render NBR group and pairwise comparison selections.
 	## Loads after goDABUND observed so control of NBM and boxplots will be 
 	## updated based on selection.
 	########################################################################
@@ -130,15 +178,27 @@
 		if(input$goDABUND){
 			isolate({
 				list(
-					# column(3,
-						HTML("
-							<h4><strong>Select Group(s) for Differential Abundance Analyses:</strong></h4>
-							"
-						),			
+					hr(),
+					fluidPage(
+						column(12,
+							uiOutput("DABUNDgrouppairtextRENDER")
+						)
+					),
+					fluidPage(
+						column(3,
+					
+							HTML("
+								<h4><strong>Select Group(s):</strong></h4>
+								"
+							),			
 
-						selectInput(inputId="dabundGROUPselect", label="", choices=CompGroups()$Groups, 
-							selected=CompGroups()$Groups[1])
-					# )
+							selectInput(inputId="dabundGROUPselect", label="", choices=CompGroups()$Groups, 
+								selected=CompGroups()$Groups[1])
+						),
+						column(3,
+							uiOutput("DABUNDpaircompRENDER")
+						)
+					)
 				)
 			})
 		} else {
@@ -177,7 +237,7 @@
 					if(input$dabundNBMtest == "Wald") {
 						list(
 								HTML("
-									<h4><strong>Select Pairwise Comparison for Differential Abundance Analyses:</strong></h4>
+									<h4><strong>Select Pairwise Comparison:</strong></h4>
 									"
 								),	
 								selectInput(inputId="dabundPAIRCOMPselect", label="", choices=DABUNDpaircomp(), 

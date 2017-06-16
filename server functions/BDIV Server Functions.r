@@ -1080,13 +1080,11 @@
 	########################################################################	
 	output$BDIVordinateselectRENDER <- renderUI({
 		list(
-				fluidPage(
-					column(12,
-						HTML("
-							<h4><strong><em>Select the desired graphical inputs.</em></strong></h4>
-							"
-						)	
-					)
+				
+				HTML("
+					<h3><strong><em>Select the desired graphical inputs. The \"Finalize &#946;-Diversity\" does NOT 
+					have to be pressed to update graphical inputs.</em></strong></h3>
+					"
 				),
 				fluidPage(
 					column(3, 

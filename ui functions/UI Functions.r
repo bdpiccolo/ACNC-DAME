@@ -15,7 +15,7 @@ importTAB <- function() {
 					fluidPage(
 						column(3,
 							HTML("
-							  <h4><strong>Import Biom Data:</strong></h4>
+							  <h4><strong>Import Microbiome Data (.biom):</strong></h4>
 							 "
 							),
 							fileInput(inputId='biomINPUT', label='', accept=c('.biom')),
@@ -26,14 +26,14 @@ importTAB <- function() {
 						),
 						column(3,
 							HTML("
-							  <h4><strong>Import Biom Metadata:</strong></h4>
+							  <h4><strong>Import Metadata (.csv):</strong></h4>
 							 "
 							),
 							fileInput(inputId='biommetaINPUT', label='', accept=c('.csv'))
 						),
 						column(3,
 							HTML("
-							  <h4><strong>Import TRE File (OPTIONAL):</strong></h4>
+							  <h4><strong>Import Phylogeny (OPTIONAL; .tre):</strong></h4>
 							 "
 							),
 							fileInput(inputId='treINPUT', label='', accept=c('.tre')),
@@ -76,7 +76,8 @@ adivTAB <- function() {
 				div(id = "text_adiv",
 					checkboxInput("aDIVbig", "Bigger text", FALSE),
 					HTML("
-						<h4><strong><em>Select the desired inputs and press the \"Finalize &#945;-Diversity\" button.</em></strong></h4>
+						<h3><strong><em>Select the desired inputs and press the \"Finalize &#945;-Diversity\" button. 
+						\"Finalize &#945;-Diversity\" button must be pressed when widgets are updated.</em></strong></h3>
 						"
 					),
 					# fluidPage(
@@ -139,7 +140,8 @@ bdivTAB <- function() {
 				div(id = "text_bdiv",
 					checkboxInput("bDIVbig", "Bigger text", FALSE),
 					HTML("
-						<h4><strong><em>Select the desired inputs and press the \"Finalize &#946;-Diversity\" button.</em></strong></h4>
+						<h3><strong><em>Select the desired inputs and press the \"Finalize &#946;-Diversity\" button.
+						\"Finalize &#946;-Diversity\" button must be pressed when widgets are updated.</em></strong></h3>
 						"
 					),
 					fluidPage(
@@ -196,11 +198,22 @@ rabundTAB <- function() {
 					checkboxInput("dABUNDbig", "Bigger text", FALSE),	
 				
 					fluidPage(
+						column(12,
+							HTML("
+							  <h3><em><strong>Select the desired TAXA and Negative Binomial (NB) Test widgets and then press the 
+							  \"Finalize Differential Abundance\" button. The \"Finalize Differential Abundance\" button must be pressed for future TAXA and 
+							  NB Test selections. </strong></em></h3>
+							 "
+							)
+						)
+					),
+					br(),
+					fluidPage(
 						column(3,
 							HTML("
-							  <h4><strong>Select the desired inputs and press the \"Select TAXA\" button.</strong></h4>
-							 "
-							),	 
+								<h4><strong>Select Taxonomic Level(s):</strong></h4>
+								"
+							),
 							selectizeInput("dabundTAXAselect", label="", selected="Phylum",
 								choices=c(taxaL, "OTU"), options=list(placeholder = 'Click box to select parameters'), 
 								multiple=TRUE),
@@ -211,29 +224,22 @@ rabundTAB <- function() {
 						),
 						column(3,
 							HTML("
-								<h4><strong>Select Test for Differential Abundance Analyses:</strong></h4>
+								<h4><strong>Select Negative Binomial Regression Test:</strong></h4>
 								"
 							),			
-
 							selectInput(inputId="dabundNBMtest", label="", choices=c("Wald Test" = "Wald", "Likelihood Ratio Test" = "LRT"), 
-								selected="Wald")
+								selected="Wald"),
+							uiOutput("DABUNDnbrtestexplanRENDER")
 						),
-						column(2,
-							actionButton("goDABUND", label=HTML("Select Taxa"),
+						column(3,
+							actionButton("goDABUND", label=HTML("Finalize Differential Abundance"),
 							icon("bicycle"), 
 								style="color: #fff; background-color: #2c2cad; border-color: #000")
-						),
-						# column(3,
-							# uiOutput("DABUNDtestselectRENDER")					
-						# ),
-						column(3,
-							uiOutput("DABUNDgroupselectRENDER"),
-							uiOutput("DABUNDpaircompRENDER")
 						)
-						
-						
 					),
-					# hr(),
+
+					uiOutput("DABUNDgroupselectRENDER"),
+
 					# fluidPage(
 						# column(12,
 							# verbatimTextOutput("dabundTEXT")						
