@@ -7,8 +7,10 @@ importTAB <- function() {
 					checkboxInput("IMPORTbig", "Bigger text", FALSE),
 					uiOutput("BIOMMETArowlengthmatch"),
 					uiOutput("BIOMMETAnomatch"),
-					uiOutput("BIOMMETAnomatchingIDs"),
+					# uiOutput("BIOMMETAnomatchingIDs"),
+					uiOutput("BIOMMETAduplicateIDs"),
 					uiOutput("BIOMMETAnumberstartgroup"),
+					uiOutput("importDIFFBIOMMETA"),
 					hr(),
 					fluidPage(
 						column(3,
@@ -47,11 +49,11 @@ importTAB <- function() {
 					),
 					hr(),
 
-					# fluidPage(
-						# column(12,
-							# verbatimTextOutput("importTEXT")
-						# )
-					# ),
+					fluidPage(
+						column(12,
+							verbatimTextOutput("importTEXT")
+						)
+					),
 
 					
 					uiOutput("PHYLOSEQtabledescTEXT"),

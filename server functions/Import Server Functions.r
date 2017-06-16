@@ -111,23 +111,19 @@
 	######################################################################
 	## Assess whether OTU and metadata have the same dimensions
 	######################################################################	
-	BIOM_META_rowlengthmatch <- reactive({
-		req(BIOM_OTU())
-		req(BIOMmetad_IMPORT())
+	# BIOM_META_rowlengthmatch <- reactive({
+		# req(BIOM_OTU())
+		# req(BIOMmetad_IMPORT())
 		## if number of rows in metadata does not equal number of columns in OTU data
-		if(nrow(BIOMmetad_IMPORT()) != length(colnames(BIOM_OTU()))) {
+		# if(nrow(BIOMmetad_IMPORT()) != length(colnames(BIOM_OTU()))) {
 			## Return object
-			"Column length of BIOM file and row length of BIOM Metadata do NOT match!"
-		} else {
+			# "Column length of BIOM file and row length of BIOM Metadata do NOT match!"
+		# } else {
 			## Or return nothing
-			NULL
-		}
-	})
-	
-	# output$importTEXT <- renderPrint({
+			# NULL
+		# }
+	# })
 
-	# })	
-	
 	######################################################################
 	## Assess whether all labels in OTU are found in metadata
 	######################################################################		
@@ -135,59 +131,87 @@
 		req(BIOM_OTU())
 		req(BIOMmetad_IMPORT())
 		## if number of rows in metadata does not equal number of columns in OTU data
-		if(nrow(BIOMmetad_IMPORT()) != length(colnames(BIOM_OTU()))) {
+		# if(nrow(BIOMmetad_IMPORT()) != length(colnames(BIOM_OTU()))) {
 			## Return nothing
-			NULL
-		} else {
+			# NULL
+		# } else {
 			## Or check if the column names in the OTU file match elements in 
 			## at least 1 of the metadata columns
 			## If there is not a match
-			if(sapply(BIOMmetad_IMPORT(), function(x) setequal(colnames(BIOM_OTU()) %in% x, TRUE)) == FALSE){
+			# if(sapply(BIOMmetad_IMPORT(), function(x) setequal(colnames(BIOM_OTU()) %in% x, TRUE)) == FALSE){
+			if(setequal(sapply(BIOMmetad_IMPORT(), function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x)), FALSE)){
 				## Return Object
 				"There is a not a column in the BIOM Metadata that contains all column IDS in the BIOM file"
 			} else {
 				## Or return nothing
 				NULL
 			}
-		}
+		# }
 	})
 
 	######################################################################
 	## Assess whether labels in OTU and metadata are equal
 	######################################################################			
-	BIOM_META_nomatchingIDs <- renderUI({
-		req(BIOM_OTU())
-		req(BIOMmetad_IMPORT())
-		metaD <- BIOMmetad_IMPORT()
-		## if number of rows in metadata does not equal number of columns in OTU data
-		if(nrow(metaD) != length(colnames(BIOM_OTU()))) {
-			## Return nothing
-			NULL
-		} else {
+	# BIOM_META_nomatchingIDs <- renderUI({
+		# req(BIOM_OTU())
+		# req(BIOMmetad_IMPORT())
+		# metaD <- BIOMmetad_IMPORT()
+
 			## Or check if the column names in the OTU file match elements in 
 			## at least 1 of the metadata columns
 			## If there is not a match
-			if(setequal(sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE)), FALSE)){
+			# if(setequal(sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE)), FALSE)){
+			# if(setequal(sapply(BIOMmetad_IMPORT(), function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x)), FALSE)){
 				## Return nothing
-				NULL
-			} else {
+				# NULL
+			# } else {
 				## Or set row names of the metadata as the matching column of BIOM identifiers
 				# matchcolumn <- metaD[,sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE))]
-				rownames(metaD) <- metaD[,sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE))]
+				# rownames(metaD) <- metaD[,sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE))]
 				## Make sure BIOM columns are in ascending order
-				biomDAT <- BIOM_OTU()[,order(colnames(BIOM_OTU()))]
+				# biomDAT <- BIOM_OTU()[,order(colnames(BIOM_OTU()))]
 				## set metadata rows into ascending order
-				metaDAT <- metaD[order(rownames(metaD)),]
+				# metaDAT <- metaD[order(rownames(metaD)),]
 				## test whether the metadata row names equals the BIOM data column names
-				if(setequal(rownames(metaDAT) != colnames(biomDAT), TRUE)) {
+				# if(setequal(rownames(metaDAT) != colnames(biomDAT), TRUE)) {
 					## If it doesn't then return object
-					"There is disagreement between the IDs in the BIOM file and the IDs of the BIOM Metadata file."
-				} else {
+					# "There is disagreement between the IDs in the BIOM file and the IDs of the BIOM Metadata file."
+				# } else {
 					## Or return nothing
-					NULL
-				}
+					# NULL
+				# }
+			# }
+		# }
+	# })
+
+	######################################################################
+	## Assess whether there is a duplicate label in metadata
+	######################################################################			
+	BIOM_META_duplicateIDs <- reactive({
+		req(BIOM_OTU())
+		req(BIOMmetad_IMPORT())
+		metaD <- BIOMmetad_IMPORT()
+
+		## Or check if the column names in the OTU file match elements in 
+		## at least 1 of the metadata columns
+		## If there is not a match
+		# if(setequal(sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE)), FALSE)){
+		if(setequal(sapply(metaD, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x)), FALSE)){
+			## Return nothing
+			NULL
+		} else {
+
+			metaD_labels <- as.character(metaD[,sapply(metaD, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))])
+
+			if(any(duplicated(metaD_labels))) {
+				## If it doesn't then return object
+				"There is at least 1 pair of duplicate row labels in the metadata file."
+			} else {
+				## Or return nothing
+				NULL
 			}
 		}
+		
 	})
 
 	######################################################################
@@ -197,35 +221,57 @@
 		req(BIOM_OTU())
 		req(BIOMmetad_IMPORT())
 		metaD <- BIOMmetad_IMPORT()
-		## if number of rows in metadata does not equal number of columns in OTU data
-		if(nrow(metaD) != length(colnames(BIOM_OTU()))) {
+		biomDAT <- BIOM_OTU()[,order(colnames(BIOM_OTU()))]
+
+		## Or check if the column names in the OTU file match elements in 
+		## at least 1 of the metadata columns
+		## If there is not a match
+		# if(setequal(sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE)), FALSE)){
+		if(setequal(sapply(metaD, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x)), FALSE)){
 			## Return nothing
 			NULL
 		} else {
-			if(setequal(sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE)), FALSE)){
-			## Return nothing
+			## Isolate the labels from the metadata
+			metaD_labels <- as.character(metaD[,sapply(metaD, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))])
+			## Check whether there are duplicates
+			if(any(duplicated(metaD_labels))) {
+				## If it does then return object
 				NULL
 			} else {
-				# matchcolumn <- metaD[,sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE))]
-				## Or set row names of the metadata as the matching column of BIOM identifiers
-				rownames(metaD) <- metaD[,sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE))]
-				metaD[,sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE))] <- NULL
-				## Make sure BIOM columns are in ascending order
-				biomDAT <- BIOM_OTU()[,order(colnames(BIOM_OTU()))]
-				## set metadata rows into ascending order
-				metaDAT <- metaD[order(rownames(metaD)),]		
-				## In each metadata column, extract the first element in the character string,
-				## coerce into a factor, character, and number.
-				## If number, will result in an NA
-				isthereNA <- lapply(metaDAT, function(x) as.numeric(as.character(factor(as.character(substr(x, 1, 1))))))
-				## Check whether there is NA and sum.
-				sumSC <- sum(unlist(lapply(isthereNA, function(x) length(x[!(x %in% NA)]) != 0)) > 0)
-				## If sum does not equal 0
-				if(sumSC != 0) {
-					## return object
+				
+				## set row names of the metadata as the matching column of BIOM identifiers
+				metaDAT <- metaD
+				rownames(metaDAT) <- metaDAT[,sapply(metaDAT, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))]
+				metaDAT[,sapply(metaDAT, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))] <- NULL
+				if(ncol(metaDAT) == 1) {
+					singleCOL <- metaDAT[,1]
+					names(singleCOL) <- rownames(metaDAT)
+					singleCOLordered <- singleCOL[order(names(singleCOL))]
+					singleCOLordered <- singleCOLordered[names(singleCOLordered) %in% colnames(biomDAT)]					
+					singleCOLordered <- data.frame(singleCOLordered)
+					colnames(singleCOLordered) <- colnames(metaDAT)
+					metaDAT <- singleCOLordered
+				} else {
+					## set metadata rows into ascending order
+					metaDAT <- metaDAT[order(rownames(metaDAT)),]	
+					metaDAT <- metaDAT[rownames(metaDAT) %in% colnames(biomDAT),]					
+				}		
+				# Filter OTU and metadata based on paired labels
+				biomDAT <- biomDAT[,colnames(biomDAT) %in% rownames(metaDAT)]		
+				# Check whether factors in metadata begin with number or special character.
+				# In each metadata column, extract the first element in the character string,
+				# test whether it is either a number or a special character and sum logical returns
+				# unlist and sum vector
+				
+				numSC <- sum(unlist(lapply(metaDAT, function(x) sum(grepl("[^[:alnum:]]", substr(x,1,1)) | grepl("\\d+", substr(x,1,1))))))
+				numSC
+
+				# If sum does not equal 0
+				if(numSC != 0) {
+					#return object
 					"Groups starting with number or SC"
 				} else {
-					## Or return nothing
+					# Or return nothing
 					NULL
 				}
 			}
@@ -235,15 +281,15 @@
 	######################################################################
 	## Render mismatch row warning
 	######################################################################		
-	output$BIOMMETArowlengthmatch <- renderUI({
-		req(BIOM_OTU())
-		req(BIOMmetad_IMPORT())
-		req(BIOM_META_rowlengthmatch())
+	# output$BIOMMETArowlengthmatch <- renderUI({
+		# req(BIOM_OTU())
+		# req(BIOMmetad_IMPORT())
+		# req(BIOM_META_rowlengthmatch())
 		
-			p(id="nomatch", em(strong("The inputs for \"Biom Data\" and \"Biom Metadata\" do not have the same number of rows.  
-				Please re-configure BIOM MetaData .CSV files to correct.")))
+			# p(id="nomatch", em(strong("The inputs for \"Biom Data\" and \"Biom Metadata\" do not have the same number of rows.  
+				# Please re-configure BIOM MetaData .CSV files to correct.")))
 
-	})	
+	# })	
 
 	
 	######################################################################
@@ -262,13 +308,27 @@
 	######################################################################
 	## Render missing/duplicate warning
 	######################################################################	
-	output$BIOMMETAnomatchingIDs <- renderUI({
+	# output$BIOMMETAnomatchingIDs <- renderUI({
+		# req(BIOM_OTU())
+		# req(BIOMmetad_IMPORT())
+		# req(BIOM_META_nomatchingcolumn())
+		# req(BIOM_META_nomatchingIDs())
+		
+			# p(id="nomatch", em(strong("There is either a missing or duplicate ID in the \"Biom Metadata\".  
+					# Please re-configure BIOM MetaData .CSV files to correct.")))
+
+	# })
+
+	######################################################################
+	## Render duplicate warning
+	######################################################################	
+	output$BIOMMETAduplicateIDs <- renderUI({
 		req(BIOM_OTU())
 		req(BIOMmetad_IMPORT())
-		req(BIOM_META_nomatchingcolumn())
-		req(BIOM_META_nomatchingIDs())
+		# req(BIOM_META_nomatchingcolumn())
+		req(BIOM_META_duplicateIDs())
 		
-			p(id="nomatch", em(strong("There is either a missing or duplicate ID in the \"Biom Metadata\".  
+			p(id="nomatch", em(strong("There is at least 1 pair of duplicate row labels in the metadata file.  
 					Please re-configure BIOM MetaData .CSV files to correct.")))
 
 	})
@@ -340,79 +400,79 @@
 	BIOMmetad_DAT <- reactive({
 		req(BIOM_OTU())
 		req(BIOMmetad_IMPORT())
-		
 		metaD <- BIOMmetad_IMPORT()
-		## if number of rows in metadata does not equal number of columns in OTU data
-		if(nrow(metaD) != length(colnames(BIOM_OTU()))) {
-			"rows in metadata does not equal number of columns in OTU data"
-			# NULL
+		biomDAT <- BIOM_OTU()[,order(colnames(BIOM_OTU()))]
+
+		## Or check if the column names in the OTU file match elements in 
+		## at least 1 of the metadata columns
+		## If there is not a match
+		# if(setequal(sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE)), FALSE)){
+		if(setequal(sapply(metaD, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x)), FALSE)){
+			## Return nothing
+			NULL
 		} else {
-			if(setequal(sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE)), FALSE)){
-			"There is not a columns that has all of the OTU labels in the metadata"
-				# NULL		
+			## Isolate the labels from the metadata
+			metaD_labels <- as.character(metaD[,sapply(metaD, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))])
+			## Check whether there are duplicates
+			if(any(duplicated(metaD_labels))) {
+				## If it does then return object
+				NULL
 			} else {
-				# matchcolumn <- metaD[,sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE))]
-				## Or set row names of the metadata as the matching column of BIOM identifiers
-				rownames(metaD) <- metaD[,sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE))]
-				metaD[,sapply(metaD, function(x) setequal(x %in% colnames(BIOM_OTU()), TRUE))] <- NULL
 				
-				
-				## Make sure BIOM columns are in ascending order
-				biomDAT <- BIOM_OTU()[,order(colnames(BIOM_OTU()))]
-				## set metadata rows into ascending order
-				metaDAT <- metaD[order(rownames(metaD)),]
-				if(class(metaDAT) != "data.frame") {
-					metaDAT <- data.frame(metaDAT)
-					colnames(metaDAT)[1] <- colnames(metaD)[1]
-					rownames(metaDAT) <- rownames(metaD)[order(rownames(metaD))]
-				} else {
-					metaDAT <- metaDAT
-				}
-				# list(metaD,metaDAT)
-				
-				
-				if(setequal(rownames(metaDAT) == colnames(biomDAT), TRUE)) {
-					"There is disagreement between the IDs in the BIOM file and the IDs of the BIOM Metadata file."
-				} else {
-					# Return nothing
-					NULL
-				}
-				## In each metadata column, extract the first element in the character string,
-				## coerce into a factor, character, and number.
-				## If number, will result in an NA
+				## set row names of the metadata as the matching column of BIOM identifiers
+				metaDAT <- metaD
+				rownames(metaDAT) <- metaDAT[,sapply(metaDAT, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))]
+				metaDAT[,sapply(metaDAT, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))] <- NULL
 				if(ncol(metaDAT) == 1) {
-					isthereNA <- as.numeric(as.character(factor(as.character(substr(metaDAT[,1], 1, 1)))))
-					sumSC <- length(isthereNA[!(isthereNA %in% NA)])
+					 
+					singleCOL <- trimws(metaDAT[,1], "r")
+					names(singleCOL) <- rownames(metaDAT)
+					singleCOLordered <- singleCOL[order(names(singleCOL))]
+					## Subset metadata to 
+					singleCOLordered <- singleCOLordered[names(singleCOLordered) %in% colnames(biomDAT)]
+					singleCOLordered <- data.frame(singleCOLordered)
+					colnames(singleCOLordered) <- colnames(metaDAT)
+					metaDATproc <- singleCOLordered
 				} else {
-					isthereNA <- lapply(metaDAT, function(x) as.numeric(as.character(factor(as.character(substr(x, 1, 1))))))
-					sumSC <- sum(unlist(lapply(isthereNA, function(x) length(x[!(x %in% NA)]) != 0)) > 0)
-				}
-				if(sumSC != 0) {
-					## Return nothing
-					NULL
+					## set metadata rows into ascending order
+					metaDAT <- metaDAT[order(rownames(metaDAT)),]	
+					metaDAT <- metaDAT[rownames(metaDAT) %in% colnames(biomDAT),]	
+					# Remove excess whitespaces from .csv file and coerce all metadata columns into factors
+					metaDATproc <- data.frame(
+						sapply(metaDAT, function(x) {
+							metavec <- x
+							trimws(metavec, "r")
+						})
+					)
+					rownames(metaDATproc) <- rownames(metaDAT)
+					
+				}	
+				metaDATproc
+				## Filter OTU and metadata based on paired labels		
+				## Check whether factors in metadata begin with number or special character.
+				## In each metadata column, extract the first element in the character string,
+				## test whether it is either a number or a special character and sum logical returns
+				## unlist and sum vector				
+				numSC <- sum(unlist(lapply(metaDATproc, function(x) sum(grepl("[^[:alnum:]]", substr(x,1,1)) | grepl("\\d+", substr(x,1,1))))))
+				numSC
+				# If sum does not equal 0
+				if(numSC != 0) {
+					NULL				
 				} else {
-					if(ncol(metaDAT) == 1) {
-						BIOMmetad_DAT <- metaDAT
+				
+					if(ncol(metaDATproc) == 1) {
+						BIOMmetad_DAT <- metaDATproc
 						BIOMmetad_DAT[,1] <- as.factor(BIOMmetad_DAT[,1])
+						rownames(BIOMmetad_DAT) <- rownames(metaDATproc)
 						BIOMmetad_DAT
 					} else {
-						## Subset metadata to match column IDs
-						BIOMmetad_DAT <- metaDAT[rownames(metaDAT) %in% colnames(BIOM_OTU()),]
-
-						## Remove excess whitespaces from .csv file and coerce all metadata columns into factors
-						## Set names and return
-						BIOMmetad_DAT <- data.frame(
-							sapply(BIOMmetad_DAT, function(x) {
-								metavec <- x
-								as.factor(trimws(metavec, "r"))
-							})
-						)
-						
-						rownames(BIOMmetad_DAT) <- colnames(BIOM_OTU())
+						# Set names and return
+						BIOMmetad_DAT <- data.frame(sapply(metaDATproc, function(x) as.factor(x)))						
+						rownames(BIOMmetad_DAT) <- rownames(metaDATproc)
 						BIOMmetad_DAT
 					}
 				}
-				# list(ncol(metaDAT), isthereNA, sumSC, BIOMmetad_DAT)
+				## list(ncol(metaDAT), isthereNA, sumSC, BIOMmetad_DAT)
 			}	
 		}
 	})
@@ -454,8 +514,8 @@
 	PHYLOSEQ <- reactive({
 		if (is.null(input$biomINPUT) & is.null(input$biommetaINPUT) & is.null(input$treINPUT)) {
 			req(ExampleProcessing())
-			OTU_import <- ExampleProcessing()$OTU
-			META_import <- ExampleProcessing()$META
+			OTU_IMP <- ExampleProcessing()$OTU
+			META_IMP <- ExampleProcessing()$META
 			TAXA_import <- ExampleProcessing()$TAXA
 		} else {
 			req(BIOMmetad_DAT())
@@ -463,24 +523,32 @@
 			OTU_import <- BIOM_OTU()
  			META_import <- BIOMmetad_DAT()
 			TAXA_import <- BIOM_DAT()$TAXA
+			OTU_IMP <- OTU_import[,colnames(OTU_import) %in% rownames(META_import)]
+			if(ncol(META_import) == 1) {
+				META_IMP <- data.frame(META_import[rownames(META_import) %in% colnames(OTU_import),])
+				colnames(META_IMP) <- colnames(META_import)[1]
+				rownames(META_IMP) <- rownames(META_import)
+			} else {
+				META_IMP <- META_import[rownames(META_import) %in% colnames(OTU_import),]
+			}
 		}
 				## If no tree data
 				if(is.null(TRE_DAT())){
 					# Convert OTU data into phyloseq otu_table class
-					OTU <- otu_table(OTU_import, taxa_are_rows = TRUE)
+					OTU <- otu_table(OTU_IMP, taxa_are_rows = TRUE)
 					# Convert taxa data into phyloseq taxonomyTable class
 					TAXA <- tax_table(TAXA_import)
 					# Convert Sample Metadata data frame into phyloseq sample_data class
-					SAMP <- sample_data(META_import)	
+					SAMP <- sample_data(META_IMP)	
 					## Create phyloseq object
 					pseq <- phyloseq(OTU, TAXA, SAMP)
 				} else {
 					# Convert OTU data into phyloseq otu_table class
-					OTU <- otu_table(OTU_import, taxa_are_rows = TRUE)
+					OTU <- otu_table(OTU_IMP, taxa_are_rows = TRUE)
 					# Convert taxa data into phyloseq taxonomyTable class
 					TAXA <- tax_table(TAXA_import)
 					# Convert Sample Metadata data frame into phyloseq sample_data class
-					SAMP <- sample_data(META_import)
+					SAMP <- sample_data(META_IMP)
 					## Finalize tree data
 					tre <- TRE_DAT()
 					TRE <- root(tre, 1, resolve.root = T)
@@ -493,7 +561,28 @@
 			# }
 		# }
 	})
+	
+	output$importDIFFBIOMMETA <- renderUI({
+		req(PHYLOSEQ())
+		rawOTU <- BIOM_OTU()
+		rawmetaD <- BIOMmetad_IMPORT()
+		pob <- PHYLOSEQ()
+		if(ncol(rawOTU) == nsamples(pob) & nrow(rawmetaD) == nsamples(pob)) {
+			NULL
 
+		} else {
+			if(ncol(rawOTU) > nrow(rawmetaD)) {
+				# "There are more OTU labels than metadata rows"
+				p(id="diffsize", strong("There are MORE samples in the BIOM file than what was found in the METADATA file.  DAME has filtered the BIOM file to match what was identified in the METADATA file."))	
+			} else {
+				# "There are less OTU labels than metadata rows"
+				p(id="diffsize", strong("There are LESS samples in the BIOM file than what was found in the METADATA file.  DAME has filtered the METADATA file to match what was identified in the BIOM file."))	
+			}
+			
+		}
+
+	})	
+	
 	######################################################################
 	## Make object that lists Metadata column names and factor levels
 	######################################################################		
@@ -643,7 +732,7 @@
 							th(colspan = 1, 'Max Sample Prevalance'),
 							th(colspan = 1, 'Min Sample Prevalance'),
 							th(colspan = 1, 'Total Reads'),
-							th(colspan = 1, 'Percent of Total Reads')	,
+							th(colspan = 1, 'Percent of Total Reads'),
 							th(colspan = 1, 'Total OTUs'),
 							th(colspan = 1, 'Percent of Total OTUs')	  
 						)
@@ -931,6 +1020,28 @@
 	})
 
 	######################################################################
+	## Render minimum number counts per sample 
+	######################################################################		
+	output$PHYLOSEQmincountTEXT <- renderUI({
+		req(PHYLOSEQ())
+		HTML("
+			<p id=\"filterheader\"><strong>Select Minimum Count Threshold</strong></p>
+			<p>Will filter samples that have total summed counts below the select threshold</p>
+			"
+		)
+		
+	})
+
+	######################################################################
+	## Render bacteria only radio button
+	######################################################################	
+	output$mincount_RENDER <- renderUI({ 
+		req(PHYLOSEQ())
+		numericInput("PHYLOSEQ_mincount", label = "", value= 1000)
+
+	})
+
+	######################################################################
 	## Render finalize import action button
 	######################################################################	
 	output$finalizeimportBUTTON_RENDER <- renderUI({
@@ -941,34 +1052,57 @@
 
 	})	
 	
+	# output$importTEXT <- renderPrint({
+	
+	# })	
+		
 	######################################################################
 	## Create final phyloseq object
 	######################################################################	
 	phyloseqFINAL <- reactive({
-		if (is.null(input$biomINPUT) & is.null(input$biommetaINPUT) & is.null(input$treINPUT)) {
+		# if (is.null(input$biomINPUT) & is.null(input$biommetaINPUT) & is.null(input$treINPUT)) {
 		
+			# req(PHYLOSEQ())
+			# META_IMP <- ExampleProcessing()$META
+			# OTU_IMP <- ExampleProcessing()$OTU
+			# TAXA_import <- ExampleProcessing()$TAXA
+		# } else {	
+			# req(PHYLOSEQ())
+			# META_IMP <- BIOMmetad_DAT()
+			# OTU_IMP <- BIOM_OTU()
+			# TAXA_import <- BIOM_DAT()$TAXA
+		# }
+		if (is.null(input$biomINPUT) & is.null(input$biommetaINPUT) & is.null(input$treINPUT)) {
 			req(PHYLOSEQ())
-			metaDAT_import <- ExampleProcessing()$META
-			BIOM_OTU_import <- ExampleProcessing()$OTU
+			OTU_IMP <- ExampleProcessing()$OTU
+			META_IMP <- ExampleProcessing()$META
 			TAXA_import <- ExampleProcessing()$TAXA
-		} else {	
+		} else {
 			req(PHYLOSEQ())
-			metaDAT_import <- BIOMmetad_DAT()
-			BIOM_OTU_import <- BIOM_OTU()
+			OTU_import <- BIOM_OTU()
+ 			META_import <- BIOMmetad_DAT()
 			TAXA_import <- BIOM_DAT()$TAXA
-		}
+			OTU_IMP <- OTU_import[,colnames(OTU_import) %in% rownames(META_import)]
+			if(ncol(META_import) == 1) {
+				META_IMP <- data.frame(META_import[rownames(META_import) %in% colnames(OTU_import),])
+				colnames(META_IMP) <- colnames(META_import)[1]
+				rownames(META_IMP) <- rownames(META_import)
+			} else {
+				META_IMP <- META_import[rownames(META_import) %in% colnames(OTU_import),]
+			}
+		}		
 		if(input$goIMPORT){
 			isolate({	
 				## Extract filtered metadata selections into a list and set name of list to experimental groups
 				metaselectionsREACTIVE <- lapply(metaselections()$Groups, function(x) reactiveValuesToList(input)[[paste0("meta_", x)]])
 				names(metaselectionsREACTIVE) <- metaselections()$Groups
 				## Import metadata
-				metaDAT <- metaDAT_import
+				metaDAT <- META_IMP
 				## Filter metadata based on filtered metadata selections
 				if(ncol(metaDAT) == 1) {
 					metaDAT <- data.frame(droplevels(metaDAT[metaDAT[,1] %in% metaselectionsREACTIVE[[1]] ,]))
-					colnames(metaDAT)[1] <- colnames(metaDAT_import)[1]
-					rownames(metaDAT) <- rownames(metaDAT_import)[metaDAT_import[,1] %in% metaselectionsREACTIVE[[1]]]
+					colnames(metaDAT)[1] <- colnames(META_IMP)[1]
+					rownames(metaDAT) <- rownames(META_IMP)[META_IMP[,1] %in% metaselectionsREACTIVE[[1]]]
 				} else {
 					for(i in 1:length(metaselectionsREACTIVE)) {
 						metaDAT <- droplevels(metaDAT[metaDAT[,names(metaselectionsREACTIVE)[i]] %in% metaselectionsREACTIVE[[i]] ,])
@@ -977,7 +1111,7 @@
 				## Extract updated row names from metadata
 				filteredIDs <- rownames(metaDAT)
 				# Filter OTU object and data into phyloseq otu_table class
-				OTU <- phyloseq::otu_table(BIOM_OTU_import[,colnames(BIOM_OTU_import) %in% filteredIDs], taxa_are_rows = TRUE)
+				OTU <- phyloseq::otu_table(OTU_IMP[,colnames(OTU_IMP) %in% filteredIDs], taxa_are_rows = TRUE)
 				OTU <- OTU[,colnames(OTU) %in% input$PHYLOSEQids]
 				# Convert taxa data into phyloseq taxonomyTable class
 				TAXA <- phyloseq::tax_table(TAXA_import)
@@ -996,12 +1130,14 @@
 				}						
 				## Remove taxa prefixes (eg., 'g__') and add 'Unassigned' labels to all missing labels
 				tax_table(pseq_SAMPfilt) <- taxaconvert(pseq_SAMPfilt, label_UNK=TRUE)
+				## Filter samples with low total counts
+				pseq_SAMPfilt_mincount <- prune_samples({sample_sums(pseq_SAMPfilt) > input$PHYLOSEQ_mincount}, pseq_SAMPfilt)
 				## Coerce minimum read input to numeric object
 				minOTU <- as.numeric(input$PHYLOSEQminOTU)		
 				## Coerce percent read threshold input to numeric object
 				pcCUT <- as.numeric(input$PHYLOSEQpccut)/100
 				## Filter OTUs based on minimum read and percent read threshold using phyloseq::filter_taxa() function
-				pseq_lowabundCUT <- filter_taxa(pseq_SAMPfilt, function(x) sum(x > minOTU) > (pcCUT * length(x)), TRUE)
+				pseq_lowabundCUT <- filter_taxa(pseq_SAMPfilt_mincount, function(x) sum(x > minOTU) > (pcCUT * length(x)), TRUE)
 				## If only bacteria are to be analyzed
 				if(input$PHYLOSEQ_domain == 2) {
 					## Subset taxa on Bacteria domain using phyloseq::subset_taxa() function
@@ -1219,19 +1355,20 @@
 							th(colspan = 1, ''),
 							th(colspan = 4, 'Sample Prevalance'),
 							th(colspan = 2, 'Reads'),
-							th(colspan = 2, 'OTU')	   
+							th(colspan = 2, 'OTU')	  
 						),
 						tr(
 							th(colspan = 1, 'Taxa'),
-							th(colspan = 1, 'Mean'),
-							th(colspan = 1, 'Median'),
-							th(colspan = 1, 'Max'),
-							th(colspan = 1, 'Min'),
+							th(colspan = 1, 'Mean Sample Prevalance'),
+							th(colspan = 1, 'Median Sample Prevalance'),
+							th(colspan = 1, 'Max Sample Prevalance'),
+							th(colspan = 1, 'Min Sample Prevalance'),
 							th(colspan = 1, 'Total Reads'),
-							th(colspan = 1, 'Percent of Total Reads')	,
+							th(colspan = 1, 'Percent of Total Reads'),
 							th(colspan = 1, 'Total OTUs'),
 							th(colspan = 1, 'Percent of Total OTUs')	  
 						)
+
 					)
 				)
 			),
@@ -1354,15 +1491,19 @@
 				)
 			),
 			fluidPage(
-				column(12, 
+				column(3,
+					uiOutput("PHYLOSEQmetaTEXT"),
+					uiOutput("metaselection_RENDER")
+				),
+				column(9, 
 					uiOutput("PHYLOSEQidTEXT")
 				)
 			),
 			br(),
 			fluidPage(
 				column(3,
-					uiOutput("PHYLOSEQmetaTEXT"),
-					uiOutput("metaselection_RENDER")
+					uiOutput("PHYLOSEQmincountTEXT"),
+					uiOutput("mincount_RENDER")
 				),
 				column(3,
 					uiOutput("PHYLOSEQminotuTEXT"),
