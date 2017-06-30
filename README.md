@@ -6,6 +6,15 @@ The current release (v0.1) assesses α- and β-Diversity measurements, and diffe
 
 ---
 
+## Installation
+
+*DAME* can be downloaded and run locally providing that the latest version of R and shiny are installed.  Github launch will install all required packages.
+
+```r
+library(shiny)
+runGitHub("ACNC-DAME", "bdpiccolo")
+```
+
 ## Getting Started
 
 *DAME* requires two files to operate:
@@ -34,8 +43,6 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 ```
 
 ## Example of BIOM Metadata 
-
-![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/www/MetadataPic.png?raw=true)
 
 ### Features 
 
@@ -75,7 +82,7 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 
 This web application was built using [Shiny](http://shiny.rstudio.com/) by [RStudio](https://www.rstudio.com/) using open source software.  It heavily relies upon functions from [phyloseq](https://joey711.github.io/phyloseq/), [vegan](https://github.com/vegandevs/vegan), and [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html).  We highly endorse and encourage visiting the websites associated with these packages.
 
-#### Created by: 
+Created by: 
 
   [Brian Piccolo](https://www.ncbi.nlm.nih.gov/myncbi/browse/collection/47610545/?sort=date&direction=descending)  
   Assistant Professor  
@@ -86,7 +93,6 @@ This web application was built using [Shiny](http://shiny.rstudio.com/) by [RStu
 
   [Kartik Shankar](http://acnc.uamsweb.com/home/faculty-listing/kartik-shankar/)  
   [Sree Chintapalli](http://acnc.uamsweb.com/home/faculty-listing/sree-v-chintapalli/)  
-  Umesh Wankhade
 
 The following R packages were utilized in no particular order of importance:
 
