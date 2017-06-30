@@ -8,7 +8,7 @@ The current release (v0.1) assesses α- and β-Diversity measurements, and diffe
 
 ## Installation
 
-*DAME* can be downloaded and run locally providing that the latest version of R and shiny are installed.  Github launch will install all required packages.
+*DAME* can be downloaded and run locally providing that the latest version of R and shiny are installed.  Github launch will install all required packages. Cut and paste the following script into the R console and *DAME* will launch and open in browser.
 
 ```r
 library(shiny)
