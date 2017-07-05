@@ -45,7 +45,7 @@ shinyUI(
 					checkboxInput("INTRObig", "Bigger text", FALSE),
 					fixedRow(
 						HTML("
-							  <center><h2><strong style=\"font: Impact, Charcoal, sans-serif;font-size: 150%;\">D</strong>yanmic 
+							  <center><h2><strong style=\"font: Impact, Charcoal, sans-serif;font-size: 150%;\">D</strong>ynamic 
 							  <strong style=\"font: Impact, Charcoal, sans-serif;font-size: 150%;\">A</strong>ssessment
 							  of <strong style=\"font: Impact, Charcoal, sans-serif;font-size: 150%;\">M</strong>icrobial 
 							  <strong style=\"font: Impact, Charcoal, sans-serif;font-size: 150%;\">E</strong>cology 
