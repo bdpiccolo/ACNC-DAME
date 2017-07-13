@@ -1495,10 +1495,6 @@
 		}
 	})
 	
-	# output$dabundTEXT <- renderPrint({
-
-	# })	
-
 	########################################################################				
 	## Set data for Phylum Boxplots
 	########################################################################	
@@ -1924,13 +1920,17 @@
 		}
 	})	
 
+	# output$dabundTEXT <- renderPrint({
+		
+	# })	
+
 	########################################################################
 	## Create highcharter object with Phylum boxplot data
 	########################################################################	
 	output$DABUNDphylumboxplotRENDER <- renderHighchart({
 		req(RABUNDphylumbpdata())
 				bpdata <- RABUNDphylumbpdata()
-				hcboxplot.2(x = bpdata$value, var = bpdata[,input$dabundGROUPselect],name = "Phylum", color = "#000000") %>% 
+				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect],name = "Phylum", color = "#000000") %>% 
 					hc_chart(type = "column") %>% 
 					hc_exporting(enabled = TRUE)
 
@@ -1942,7 +1942,7 @@
 	output$DABUNDclassboxplotRENDER <- renderHighchart({
 		req(RABUNDclassbpdata())
 				bpdata <- RABUNDclassbpdata()
-				hcboxplot.2(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Class", color = "#000000") %>% 
+				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Class", color = "#000000") %>% 
 					hc_chart(type = "column") %>% 
 					hc_exporting(enabled = TRUE)
 
@@ -1954,7 +1954,7 @@
 	output$DABUNDorderboxplotRENDER <- renderHighchart({
 		req(RABUNDorderbpdata())
 				bpdata <- RABUNDorderbpdata()
-				hcboxplot.2(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Order", color = "black") %>% 
+				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Order", color = "black") %>% 
 					hc_chart(type = "column") %>% 
 					hc_exporting(enabled = TRUE)
 
@@ -1966,7 +1966,7 @@
 	output$DABUNDfamilyboxplotRENDER <- renderHighchart({
 		req(RABUNDfamilybpdata())
 				bpdata <- RABUNDfamilybpdata()
-				hcboxplot.2(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Family", color = "#000000") %>% 
+				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Family", color = "#000000") %>% 
 					hc_chart(type = "column") %>% 
 					hc_exporting(enabled = TRUE)
 
@@ -1978,7 +1978,7 @@
 	output$DABUNDgenusboxplotRENDER <- renderHighchart({
 		req(RABUNDgenusbpdata())
 				bpdata <- RABUNDgenusbpdata()
-				hcboxplot.2(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Genus", color = "#000000") %>% 
+				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Genus", color = "#000000") %>% 
 					hc_chart(type = "column") %>% 
 					hc_exporting(enabled = TRUE)
 
@@ -1990,16 +1990,15 @@
 	output$DABUNDotuboxplotRENDER <- renderHighchart({
 		req(RABUNDotubpdata())
 				bpdata <- RABUNDotubpdata()
-				hcboxplot.2(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "OTU", color = "#000000") %>% 
+				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "OTU", color = "#000000") %>% 
 					hc_chart(type = "column") %>% 
 					hc_exporting(enabled = TRUE)
 
 	})
 
-	output$DABUNDtesttabletextRENDER <- renderUI({
+	output$DABUNDphylumtesttabletextRENDER <- renderUI({
 		if(input$goDABUND){
-			isolate({
-				if(input$dabundNBMtest == "Wald") {
+			if(input$dabundNBMtest == "Wald") {
 					list(
 						HTML("
 							<p>Assessing pairwise comparisons with Wald Test</p>
@@ -2013,7 +2012,117 @@
 							 "
 						)					
 				}
-			})
+			
+		} else {
+			NULL
+		}					
+	})
+
+	output$DABUNDclasstesttabletextRENDER <- renderUI({
+		if(input$goDABUND){
+			if(input$dabundNBMtest == "Wald") {
+					list(
+						HTML("
+							<p>Assessing pairwise comparisons with Wald Test</p>
+							<p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
+							 "
+						)
+					)
+				} else {
+						HTML("
+							<p>Assessing overall group effect using Likelihood Ratio Test</p>
+							 "
+						)					
+				}
+			
+		} else {
+			NULL
+		}					
+	})
+
+	output$DABUNDordertesttabletextRENDER <- renderUI({
+		if(input$goDABUND){
+			if(input$dabundNBMtest == "Wald") {
+					list(
+						HTML("
+							<p>Assessing pairwise comparisons with Wald Test</p>
+							<p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
+							 "
+						)
+					)
+				} else {
+						HTML("
+							<p>Assessing overall group effect using Likelihood Ratio Test</p>
+							 "
+						)					
+				}
+			
+		} else {
+			NULL
+		}					
+	})
+
+	output$DABUNDfamilytesttabletextRENDER <- renderUI({
+		if(input$goDABUND){
+			if(input$dabundNBMtest == "Wald") {
+					list(
+						HTML("
+							<p>Assessing pairwise comparisons with Wald Test</p>
+							<p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
+							 "
+						)
+					)
+				} else {
+						HTML("
+							<p>Assessing overall group effect using Likelihood Ratio Test</p>
+							 "
+						)					
+				}
+			
+		} else {
+			NULL
+		}					
+	})
+
+	output$DABUNDgenustesttabletextRENDER <- renderUI({
+		if(input$goDABUND){
+			if(input$dabundNBMtest == "Wald") {
+					list(
+						HTML("
+							<p>Assessing pairwise comparisons with Wald Test</p>
+							<p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
+							 "
+						)
+					)
+				} else {
+						HTML("
+							<p>Assessing overall group effect using Likelihood Ratio Test</p>
+							 "
+						)					
+				}
+			
+		} else {
+			NULL
+		}					
+	})
+
+	output$DABUNDotutesttabletextRENDER <- renderUI({
+		if(input$goDABUND){
+			if(input$dabundNBMtest == "Wald") {
+					list(
+						HTML("
+							<p>Assessing pairwise comparisons with Wald Test</p>
+							<p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
+							 "
+						)
+					)
+				} else {
+						HTML("
+							<p>Assessing overall group effect using Likelihood Ratio Test</p>
+							 "
+						)					
+				}
+			
 		} else {
 			NULL
 		}					
@@ -2087,7 +2196,7 @@
 					fluidPage(
 						column(6,				
 							DT::dataTableOutput("DABUNDphylumNBMtableRENDER"),
-							uiOutput("DABUNDtesttabletextRENDER")
+							uiOutput("DABUNDphylumtesttabletextRENDER")
 							
 						),
 						column(6,
@@ -2172,10 +2281,8 @@
 					fluidPage(
 						column(6,				
 							DT::dataTableOutput("DABUNDclassNBMtableRENDER"),
-							HTML("
-								 <p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
-								 "
-							)
+							uiOutput("DABUNDclasstesttabletextRENDER")
+
 							
 						),
 						column(6,
@@ -2261,10 +2368,8 @@
 					fluidPage(
 						column(6,				
 							DT::dataTableOutput("DABUNDorderNBMtableRENDER"),
-							HTML("
-								 <p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
-								 "
-							)
+							uiOutput("DABUNDordertesttabletextRENDER")
+
 							
 						),
 						column(6,
@@ -2349,10 +2454,8 @@
 					fluidPage(
 						column(6,				
 							DT::dataTableOutput("DABUNDfamilyNBMtableRENDER"),
-							HTML("
-								 <p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
-								 "
-							)
+							uiOutput("DABUNDfamilytesttabletextRENDER")
+
 							
 						),
 						column(6,
@@ -2437,10 +2540,8 @@
 					fluidPage(
 						column(6,		
 							DT::dataTableOutput("DABUNDgenusNBMtableRENDER"),
-							HTML("
-								 <p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
-								 "
-							)
+							uiOutput("DABUNDgenustesttabletextRENDER")
+
 							
 						),
 						column(6,
@@ -2525,10 +2626,9 @@
 					fluidPage(
 						column(6,				
 							DT::dataTableOutput("DABUNDotuNBMtableRENDER"),
-							HTML("
-								 <p>Reference group is ", factorSPLIT(input$dabundPAIRCOMPselect, " vs ", 2), "</p>
-								 "
-							)
+							uiOutput("DABUNDotutesttabletextRENDER")
+
+							
 							
 						),
 						column(6,

@@ -794,7 +794,7 @@
 			## Number of metadata
 			sampvarN <- length(sample_variables(PHYLOSEQ()))
 			## Total number of TAXA levels
-			xarankN <- length(rank_names(PHYLOSEQ()))
+			taxarankN <- length(rank_names(PHYLOSEQ()))
 			## Number of nodes
 			trenodeN <- Nnode(phy_tree(PHYLOSEQ()))
 			## Number of tips
