@@ -23,6 +23,7 @@ library(dplyr)
 library(vegan)
 library(DESeq2)
 library(RColorBrewer)
+library(tidyr)
 
 ## Functions
 
@@ -104,57 +105,103 @@ gm_mean = function(x, na.rm=TRUE){
 
 options(shiny.maxRequestSize=5000*1024^2)
 
-
-hcboxplot.2 <- function (x = NULL, var = NULL, var2 = NULL, outliers = TRUE, 
-    ...) 
-{
-    stopifnot(is.numeric(x))
-    if (is.null(var)) 
-        var <- NA
-    if (is.null(var2)) 
-        var2 <- NA
-    df <- data_frame(x, g1 = var, g2 = var2)
-    get_box_values <- function(x) {
-        boxplot.stats(x)$stats %>% t() %>% as.data.frame() %>% 
-            setNames(c("low", "q1", "median", "q3", "high"))
-    }
-    get_outliers_values <- function(x) {
-        boxplot.stats(x)$out
-    }
-    series_box <- df %>% group_by_("g1", "g2") %>% do(data = get_box_values(.$x)) %>% 
-        tidyr::unnest() %>% group_by_("g2") %>% do(data = list_parse(rename_(select_(., 
-        "-g2"), name = "g1"))) %>% mutate(type = "boxplot") %>% 
-        mutate_(id = "as.character(g2)")
-    # if (length(list(...)) > 0) 
-        # series_box <- add_arg_to_df(series_box, ...)
-    series_out <- df %>% group_by_("g1", "g2") %>% do(data = get_outliers_values(.$x)) %>% 
-        tidyr::unnest() %>% group_by_("g2") %>% do(data = list_parse(select_(., 
-        name = "g1", y = "data"))) %>% mutate(type = "scatter") %>% 
-        mutate(linkedTo = "as.character(g2)")
-    # if (length(list(...)) > 0) 
-        # series_out <- add_arg_to_df(series_out, ...)
-    if (!has_name(list(...), "color")) {
-        colors <- colorize(seq(1, nrow(series_box)))
-        colors <- hex_to_rgba(colors, alpha = 0.75)
-    }
-    if (!has_name(list(...), "name")) {
-        series_box <- rename_(series_box, name = "g2")
-        series_out <- rename_(series_out, name = "g2")
-    }
-	
-	
-    hc <- highchart() %>% hc_chart(type = "bar") %>% hc_xAxis(type = "category") %>% 
-        hc_plotOptions(series = list(marker = list(symbol = "circle")))
-    hc <- hc_add_series_list(hc, list_parse(series_box))
-    if (is.na(var2) || is.na(var)) {
-        hc <- hc %>% hc_xAxis(categories = "") %>% hc_plotOptions(series = list(showInLegend = FALSE))
-    }
-    if (outliers) 
-        hc <- hc_add_series_list(hc, list_parse(series_out))
-    hc
+ 
+get_box_values <- function(x = rt(1000, df = 10)){ 
+    boxplot.stats(x)$stats %>% 
+		t() %>% 
+		as.data.frame() %>% 
+		setNames(c("low", "q1", "median", "q3", "high"))
 }
+  
+get_outliers_values <- function(x = rt(1000, df = 10)) {
+	boxplot.stats(x)$out
+}
+  
+ 		  
+parseboxFUN <- function(datav, metav) {
+	parseDAT <- lapply(levels(metav), function(x) { 
+		Fdat <- datav[metav %in% x]
+		as.list(c(name = x, get_box_values(Fdat)))
+	})
+	list(	
+		list(g1 = as.logical("NA"),
+			data= parseDAT,
+			type = "boxplot",
+			id = as.logical("NA")
+		)
+	)	
+} 
 
+parseoutFUN <- function(datav, metav) {
+	
+	parseDAT <- lapply(levels(metav), function(x) {
+		Fdat <- datav[metav %in% x]
+		out <- get_outliers_values(Fdat)
+		if(length(out) == 0){
+			out <- list(list(name=x, y=out))
+		} else {
+			if(length(out) == 1) {
+				out <- list(list(name=x, y=out))
+			} else {
+				out <- lapply(1:length(out), function(k) list(name=x, y=out[k]))
+			}
+		}
+	})	
+	parseDAT <- do.call(list, unlist(parseDAT, recursive=FALSE))
+	
 
+	listlength <- 0 %in% sapply(parseDAT, function(x) length(x[[2]]))
+	
+	if(listlength){
+		parseDAT <- parseDAT[sapply(parseDAT, function(x) length(x[[2]])) %in% 1]
+		
+	} else {
+		parseDAT <- parseDAT
+	}
+
+	list(
+		list(name = as.logical(NA),
+			data = parseDAT,
+			type = "scatter",
+			linkedTo=  as.character(NA)
+		)
+	)
+}
+	
+hcboxplot_v3 <- function(x = NULL, var = NULL, outliers = TRUE, ...) {
+  
+  stopifnot(!is.null(x))
+  
+
+  series_box <- parseboxFUN(x, var)
+  series_out <- parseoutFUN(x, var)
+  
+
+ 
+  hc <- highchart() %>% 
+    hc_chart(type = "bar") %>% 
+    # hc_colors(colors) %>% 
+    hc_xAxis(type = "category") %>% 
+    hc_plotOptions(series = list(
+      marker = list(
+        symbol = "circle"
+      )
+    )) 
+  
+  hc <- hc_add_series_list(hc, series_box)
+  
+  # if(is.na(var2) || is.na(var)) {
+    # hc <- hc %>% 
+      # hc_xAxis(categories = "") %>% 
+      # hc_plotOptions(series = list(showInLegend = FALSE))
+  # }
+    
+  
+  if(outliers)
+    hc <- hc_add_series_list(hc, series_out)
+  
+  hc
+}
 
 
 
