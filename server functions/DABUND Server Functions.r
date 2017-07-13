@@ -782,6 +782,10 @@
 			}
 		}
 	})	
+
+	# output$dabundTEXT <- renderPrint({
+
+	# })	
 			
 	########################################################################	
 	## Create DataTable object with OTU NBM data
@@ -796,10 +800,10 @@
 				# t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]][[input$dabundPAIRCOMPselect]]
 				# t1DF <- t1[,c("OTU","Family", "Genus", "baseMean", "log2FoldChange", "pvalue", "padj")]
 				if(input$dabundNBMtest == "Wald"){
-					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]][[input$dabundPAIRCOMPselect]]
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]][[input$dabundPAIRCOMPselect]]
 					t1DF <- t1[,c("OTU","Family","Genus", "baseMean", "log2FoldChange", "pvalue", "padj")]
 				} else {
-					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "Genus")]]
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]]
 					t1DF <- t1[,c("OTU","Family","Genus", "baseMean", "pvalue", "padj")]					
 				}				
 				## Remove excess characters from OTU labels and reset into DF
@@ -1920,10 +1924,6 @@
 		}
 	})	
 
-	# output$dabundTEXT <- renderPrint({
-		
-	# })	
-
 	########################################################################
 	## Create highcharter object with Phylum boxplot data
 	########################################################################	
@@ -1931,8 +1931,8 @@
 		req(RABUNDphylumbpdata())
 				bpdata <- RABUNDphylumbpdata()
 				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect],name = "Phylum", color = "#000000") %>% 
-					hc_chart(type = "column") %>% 
-					hc_exporting(enabled = TRUE)
+					hc_chart(type = "column", zoomType = "xy") %>% 
+					hc_exporting(enabled = TRUE) 
 
 	})
 
@@ -1943,7 +1943,7 @@
 		req(RABUNDclassbpdata())
 				bpdata <- RABUNDclassbpdata()
 				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Class", color = "#000000") %>% 
-					hc_chart(type = "column") %>% 
+					hc_chart(type = "column", zoomType = "xy") %>% 
 					hc_exporting(enabled = TRUE)
 
 	})
@@ -1955,7 +1955,7 @@
 		req(RABUNDorderbpdata())
 				bpdata <- RABUNDorderbpdata()
 				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Order", color = "black") %>% 
-					hc_chart(type = "column") %>% 
+					hc_chart(type = "column", zoomType = "xy") %>% 
 					hc_exporting(enabled = TRUE)
 
 	})
@@ -1967,7 +1967,7 @@
 		req(RABUNDfamilybpdata())
 				bpdata <- RABUNDfamilybpdata()
 				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Family", color = "#000000") %>% 
-					hc_chart(type = "column") %>% 
+					hc_chart(type = "column", zoomType = "xy") %>% 
 					hc_exporting(enabled = TRUE)
 
 	})
@@ -1979,7 +1979,7 @@
 		req(RABUNDgenusbpdata())
 				bpdata <- RABUNDgenusbpdata()
 				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Genus", color = "#000000") %>% 
-					hc_chart(type = "column") %>% 
+					hc_chart(type = "column", zoomType = "xy") %>% 
 					hc_exporting(enabled = TRUE)
 
 	})
@@ -1991,7 +1991,7 @@
 		req(RABUNDotubpdata())
 				bpdata <- RABUNDotubpdata()
 				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "OTU", color = "#000000") %>% 
-					hc_chart(type = "column") %>% 
+					hc_chart(type = "column", zoomType = "xy") %>% 
 					hc_exporting(enabled = TRUE)
 
 	})
