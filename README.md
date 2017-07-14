@@ -84,15 +84,18 @@ This web application was built using [Shiny](http://shiny.rstudio.com/) by [RStu
 
 Created by: 
 
-  [Brian Piccolo](https://www.ncbi.nlm.nih.gov/myncbi/browse/collection/47610545/?sort=date&direction=descending)  
+  [Brian Piccolo](https://www.ncbi.nlm.nih.gov/myncbi/browse/collection/47610545/?sort=date&direction=descending)  
   Assistant Professor  
-  [Arkansas Nutrition Research Center](http://acnc.uamsweb.com/home/faculty-listing/brian-piccolo/)  
+  [Arkansas Nutrition Research Center](http://acnc.uams.edu/home/faculty-listing-2/brian-piccolo/)  
   University of Arkansas for Medical Sciences  
 
 #### Special thanks to:
 
-  [Kartik Shankar](http://acnc.uamsweb.com/home/faculty-listing/kartik-shankar/)  
-  [Sree Chintapalli](http://acnc.uamsweb.com/home/faculty-listing/sree-v-chintapalli/)  
+  [Kartik Shankar](http://acnc.uams.edu/home/faculty-listing-2/kartik-shankar/)  
+  [Sree Chintapalli](http://acnc.uamsweb.com/home/faculty-listing-2/sree-v-chintapalli/)  
+  [Umesh Wankhade](https://scholar.google.com/citations?user=or5rSIoAAAAJ&hl=en)
+  Sudeepa Bhattacharyya
+  [Chunqiao Luo](https://scholar.google.com/citations?user=r-gg-hYAAAAJ&hl=en)
 
 The following R packages were utilized in no particular order of importance:
 
