@@ -6,7 +6,7 @@
 
   Note: Use the OTU generated file that has taxonomy details (e.g. **otu_table_mc3_w_tax.biom**).  DAME will fail to recognize OTU table without taxonomy details.
 
-2. BIOM Metadata File - .CSV file containing a column with exact sample labels used in QIIMe analysis and experimental groupings.  It is recommended to re-purpose the original map file used in QIIME analysis.
+2. BIOM Metadata File - .CSV file containing a column with exact sample labels used in QIIME analysis and experimental groupings.  It is recommended to re-purpose the original map file used in QIIME analysis.
 
 3. TRE file (optional) - .TRE file, typically found in the same folder (**OTU**) from QIIME output.
 

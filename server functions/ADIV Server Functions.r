@@ -56,7 +56,7 @@
 					"
 				),	
 				selectInput(inputId="adivDISPERSIONtype", label = "", 
-					choices = c("Standard Error Mean" = "SEM", "Standard Deveiation"= "SD"), selected = "SEM")
+					choices = c("Standard Error Mean" = "SEM", "Standard Deviation"= "SD"), selected = "SEM")
 			)
 		} else {
 			NULL
@@ -652,7 +652,7 @@
 						   # style = list(color = "#000000", useHTML = TRUE)) %>% 
 				  hc_xAxis(title = NULL) %>%
 				  hc_yAxis(title = list(text = "Phylum alpha-Diversity")) %>%
-				  hc_chart(type = input$type)	
+				  hc_chart(type = input$type, zoomType = "xy")	
 				if (input$theme != "default") {
 					theme <- switch(input$theme,
 							  null = hc_theme_null(),
@@ -779,7 +779,7 @@
 						   # style = list(color = "#000000", useHTML = TRUE)) %>% 
 				  hc_xAxis(title = NULL) %>%
 				  hc_yAxis(title = list(text = "Class Alpha Diversity")) %>%
-				  hc_chart(type = input$type)		
+				  hc_chart(type = input$type, zoomType = "xy")		
 				  
 				if (input$theme != "default") {
 					theme <- switch(input$theme,
@@ -915,7 +915,7 @@
 						   # style = list(color = "#000000", useHTML = TRUE)) %>% 
 				  hc_xAxis(title = NULL) %>%
 				  hc_yAxis(title = list(text = "Order Alpha Diversity")) %>%
-				  hc_chart(type = input$type)	
+				  hc_chart(type = input$type, zoomType = "xy")	
 				  
 				if (input$theme != "default") {
 					theme <- switch(input$theme,
@@ -1043,7 +1043,7 @@
 						   # style = list(color = "#000000", useHTML = TRUE)) %>% 
 				  hc_xAxis(title = NULL) %>%
 				  hc_yAxis(title = list(text = "Family Alpha Diversity")) %>%
-				  hc_chart(type = input$type)	
+				  hc_chart(type = input$type, zoomType = "xy")	
 				  
 				if (input$theme != "default") {
 					theme <- switch(input$theme,
@@ -1173,7 +1173,7 @@
 						   # style = list(color = "#000000", useHTML = TRUE)) %>% 
 				  hc_xAxis(title = NULL) %>%
 				  hc_yAxis(title = list(text = "Genus Alpha Diversity")) %>%
-				  hc_chart(type = input$type)	
+				  hc_chart(type = input$type, zoomType = "xy")	
 				  
 				if (input$theme != "default") {
 					theme <- switch(input$theme,
@@ -1303,7 +1303,7 @@
 						   # style = list(color = "#000000", useHTML = TRUE)) %>% 
 				  hc_xAxis(title = NULL) %>%
 				  hc_yAxis(title = list(text = "OTU Level Alpha Diversity")) %>%
-				  hc_chart(type = input$type)	
+				  hc_chart(type = input$type, zoomType = "xy")	
 				  
 				if (input$theme != "default") {
 					theme <- switch(input$theme,
