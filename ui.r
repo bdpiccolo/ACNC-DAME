@@ -34,6 +34,7 @@ shinyUI(
 	fluidPage(
 		shinyjs::useShinyjs(),
 		shinyjs::extendShinyjs(text = jscode),
+		# tags$head(includeScript("google-analytics.js")),
         tags$head(
 			tags$link(
 				rel="stylesheet", type="text/css", href="custom.css"
