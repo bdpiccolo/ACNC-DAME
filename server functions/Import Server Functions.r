@@ -345,7 +345,11 @@
 					Please re-configure BIOM MetaData .CSV files to correct.")))
 
 	})	
-
+	
+	# output$importTEXT <- renderPrint({
+	
+	# })	
+	
 	######################################################################
 	## Import .TRE file
 	######################################################################	
@@ -355,10 +359,11 @@
 		} else {
 			validate(
 				need(tools::file_ext(input$treINPUT$name) %in% c(
-					'tre'
+					'tre', 'tree'
 				), "Wrong File Format Uploaded")
 			)		
-			read.tree(fixUploadedFilesNames(input$treINPUT)$datapath)
+			phyloseq::read_tree_greengenes(fixUploadedFilesNames(input$treINPUT)$datapath)
+			# phyloseq::read_tree_greengenes(input$treINPUT$datapath)
 		}
 	})	
 
@@ -551,9 +556,9 @@
 					SAMP <- sample_data(META_IMP)
 					## Finalize tree data
 					tre <- TRE_DAT()
-					TRE <- root(tre, 1, resolve.root = T)
+					# TRE <- root(tre, 1, resolve.root = T)
 					## Create phyloseq object
-					pseq <- phyloseq(OTU, TAXA, SAMP, TRE)
+					pseq <- phyloseq(OTU, TAXA, SAMP, tre)
 				}
 				## Remove taxa prefixes (eg., 'g__') and add 'Unassigned' labels to all missing labels
 				tax_table(pseq) <- taxaconvert(pseq, label_UNK=TRUE)
@@ -764,7 +769,7 @@
 	## Render phyloseq descriptions
 	######################################################################			
 	output$PHYLOSEQdescription <- renderUI({
-	req(PHYLOSEQ())	
+		req(PHYLOSEQ())	
 		## If no .TRE file
 		if(is.null(TRE_DAT())){	
 			## Total number of OTUs
@@ -1053,10 +1058,6 @@
 
 	})	
 	
-	# output$importTEXT <- renderPrint({
-	
-	# })	
-		
 	######################################################################
 	## Create final phyloseq object
 	######################################################################	
