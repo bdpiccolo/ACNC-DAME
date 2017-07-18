@@ -14,7 +14,7 @@ There are 3 widgets that are initially displayed when selecting the Differential
 	
 	* Taxa selections do not need to be in the hierarchical order
 	
-	* Selecting OTU will use calculate imported OTU data, while all other taxa selections will merge the OTU count data into the selected taxa using the tax_glom() function from the phyloseq package.  It takes longer to compute genus relative to family and so forth (genus > family > order > class > phylum)
+	* Selecting OTU will use uploaded OTU data, while all other taxa selections will merge the OTU count data into the selected taxa using the tax_glom() function from the phyloseq package.  It takes longer to compute genus relative to family and so forth (genus > family > order > class > phylum)
 		
 2. Select Negative Binomial Regression Test:
 
@@ -22,7 +22,7 @@ There are 3 widgets that are initially displayed when selecting the Differential
 	
 		* Selection of Wald Test will compute negative binomial regression with Wald test for pairwise comparisons.
 		
-		* Selection of Walt Test will compute a full model (includes group variable) and reduced (does not include group variable) models and then test whether the addition of the group variable is statistically signficant using a likelihood ratio test. 
+		* Selection of Likelihood Ratio Test will compute a full model (includes group variable) and reduced (does not include group variable) models and then test whether the addition of the group variable is statistically signficant using a likelihood ratio test. 
 	
 	* If Wald Test is selected, an additional input widget listing available pairwise comparisons will render after pressing the *Finalize Differential Abundance* button.  This option is not rendered if Likelihood Ratio Test is selected.
 		
@@ -36,7 +36,7 @@ There are 3 widgets that are initially displayed when selecting the Differential
 	
 	* Renders DESeq2 results (downloading options and DT table), and boxplot(s) with additional control widgets. 
 	
-	* Can be pressed at anytime and will re-calculate α-diversity calculations and ANOVA(s), and then render newly selected taxonomic levels if pressed again.		
+	* Can be pressed at anytime and will re-calculate DESeq2 calculations, and then render newly selected taxonomic levels if pressed again.		
 
 # Group selections
 
@@ -60,7 +60,7 @@ Input widgets allowing for realtime updates of result table(s) and boxplot(s) ar
 
 	* Only rendered if Wald Test is selected in *Select Negative Binomial Regression Test* widget above.
 	
-	* If there are only 2 factor levels in an experimental group, then widget will only provide a single pairwise comparison.
+	* If there are only 2 factor levels in an experimental group, then the widget will only provide a single pairwise comparison.
 	
 	* If there are > 2 factor levels in an experimental group, then the widget will provide all potential pairwise comparisons.
 	
@@ -70,11 +70,11 @@ For each taxonomic section there is a DT table providing the DESeq2 results and 
 	
 # Differential Abundance Table
 
-DAME uses DESeq2 to calculate negative binomial models and post hoc tests and provides a modified version of the results table provided by the [results() function](https://bioconductor.org/packages/devel/bioc/manuals/DESeq2/man/DESeq2.pdf).  The unaltered results() output for all pairwise comparisons within a taxonomic level is downloadable.  
+DAME uses DESeq2 to calculate negative binomial regression models and post hoc tests.  A modified version of the output provided by the [results() function](https://bioconductor.org/packages/devel/bioc/manuals/DESeq2/man/DESeq2.pdf) is diplayed as a DT table.  The unaltered results() output for all pairwise comparisons within a taxonomic level is downloadable.  
 
 ![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_dabund_deseq2_table.png?raw=true)
 
-1. The DT table always displays the OTU tag, taxonomic information, base mean, log2 fold change (if Wald Test is selected), original P-value, and the FDR adjusted P-value, regardless of which test is selected in the Select Negative Binomial Regression Test* widget. 
+1. The DT table always displays the OTU tag, taxonomic information, base mean, log2 fold change (if Wald Test is selected), original P-value, and the FDR adjusted P-value. 
 
 	* If Wald Test is selected, then the table represents the pairwise comparison designated in the *Select Pairwise Comparison* widget.
 	
@@ -96,11 +96,11 @@ DAME uses DESeq2 to calculate negative binomial models and post hoc tests and pr
 		
 2. The full DESeq2 results() output is available by clicking the Show/Hide Differential Abundance Downloading Options hyperlink above the DT table.
 
-	* Clicking on the hyperlink will render 2 additional widgets.  This hyperlink is below the 2 hyperlinks for downloading options.  
+	* Clicking on the hyperlink will render 2 additional widgets.  This hyperlink is below the 2 hyperlinks for downloading options. 
 	
 		1. Choose File Name
 		
-			* Defaults file name to Differential Abundance Data.
+			* Defaults file name to "Differential Abundance Data."
 			
 			* Can add text to box and type in new name of file.
 			
@@ -111,7 +111,7 @@ DAME uses DESeq2 to calculate negative binomial models and post hoc tests and pr
 
 # Boxplots
 
-An interactive boxplot is rendered within each taxonomic section using the highcharter package.  Either 2 or 3 input widgets are also rendered with the boxplot depending on how many factor levels are within the selected experimental group from the *Select Group(s)* widget.
+An interactive boxplot is rendered within each taxonomic section using the highcharter package.  Either 2 or 3 input widgets are rendered with the boxplot depending on how many factor levels are within the selected experimental group from the *Select Group(s)* widget.
 
 ![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_dabund_plot_interactivity.png?raw=true)
 
@@ -125,7 +125,7 @@ An interactive boxplot is rendered within each taxonomic section using the highc
 		
 	* Defaults to taxa with the lowest adjusted p-value in the adjacent table.
 		
-	* The selectInput() function that renders the dropdown box appears to have a item limit and may not show all OTUs; however, OTUs that are not displayed in the dropdown menu are still accessible.
+	* The shiny::selectInput() function that renders the dropdown box appears to have a item limit and may not show all OTUs; however, OTUs that are not displayed in the dropdown menu are still accessible.
 	
 		* Click the selection box and hit backspace.  The dropdown selections will appear, but do not select any of these items. 
 		
@@ -169,7 +169,7 @@ An interactive boxplot is rendered within each taxonomic section using the highc
 		
 		* Download image as either PNG, JPEG, SVG, and PDF.  NOTE: Selecting PDF option tends to crash DAME.
 		
-		* Download plotting data in either CSV or XLS format.  Only provides data from selected plot.  Comprehensive plotting data is provided in Downloading Options hyperlink above.
+		* Download plotting data in either CSV or XLS format.  Only provides data from selected plot.  
 		
 		* Display data table will render a HTML table below plot with plotting data.	
 		
