@@ -36,7 +36,7 @@ importTAB <- function() {
 							  <h4><strong>Import Phylogeny (OPTIONAL; .tre):</strong></h4>
 							 "
 							),
-							fileInput(inputId='treINPUT', label='', accept=c('.tre')),
+							fileInput(inputId='treINPUT', label='', accept=c('.tre', '.tree')),
 							HTML("
 							  <p>Expect upwards of 15 second wait for files >2 MB.</p>
 							 "
