@@ -29,7 +29,9 @@ Selecting the Import Data tab provides widgets for uploading the required files 
 
 	* Phylogenic Tree file is optional.  Currently, DAME only utilizes a .tre file for β-Diversity calculations (Weighted and Unweighted Unifrac, and DPCoA distances). 
   
-  * Importation of .tre file is handled through the read.tree() function from the [ape package](http://ape-package.ird.fr/)
+  * Importation of .tre file is handled through the read_tree_greengenes() function from the phyloseq package.
+  
+  	* This version of DAME only supports .tre and .tree files in newick format.  Furthermore, DAME is optimized for .tre files generated in greengenes newick format. 
 
   * Select Browse..., and a new window will open.  Files with a .tre extension will be displayed in the window.  Select file and press open.
 	
