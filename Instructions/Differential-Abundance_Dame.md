@@ -1,6 +1,6 @@
 # Differential Abundance
 
-Current implementation of differential abundance analysis of individual taxa is computed via negative binomial regression through the [DESeq2 package](https://github.com/Bioconductor-mirror/DESeq2).  Users can assess overall group differences with a likelihood ratio test comparing the full model versus a reduced model.  Pairwise comparisons of group levels are determined using Wald's Test.  Group differences of individual taxa are graphically shown as an interactive boxplot using the [highcharter package](https://github.com/jbkunst/highcharter).  DESeq2 results are presented in a tabular format using the [DT package] (https://github.com/rstudio/DT).   
+Current implementation of differential abundance analysis of individual taxa is computed via negative binomial regression through the [DESeq2 package](https://github.com/Bioconductor-mirror/DESeq2).  Users can assess overall group differences with a likelihood ratio test comparing the full model versus a reduced model.  Pairwise comparisons of group levels are determined using Wald's Test.  Group differences of individual taxa are graphically shown as an interactive boxplot using the [highcharter package](https://github.com/jbkunst/highcharter).  DESeq2 results are presented in a tabular format using the [DT package](https://github.com/rstudio/DT).   
 
 # Getting Started
 
