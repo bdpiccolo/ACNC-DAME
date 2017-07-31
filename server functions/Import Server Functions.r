@@ -39,7 +39,7 @@
 	Example_BIOM_DAT <- reactive({
 		if (is.null(input$biomINPUT) & is.null(input$biommetaINPUT) & is.null(input$treINPUT)) {
 			if(as.numeric(input$loadexample) == 2){
-				BIOM <- read_biom("./Example/otu_table_mc2_w_tax_KITTEST.biom")
+				BIOM <- read_biom("./Example/Example_BIOMFILE.biom")
 				BIOMmatrix <- as(biom_data(BIOM), "matrix")
 				## Extract TAXA data and rename columns
 				BIOMtax_matrix <- as.matrix(observation_metadata(BIOM))
@@ -362,8 +362,8 @@
 					'tre', 'tree'
 				), "Wrong File Format Uploaded")
 			)		
+			# ape::read.tree(fixUploadedFilesNames(input$treINPUT)$datapath)
 			phyloseq::read_tree_greengenes(fixUploadedFilesNames(input$treINPUT)$datapath)
-			# phyloseq::read_tree_greengenes(input$treINPUT$datapath)
 		}
 	})	
 
