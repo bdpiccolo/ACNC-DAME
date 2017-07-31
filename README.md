@@ -80,6 +80,10 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
    * Boxplots displayed with either Total Reads or Percent Abundance and rendered with the [highcharter](http://jkunst.com/highcharter/) package.*
    * All results are downloadable.
 
+### Instructions/Manual
+
+Detailed instructions can be found at the [Github repository.](https://github.com/bdpiccolo/ACNC-DAME/tree/master/Instructions)
+
 ### About 
 
 This web application was built using [Shiny](http://shiny.rstudio.com/) by [RStudio](https://www.rstudio.com/) using open source software.  It heavily relies upon functions from [phyloseq](https://joey711.github.io/phyloseq/), [vegan](https://github.com/vegandevs/vegan), and [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html).  We highly endorse and encourage visiting the websites associated with these packages.
