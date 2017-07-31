@@ -82,7 +82,7 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 
 ### Instructions/Manual
 
-Detailed instructions can be found at the [Github repository.](https://github.com/bdpiccolo/ACNC-DAME/tree/master/Instructions)
+Detailed instructions can be found at the [DAME Wiki](https://github.com/bdpiccolo/ACNC-DAME/wiki) and [Github repository](https://github.com/bdpiccolo/ACNC-DAME/tree/master/Instructions)
 
 ### About 
 
