@@ -2,19 +2,19 @@
 
 α-Diversity is a measurement of biodiversity and has also described as the within sample diversity.  It provides information related to taxa presence, absence, richness, evenness, and other ecology based metrics.  DAME provides commonly used [α-diversity estimates](https://www.rdocumentation.org/packages/phyloseq/versions/1.16.2/topics/estimate_richness) from the [phyloseq](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0061217) package. 
 
-	* Observed: Unadjusted number of taxa observed in sample
+* Observed: Unadjusted number of taxa observed in sample
 	
-	* Chao1: Richness estimate that utilizes correction factor on observed taxa.  Robust with data with a high number of low abundant taxa ([Hughes et al., _Appl Environ Microbiol_, 2001](http://aem.asm.org/content/67/10/4399) ). 
+* Chao1: Richness estimate that utilizes correction factor on observed taxa.  Robust with data with a high number of low abundant taxa ([Hughes et al., _Appl Environ Microbiol_, 2001](http://aem.asm.org/content/67/10/4399) ). 
 
-	* Abundance-based Coverage Estimator (ACE): Richness estimate that also utilizes correction factor on observed taxa.  Low sample sizes will cause both Chao1 and ACE to underestimate _true_ richness ([Hughes et al., _Appl Environ Microbiol_, 2001](http://aem.asm.org/content/67/10/4399) ). 
+* Abundance-based Coverage Estimator (ACE): Richness estimate that also utilizes correction factor on observed taxa.  Low sample sizes will cause both Chao1 and ACE to underestimate _true_ richness ([Hughes et al., _Appl Environ Microbiol_, 2001](http://aem.asm.org/content/67/10/4399) ). 
 	
-	* Shannon Diversity Index: Takes into account abundance and evenness of taxa.  Assumes samples are randomly sampled and all taxa are represented ([Magguran, Measuring Biological Diversity, Wiley-Blackwell, 2003](http://www.wiley.com/WileyCDA/WileyTitle/productCd-0632056339.html) ).  
+* Shannon Diversity Index: Takes into account abundance and evenness of taxa.  Assumes samples are randomly sampled and all taxa are represented ([Magguran, Measuring Biological Diversity, Wiley-Blackwell, 2003](http://www.wiley.com/WileyCDA/WileyTitle/productCd-0632056339.html) ).  
 	
-	* Simpson's Index: Dominance measurement.  Weighted toward the most abundant taxa and less sensitive toward richness ([Magguran, Measuring Biological Diversity, Wiley-Blackwell, 2003](http://www.wiley.com/WileyCDA/WileyTitle/productCd-0632056339.html) ).  
+* Simpson's Index: Dominance measurement.  Weighted toward the most abundant taxa and less sensitive toward richness ([Magguran, Measuring Biological Diversity, Wiley-Blackwell, 2003](http://www.wiley.com/WileyCDA/WileyTitle/productCd-0632056339.html) ).  
 	
-	* Inverse Simpson's Index: Reciprocal of Simpson's Index. More commonly used relative to Simpson's Index, but noted to have variance problems ([Magguran, Measuring Biological Diversity, Wiley-Blackwell, 2003](http://www.wiley.com/WileyCDA/WileyTitle/productCd-0632056339.html) ).  
+* Inverse Simpson's Index: Reciprocal of Simpson's Index. More commonly used relative to Simpson's Index, but noted to have variance problems ([Magguran, Measuring Biological Diversity, Wiley-Blackwell, 2003](http://www.wiley.com/WileyCDA/WileyTitle/productCd-0632056339.html) ).  
 	
-	* Fisher's alpha Index: Evenness measurement that assumes the taxa has a log-series distribution ([Fisher et al., _J Animal Ecol_, 1943](https://www.jstor.org/stable/1411?seq=1#page_scan_tab_contents]) ).
+* Fisher's alpha Index: Evenness measurement that assumes the taxa has a log-series distribution ([Fisher et al., _J Animal Ecol_, 1943](https://www.jstor.org/stable/1411?seq=1#page_scan_tab_contents]) ).
 
 # Overview
 	
