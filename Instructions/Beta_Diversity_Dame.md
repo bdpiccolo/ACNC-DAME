@@ -1,6 +1,6 @@
 # β-Diversity
 
-Current implementation of β-diversity calculations and ordinations are handled through the ordinate() function from the [phyloseq package](https://joey711.github.io/phyloseq/index.html). Ordinations numerically calculate how similar or dissimilar samples are from each other and these calculations can then be graphically demonstrated in a scatterplot.  At this time, only the first two components of ordinations are available for visualization and rendered with the [scatterD3](https://github.com/juba/scatterD3) package.  Group comparisons of β-diversity is assessed with permutational multivariate ANOVA (PERMANOVA) of a dissimilarity or distance matix using the adonis() function from the [vegan](https://github.com/vegandevs/vegan) package.
+Current implementation of β-diversity calculations and ordinations are handled through the ordinate() function from the [phyloseq package](https://joey711.github.io/phyloseq/index.html). Ordinations numerically calculate how similar or dissimilar samples are from each other and these calculations can then be graphically demonstrated in a scatterplot.  At this time, only the first two components of ordinations are available for visualization and rendered with the [scatterD3](https://github.com/juba/scatterD3) package.  Group comparisons of β-diversity is assessed with permutational multivariate ANOVA (PERMANOVA) of a dissimilarity or distance matix using the adonis2() function from the [vegan](https://github.com/vegandevs/vegan) package.
 
 # Getting Started
 
@@ -178,7 +178,7 @@ DAME uses PERMANOVA to identify group differences in dissimilarity or distance m
 
 ![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_Bdiv_PERMANOVA_table.png?raw=true)
 
-The PERMANOVA output is generated using the [DT](https://rstudio.github.io/DT/) package and provides group calculations of Degrees of Freedom, Sequential Sums of Squares, Mean Squares, F-Statistic, Partial R-Squared, and P-value.  Residual and Total calculations are also provided in the table.  Interactive functions are provided herein.
+The PERMANOVA output is generated using the [DT](https://rstudio.github.io/DT/) package and provides group calculations of Degrees of Freedom, Sums of Squares,F-Statistic, and P-value.  Residual calculations are also provided in the table.  Interactive functions are provided herein.
 
 * The table can be downloaded as either an Excel, PDF, or CSV file.  Buttons are provided at the top of the table for each file option.
 
