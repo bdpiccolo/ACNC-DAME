@@ -18,7 +18,7 @@
 
 # Overview
 	
-Current implementation of α-diversity calculations is handled through the estimate_richness() function from the [phyloseq package](https://joey711.github.io/phyloseq/index.html). Group differences are assessed with the aov() function from the stats package and shown graphically with interactive plots using the [rbokeh package](http://hafen.github.io/rbokeh/).  ANOVA results are provided alongside of bar plot(s) in a tabular format using the [DT package] (https://github.com/rstudio/DT).
+Current implementation of α-diversity calculations is handled through the estimate_richness() function from the [phyloseq package](https://joey711.github.io/phyloseq/index.html). Group differences are assessed with the aov() function from the stats package and shown graphically with interactive plots using the [rbokeh package](http://hafen.github.io/rbokeh/).  ANOVA results are provided alongside of bar plot(s) in a tabular format using the [DT package](https://github.com/rstudio/DT).
 
 # Getting Started
 
@@ -96,23 +96,23 @@ Hyperlinks will appear below the initial set of widgets with options to download
 
 ![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_advplot_opts.png?raw=true)
 
-	* Will only appear if parametric statistical tests are chosen above (e.g., 1-way ANOVA, Multi-factor ANOVA, and t-test)
+* Will only appear if parametric statistical tests are chosen above (e.g., 1-way ANOVA, Multi-factor ANOVA, and t-test)
 	
-	* Clicking on the hyperlink, *Show/hide plotting options*, will render a single widgets.  
+* Clicking on the hyperlink, *Show/hide plotting options*, will render a single widgets.  
 	
-	* Provides graphics representing the distribution of the data and visual assessments of parametric assumptions (e.g., normal distribution and heterogeneity of variance).
+* Provides graphics representing the distribution of the data and visual assessments of parametric assumptions (e.g., normal distribution and heterogeneity of variance).
 	
-	* If 1-way ANOVA or Multifactor ANOVA were chosen statistical test, widget will display Boxplot, Barplot, qqplot, and Fitted vs Residuals plot.
+* If 1-way ANOVA or Multifactor ANOVA were chosen statistical test, widget will display Boxplot, Barplot, qqplot, and Fitted vs Residuals plot.
 	
-	* If t-test is the chosen statistical test, widget will display Boxplot, Barplot, and qqplot.
+* If t-test is the chosen statistical test, widget will display Boxplot, Barplot, and qqplot.
 	
-	* All plots default to Boxplot.  Boxplots are overlayed with jittered values.
+* All plots default to Boxplot.  Boxplots are overlayed with jittered values.
 	
-	* Selection of barplot will display means with standard error bars
+* Selection of barplot will display means with standard error bars
 	
-	* Selection of qqplot will display a probability plots of quantiles of a standard normal distribution vs the quantiles of standardized residuals in the case of ANOVA or sample values (t-test).  Points on the plot should follow a straight line and deviations from the line may suggest that the data is not normally distributed.  Non-normal distribution may suggest the need for a non-parametric test.
+* Selection of qqplot will display a probability plots of quantiles of a standard normal distribution vs the quantiles of standardized residuals in the case of ANOVA or sample values (t-test).  Points on the plot should follow a straight line and deviations from the line may suggest that the data is not normally distributed.  Non-normal distribution may suggest the need for a non-parametric test.
 	
-	* Selection of Fitted vs Residuals Plot will display the estimated ANOVA values vs the residuals from the ANOVA model.  The points on the point should appear at random between the 0 value on the y-axis.  Visual identification of patterns in the fitted vs residual plots may suggest unequal variance across the range of values (heteroscedasiticity).  Presence of heteroscedasiticity may suggest the need for a non-parametric test.
+* Selection of Fitted vs Residuals Plot will display the estimated ANOVA values vs the residuals from the ANOVA model.  The points on the point should appear at random between the 0 value on the y-axis.  Visual identification of patterns in the fitted vs residual plots may suggest unequal variance across the range of values (heteroscedasiticity).  Presence of heteroscedasiticity may suggest the need for a non-parametric test.
 		
 
 # Results
