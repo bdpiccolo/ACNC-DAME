@@ -13,7 +13,7 @@ DAME requires two files to operate:
 
     * Use the OTU generated file that has taxonomy details (e.g. **otu_table_mc3_w_tax.biom**). DAME will fail to recognize OTU table without taxonomy details.
 
-    * BIOM files that are generated through other pipelines (which are in JSON format) must be converted to HDF5 format before loading into DAME.
+    * DAME can accept BIOM files in HDF5 and JSON formats.
 
 Convert from biom to txt:
 	
@@ -73,7 +73,9 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 
 	* Calculates observed, chao1, ACE, Shannon, Simpson, Inverse Simpson, and Fisher indices.
    
-	* Calculates 1-way or multifactor ANOVAs based on meta-data.
+	* Calculates 1-way or multifactor ANOVAs, t-tests, Kruskal Wallis, and Mann Whitney U tests based on meta-data.
+	
+	* Provides QQ plots and Fitted vs Residual plots to identify behaviors of parametric tests.
    
     * Output tables are rendered with the [DT](https://rstudio.github.io/DT/) package.
    
