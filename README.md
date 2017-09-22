@@ -120,4 +120,5 @@ The following R packages were utilized in no particular order of importance:
   [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)  
   [scatterD3](https://github.com/juba/scatterD3)  
   [RColorBrewer](http://colorbrewer2.org/)  
+  [rbokeh](http://hafen.github.io/rbokeh/)
 						
