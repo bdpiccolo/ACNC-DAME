@@ -63,9 +63,9 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
    
 - α-diversity statistics by taxonomic levels:
    * Calculates observed, chao1, ACE, Shannon, Simpson, Inverse Simpson, Fisher indices.
-   * Calculates 1-way or multifactor ANOVAs based on meta-data.
+   * Calculates 1-way or multifactor ANOVA, t-test, Kruskal Wallis, and Mann Whitney Test based on meta-data.
    * Output tables are rendered with the [DT](https://rstudio.github.io/DT/) package.
-   * Barplots rendered with the [highcharter](http://jkunst.com/highcharter/) package.*
+   * Barplots rendered with the [rbokeh](http://hafen.github.io/rbokeh/) package.
    * All data (α-diversity calculations and statistics) are downloadable.
    
 - β-diversity statistics by taxonomic levels:
@@ -77,7 +77,7 @@ biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-typ
 - Differential abundance analysis using Negative Binomial Regression by taxonomic levels:
    * Pairwise comparisons of meta-data using [DESeq2](http://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8) workflow.
    * DESeq2 result table rendered with [DT](https://rstudio.github.io/DT/) package.
-   * Boxplots displayed with either Total Reads or Percent Abundance and rendered with the [highcharter](http://jkunst.com/highcharter/) package.*
+   * Boxplots displayed with either Total Reads or Percent Abundance and rendered with the [rbokeh](http://hafen.github.io/rbokeh/) package.
    * All results are downloadable.
 
 ### Instructions/Manual
@@ -100,13 +100,14 @@ This web application was built using [Shiny](http://shiny.rstudio.com/) by [RStu
   [Kartik Shankar](http://acnc.uamsweb.com/home/faculty-listing/kartik-shankar/)  
   [Sree Chintapalli](http://acnc.uamsweb.com/home/faculty-listing/sree-v-chintapalli/)  
   Umesh Wankhade
+  Sudeepa Bhattacharyya
+  Chunqiao Luo
 
 The following R packages were utilized in no particular order of importance:
 
   [shiny](http://shiny.rstudio.com/)  
   [shinyjs](https://github.com/daattali/shinyjs)  
-  [DT](https://rstudio.github.io/DT/)  
-  [highcharter](http://jkunst.com/highcharter/)*  
+  [DT](https://rstudio.github.io/DT/)   
   [V8](https://cran.r-project.org/web/packages/V8/vignettes/v8_intro.html)  
   [biomformat](https://www.bioconductor.org/packages/release/bioc/html/biomformat.html)  
   [ape](http://ape-package.ird.fr/)  
@@ -120,4 +121,3 @@ The following R packages were utilized in no particular order of importance:
   [scatterD3](https://github.com/juba/scatterD3)  
   [RColorBrewer](http://colorbrewer2.org/)  
 						
-\* This app uses [Highsoft](https://shop.highsoft.com/faq/non-commercial) software with non-commercial packages.  Highsoft software product is not free for commercial use.
