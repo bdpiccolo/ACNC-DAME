@@ -15,18 +15,6 @@ DAME requires two files to operate:
 
     * DAME can accept BIOM files in HDF5 and JSON formats.
 
-Convert from biom to txt:
-	
-```python
-biom convert –i table.biom –o otu_table.txt –to-tsv –header-key taxonomy
-```
-
-Convert back to biom:
-	
-```python				
-biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-type=”OTU table"–process-obs-metadata taxonomy
-```
-
 2. BIOM Metadata File - .CSV file containing a column with exact sample labels used in QIIME analysis and experimental groupings. 
 
     * It is recommended to re-purpose the original map file used in QIIME analysis.
