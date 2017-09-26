@@ -153,16 +153,18 @@ An interactive boxplot is rendered within each taxonomic section using the rboke
 	
 4. Box Plots
 
-An interactive box plot(s) is rendered within each taxonomic section using the rbokeh package.  The box plot(s) consist of box-and-whisker plot(s) and are described [here](https://www.rdocumentation.org/packages/grDevices/versions/3.4.1/topics/boxplot.stats).  Raw values are overlayed on the boxplots. 
+	* An interactive box plot(s) is rendered within each taxonomic section using the rbokeh package.  The box plot(s) consist of box-and-whisker plot(s) and are described [here](https://www.rdocumentation.org/packages/grDevices/versions/3.4.1/topics/boxplot.stats).  Raw values are overlayed on the boxplots. 
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_plot_interactivity.png?raw=true)
+	* Hovering the mouse cursor over a point will provide additional text.  Currently, DAME displays the group level and either the total reads or % relative abundance.
 
-More information regarding the rbokeh package and boxplots can be found [here](https://hafen.github.io/rbokeh/rd.html#ly_boxplot).  Plotting interactivity (e.g., hovering text box, zooming, etc.) in rbokeh plots within a taxonomic section are independent of others if multiple taxonomic levels are rendered.  Furthermore, interactivity within a single plot is independent of multiple plots within a taxonomic section.  Resets and save functions will affect multiple plots when within a single taxonomic section. Interactive functionality in DAME is described herein.
+	* By default, click and holding the left mouse button while dragging the mouse will move the plotting canvas.  This function is designated by the arrow cross icon found on the top right hand corner of the graphic window.  A *Reset* button is also found on the upper right panel and will reset changes to all plots in the graphic window.
 
-* Hovering the mouse cursor over a point will provide additional text.  Currently, DAME displays the group level and either the total reads or % relative abundance.
+	* There are two ways to zoom.  The panel in the top right hand corner has an icon with a magnifying glass in a box and another with a magnifying glass next to an oval. Pressing The former icon will allow zooming by mouse dragging while the latter will allow zooming with the mouse wheel.  Both zooming options are plot independent, i.e., will affect a single plot within a multi plot panel.   A *Reset* button is also found on the upper right panel and will reset changes to all plots in the graphic window.
 
-* By default, click and holding the left mouse button while dragging the mouse will move the plotting canvas.  This function is designated by the arrow cross icon found on the top right hand corner of the graphic window.  A *Reset* button is also found on the upper right panel and will reset changes to all plots in the graphic window.
-
-* There are two ways to zoom.  The panel in the top right hand corner has an icon with a magnifying glass in a box and another with a magnifying glass next to an oval. Pressing The former icon will allow zooming by mouse dragging while the latter will allow zooming with the mouse wheel.  Both zooming options are plot independent, i.e., will affect a single plot within a multi plot panel.   A *Reset* button is also found on the upper right panel and will reset changes to all plots in the graphic window.
-
-* The graphic window can be saved in PNG format by clicking the floppy disk icon on the panel in the top right hand panel.  Please note that this will save all plots within the graphic space.
+	* The graphic window can be saved in PNG format by clicking the floppy disk icon on the panel in the top right hand panel.  Please note that this will save all plots within the graphic space.
+	
+	* Plotting interactivity (e.g., hovering text box, zooming, etc.) in rbokeh plots within a taxonomic section are independent of others if multiple taxonomic levels are rendered. 
+	
+	* interactivity within a single plot is independent of multiple plots within a taxonomic section.  Resets and save functions will affect multiple plots when within a single taxonomic section.
+	
+	* More information regarding the rbokeh package and boxplots can be found [here](https://hafen.github.io/rbokeh/rd.html#ly_boxplot). 
