@@ -24,7 +24,7 @@ Current implementation of α-diversity calculations is handled through the estim
 
 There are 5 widgets that are initially displayed when selecting the Alpha-Diversity tab.  The first 4 allow for selections of taxonomic level(s), α-diversity parameter(s), experimental group(s), and the statistical test used to compare groups.   All of these widgetes are managed by the *Finalize α-diversity* button.  Pressing the *Finalize α-diversity* button will finalize the analysis and render downloadable options, graphics, and ANOVA results.
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_getting_started.png?raw=true)
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_getting_started_92517.png?raw=true)
 
 1. Select Taxonomic Level(s):
 
@@ -94,7 +94,7 @@ Hyperlinks will appear below the initial set of widgets with options to download
 
 # Advanced Options for Graphics
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_advplot_opts.png?raw=true)
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_download_opts_92517.png?raw=true)
 
 * Will only appear if parametric statistical tests are chosen above (e.g., 1-way ANOVA, Multi-factor ANOVA, and t-test)
 	
@@ -123,7 +123,7 @@ For each taxonomic level selected there is an interactive graphic and ANOVA tabl
 
 An interactive box plot(s) is rendered within each taxonomic section using the rbokeh package.  The box plot(s) consist of box-and-whisker plot(s) and are described [here](https://www.rdocumentation.org/packages/grDevices/versions/3.4.1/topics/boxplot.stats).  Raw values are overlayed on the boxplots.  A single graphic will appear when 1 α-diversity parameter is selected.  When multiple α-diversity selections are chosen, the selections will be shown in single plots in a two column format.  If > 1 groups are selected, then the groups will concatenate the factor levels and display a bar for the combined levels.
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_plot_interactivity.png?raw=true)
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_boxplot_interactivity_92517.png?raw=true)
 
 More information regarding the rbokeh package and boxplots can be found [here](https://hafen.github.io/rbokeh/rd.html#ly_boxplot).  Plotting interactivity (e.g., hovering text box, zooming, etc.) in rbokeh plots within a taxonomic section are independent of others if multiple taxonomic levels are rendered.  Furthermore, interactivity within a single plot is independent of multiple plots within a taxonomic section.  Resets and save functions will affect multiple plots when within a single taxonomic section. Interactive functionality in DAME is described herein.
 
@@ -139,7 +139,7 @@ More information regarding the rbokeh package and boxplots can be found [here](h
 
 An interactive bar plot(s) is rendered within each taxonomic section using the rbokeh package.  The bar plot(s) consist of bars with standard error bars.  A single graphic will appear when 1 α-diversity parameter is selected.  When multiple α-diversity selections are chosen, the selections will be shown in single plots in a two column format.  If > 1 groups are selected, then the groups will concatenate the factor levels and display all levels within a single plot.
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_plot_interactivity.png?raw=true)
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_barplot_interactivity_92517.png?raw=true)
 
 More information regarding the rbokeh package and bar plots can be found [here](https://hafen.github.io/rbokeh/rd.html#ly_bar).  Plotting interactivity (e.g., hovering text box, zooming, etc.) in rbokeh plots within a taxonomic section are independent of others if multiple taxonomic levels are rendered.  Furthermore, interactivity within a single plot is independent of multiple plots within a taxonomic section.  Resets and save functions will affect multiple plots when within a single taxonomic section. Interactive functionality in DAME is described herein.
 
@@ -155,7 +155,7 @@ More information regarding the rbokeh package and bar plots can be found [here](
 
 An interactive qq plot(s) is rendered within each taxonomic section using the rbokeh package.  The qq plot(s) is a x and y scatter plot of quantiles of a normal distribution against quantiles of data.  QQ plots will only render if a parametric statistical test is selected.  A single graphic will appear when 1 α-diversity parameter is selected.  When multiple α-diversity selections are chosen, the selections will be shown in single plots in a two column format.  If > 1 groups are selected, then the groups will concatenate the factor levels and display all levels within a single plot.
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_plot_interactivity.png?raw=true)
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_qqplot_interactivity_92517.png?raw=true)
 
 More information regarding the rbokeh package and point plots can be found [here](https://hafen.github.io/rbokeh/rd.html#ly_patch).  Plotting interactivity (e.g., hovering text box, zooming, etc.) in rbokeh plots within a taxonomic section are independent of others if multiple taxonomic levels are rendered.  Furthermore, interactivity within a single plot is independent of multiple plots within a taxonomic section.  Resets and save functions will affect multiple plots when within a single taxonomic section. Interactive functionality in DAME is described herein.
 
@@ -171,7 +171,7 @@ More information regarding the rbokeh package and point plots can be found [here
 
 An interactive Fitted vs Residuals plot(s) is rendered within each taxonomic section using the rbokeh package.  The Fitted vs Residuals plot(s) is a x and y scatter plot of estimated ANOVA values against the standardized residuals from the ANOVA.  Fitted vs Residual plot(s) will only be displayed if ANOVA based tests are selected.  A single graphic will appear when 1 α-diversity parameter is selected.  When multiple α-diversity selections are chosen, the selections will be shown in single plots in a two column format.  If > 1 groups are selected, then the groups will concatenate the factor levels and display all levels within a single plot.
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_plot_interactivity.png?raw=true)
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_fvsrplot_interactivity_92517.png?raw=true)
 
 More information regarding the rbokeh package and point plots can be found [here](https://hafen.github.io/rbokeh/rd.html#ly_patch).  Plotting interactivity (e.g., hovering text box, zooming, etc.) in rbokeh plots within a taxonomic section are independent of others if multiple taxonomic levels are rendered.  Furthermore, interactivity within a single plot is independent of multiple plots within a taxonomic section.  Resets and save functions will affect multiple plots when within a single taxonomic section. Interactive functionality in DAME is described herein.
 
@@ -187,7 +187,7 @@ More information regarding the rbokeh package and point plots can be found [here
 
 Currently, DAME utilizes ANOVA to assess group differences in a-diversity calculations using the aov() function.  between groups. 
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_ANOVA_table.png?raw=true)
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_ANOVA_table_92517.png?raw=true)
 
 The ANOVA output is generated using the [DT](https://rstudio.github.io/DT/) package and provides group calculations of Degrees of Freedom, Sequential Sums of Squares, Mean Squares, F-Statistic, Partial R-Squared, and P-value.  Residual and Total calculations are also provided in the table.  Interactive functions are provided herein.
 
