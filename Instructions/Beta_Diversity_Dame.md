@@ -13,7 +13,7 @@ Current implementation of β-diversity calculations and ordinations are handled 
 
 There are 9 widgets that are initially displayed when first selecting the Beta-Diversity tab, but only the first 4 are necessary to render the 2-dimensional ordinations scatterplot and PERMANVOA table.  The remaining widgets influence the the 2-dimensional ordination plots after rendering.
 
-![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_bdiv_getting_started.png?raw=true)
+![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_bdiv_getting_started_92517.png?raw=true)
 
 1. Select Taxonomic Level(s):
 
@@ -53,7 +53,7 @@ There are 9 widgets that are initially displayed when first selecting the Beta-D
 
 Although several plotting widgets are displayed when the β-diversity tab is first loaded, they are not functional and will reset to defaults after the Finalize β-diversity control button is pressed.  Each widget will return to its default setting when the Finalize β-diversity control button is re-pressed.
 
-![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_bdiv_plot_widgets_92517?raw=true)
+![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_bdiv_plot_widgets_92517.png?raw=true)
 
 1. Select β-Diversity Parameter(s):
 
