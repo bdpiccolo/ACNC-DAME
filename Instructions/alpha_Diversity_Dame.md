@@ -94,7 +94,7 @@ Hyperlinks will appear below the initial set of widgets with options to download
 
 # Advanced Options for Graphics
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_download_opts_92517.png?raw=true)
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_adiv_plot_opts_92517.png?raw=true)
 
 * Will only appear if parametric statistical tests are chosen above (e.g., 1-way ANOVA, Multi-factor ANOVA, and t-test)
 	
