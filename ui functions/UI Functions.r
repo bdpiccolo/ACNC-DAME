@@ -5,6 +5,7 @@ importTAB <- function() {
             tabPanel(title = "Import Data", id = "importdatpage",
 				div(id = "text_import",
 					checkboxInput("IMPORTbig", "Bigger text", FALSE),
+					uiOutput("BIOMnotaxarender"),
 					uiOutput("BIOMMETArowlengthmatch"),
 					uiOutput("BIOMMETAnomatch"),
 					# uiOutput("BIOMMETAnomatchingIDs"),
@@ -108,20 +109,32 @@ adivTAB <- function() {
 							selectizeInput("adivADIVselect", label="", selected="Observed",
 								choices=adivL, options = list(minItems = 1), 
 								multiple=TRUE
+							),
+							HTML("
+								<p>&#945;-Diversity is an estimate of biodiversity, also referred to as within sample diversity.  Commonly used measurements in microbial analyses (Chao1, 
+								Shannon & Simpson Indices) are included. More in depth review can be found 
+								<a href=\"https://academic.oup.com/femsre/article/32/4/557/1812950\" target=\"_blank\">here</a>.</p>
+								"
 							)
 						),
 						column(3,
 							uiOutput("ADIVgroupselectRENDER")
 						),
 						column(3,
+							uiOutput("ADIVtesttypeRENDER")						
+						)
+					),
+					fluidPage(
+						column(5),
+						column(3,
+							br(),
 							actionButton("goADIV", label=HTML("Finalize &#945;-Diversity"),
-							# "Finalize Alpha-Diversity", 
-							icon("bicycle"), 
-								style="color: #fff; background-color: #2c2cad; border-color: #000")
-							
+							icon("bicycle"), style="color: #fff; background-color: #2c2cad; border-color: #000")
 						)
 					),
 					uiOutput("ADIVdownloadRENDER"),
+					uiOutput("ADIVadvanceplotRENDER"),
+					
 					
 					uiOutput("ADIVphylumgraphicsRENDER"),
 					uiOutput("ADIVclassgraphicsRENDER"),
@@ -164,11 +177,15 @@ bdivTAB <- function() {
 						),
 						column(3,
 							HTML("
-								<p id=\"filterheader\"><strong>Choose number of permuations for PERMANOVA</strong></p>
+								<h4><strong>Choose number of permutations for PERMANOVA:</strong></h4>
 								"
 							),
 							selectInput(inputId="BDIVpermcut", label="", 
-								choices=seq(100, 1000, 100), selected=500)							
+								choices=seq(100, 1000, 100), selected=500),
+							HTML("
+								<p>PERMANOVA determines a p-value by comparing the true F statistic to randomly permuted F statistics. DAME defaults to 500 permutations.</p>
+								"
+							)							
 						),
 						column(3,
 							actionButton("goBDIV", label=HTML("Finalize &#946;-Diversity"),

@@ -27,12 +27,12 @@ library(tidyr)
 
 ## Functions
 
+sD3colors <- brewer.pal(12,"Paired")	
 
 fixUploadedFilesNames <- function(x) {
 	if (is.null(x)) {
 		return()
-	}
- 
+	} 
 	oldNames = x$datapath
 	newNames = file.path(dirname(x$datapath), x$name)
 	file.rename(from = oldNames, to = newNames)
@@ -40,10 +40,80 @@ fixUploadedFilesNames <- function(x) {
 	x
 }
 
+JSONtaxa <- function(TAXA) {
+	# TAXA <- observation_metadata(biom)
+	TAXAMAT <- as.data.frame(matrix(NA, ncol=8, nrow=length(TAXA)))
+	colnames(TAXAMAT) <- c("d__", "k__", "p__", "c__", "o__", "f__", "g__", "s__")
+	rownames(TAXAMAT) <- names(TAXA)
+	for(i in 1:length(TAXA)){
+		## Domain
+		if(!(setequal(grepl("d__", TAXA[[i]]), FALSE))){
+			TAXAMAT[i,colnames(TAXAMAT) %in% "d__"] <- TAXA[[i]][grepl("d__", TAXA[[i]])]
+			rownames(TAXAMAT)[i] <- names(TAXA)[i]
+		} else {
+			NULL
+		}	
+		## Kingdom
+		if(!(setequal(grepl("k__", TAXA[[i]]), FALSE))){
+			TAXAMAT[i,colnames(TAXAMAT) %in% "k__"] <- TAXA[[i]][grepl("k__", TAXA[[i]])]
+			rownames(TAXAMAT)[i] <- names(TAXA)[i]
+		} else {
+			NULL
+		}
+		## Phylum
+		if(!(setequal(grepl("p__", TAXA[[i]]), FALSE))){
+			TAXAMAT[i,colnames(TAXAMAT) %in% "p__"] <- TAXA[[i]][grepl("p__", TAXA[[i]])]
+			rownames(TAXAMAT)[i] <- names(TAXA)[i]
+		} else {
+			NULL
+		}
+		## Class
+		if(!(setequal(grepl("c__", TAXA[[i]]), FALSE))){
+			TAXAMAT[i,colnames(TAXAMAT) %in% "c__"] <- TAXA[[i]][grepl("c__", TAXA[[i]])]
+			rownames(TAXAMAT)[i] <- names(TAXA)[i]
+		} else {
+			NULL
+		}
+		## Order
+		if(!(setequal(grepl("o__", TAXA[[i]]), FALSE))){
+			TAXAMAT[i,colnames(TAXAMAT) %in% "o__"] <- TAXA[[i]][grepl("o__", TAXA[[i]])]
+			rownames(TAXAMAT)[i] <- names(TAXA)[i]
+		} else {
+			NULL
+		}
+		## Family
+		if(!(setequal(grepl("f__", TAXA[[i]]), FALSE))){
+			TAXAMAT[i,colnames(TAXAMAT) %in% "f__"] <- TAXA[[i]][grepl("f__", TAXA[[i]])]
+			rownames(TAXAMAT)[i] <- names(TAXA)[i]
+		} else {
+			NULL
+		}
+		## Genus
+		if(!(setequal(grepl("g__", TAXA[[i]]), FALSE))){
+			TAXAMAT[i,colnames(TAXAMAT) %in% "g__"] <- TAXA[[i]][grepl("g__", TAXA[[i]])]
+			rownames(TAXAMAT)[i] <- names(TAXA)[i]
+		} else {
+			NULL
+		}
+		## Species
+		if(!(setequal(grepl("s__", TAXA[[i]]), FALSE))){
+			TAXAMAT[i,colnames(TAXAMAT) %in% "s__"] <- TAXA[[i]][grepl("s__", TAXA[[i]])]
+			rownames(TAXAMAT)[i] <- names(TAXA)[i]
+		} else {
+			NULL
+		}
+
+	}
+	TAXAMAT <- apply(TAXAMAT, 2, function(x) ifelse(x %in% NA, "", x))
+	colnames(TAXAMAT) <- c("d__", "k__", "p__", "c__", "o__", "f__", "g__", "s__")
+	rownames(TAXAMAT) <- names(TAXA)
+	TAXAMAT
+}
 
 taxaconvert <- function(phyloO, label_UNK=FALSE) {
 	taxT <- tax_table(phyloO)
-	taxT[,"Domain"] <- gsub("k__", "", taxT[,"Domain"])
+	# taxT[,"Domain"] <- gsub("d__", "", taxT[,"Domain"])
+	taxT[,"Kingdom"] <- gsub("k__", "", taxT[,"Kingdom"])
 	taxT[,"Phylum"] <- gsub("p__", "", taxT[,"Phylum"])
 	taxT[,"Class"] <- gsub("c__", "", taxT[,"Class"])
 	taxT[,"Order"] <- gsub("o__", "", taxT[,"Order"])
@@ -51,7 +121,8 @@ taxaconvert <- function(phyloO, label_UNK=FALSE) {
 	taxT[,"Genus"] <- gsub("g__", "", taxT[,"Genus"])
 	taxT[,"Species"] <- gsub("s__", "", taxT[,"Species"])
 	if(label_UNK == TRUE) {
-		taxT[,"Domain"][which(taxT[,"Domain"] %in% "")] <- "Unassigned"
+		# taxT[,"Domain"][which(taxT[,"Domain"] %in% "")] <- "Unassigned"
+		taxT[,"Kingdom"][which(taxT[,"Kingdom"] %in% "")] <- "Unassigned"
 		taxT[,"Phylum"][which(taxT[,"Phylum"] %in% "")] <- "Unassigned"
 		taxT[,"Class"][which(taxT[,"Class"] %in% "")] <- "Unassigned"
 		taxT[,"Order"][which(taxT[,"Order"] %in% "")] <- "Unassigned"
@@ -167,40 +238,22 @@ parseoutFUN <- function(datav, metav) {
 		)
 	)
 }
-	
-hcboxplot_v3 <- function(x = NULL, var = NULL, outliers = TRUE, ...) {
-  
-  stopifnot(!is.null(x))
-  
 
-  series_box <- parseboxFUN(x, var)
-  series_out <- parseoutFUN(x, var)
-  
-
- 
-  hc <- highchart() %>% 
-    hc_chart(type = "bar") %>% 
-    # hc_colors(colors) %>% 
-    hc_xAxis(type = "category") %>% 
-    hc_plotOptions(series = list(
-      marker = list(
-        symbol = "circle"
-      )
-    )) 
-  
-  hc <- hc_add_series_list(hc, series_box)
-  
-  # if(is.na(var2) || is.na(var)) {
-    # hc <- hc %>% 
-      # hc_xAxis(categories = "") %>% 
-      # hc_plotOptions(series = list(showInLegend = FALSE))
-  # }
-    
-  
-  if(outliers)
-    hc <- hc_add_series_list(hc, series_out)
-  
-  hc
+qqlineRESULTS <- function (y, datax = FALSE, distribution = qnorm, probs = c(0.25, 
+    0.75), qtype = 7, ...) 
+{
+    stopifnot(length(probs) == 2, is.function(distribution))
+    y <- quantile(y, probs, names = FALSE, type = qtype, na.rm = TRUE)
+    x <- distribution(probs)
+    if (datax) {
+        slope <- diff(x)/diff(y)
+        int <- x[1L] - slope * y[1L]
+    }
+    else {
+        slope <- diff(y)/diff(x)
+        int <- y[1L] - slope * x[1L]
+    }
+	list(intercept = int, slope = slope)
 }
 
 

@@ -1,12 +1,19 @@
 # β-Diversity
 
-Current implementation of β-diversity calculations and ordinations are handled through the ordinate() function from the [phyloseq package](https://joey711.github.io/phyloseq/index.html). Ordinations numerically calculate how similar or dissimilar samples are from each other and these calculations can then be graphically demonstrated in a scatterplot.  At this time, only the first two components of ordinations are available for visualization and rendered with the [scatterD3](https://github.com/juba/scatterD3) package.  Group comparisons of β-diversity is assessed with permutational multivariate ANOVA (PERMANOVA) of a dissimilarity or distance matix using the adonis() function from the [vegan](https://github.com/vegandevs/vegan) package.
+β-diversity is an estimate of biodiversity, also referred to as between sample diversity. Dissimilarity and distance indices are commonly used to estimate β-diversity. Dissimilarity based measurements (Bray-Curtis and Jaccard) are commonly used in microbial analyses. β-diversity is visualized with by data reduction techniques that are collectively referred to as ordinations.  Ordinations  work by summarizing the inherent variance found within a dataset and then projecting the results into a lower dimensional plot (e.g., scatterplot) where similar samples will cluster together and dissimilar samples will distance themselves from one another. Principal Co-ordinate Analysis (PCoA), and Non-multi Dimensional Scaling (NMDS) are commonly used in microbial analyses.
+
+More in depth review can be found [here](http://www.sciencedirect.com/science/article/pii/S0092867414008642?via%3Dihub).  Description of non-phylogenetic β-diversity measurements can be found [here](https://www.rdocumentation.org/packages/vegan/versions/2.4-2/topics/vegdist).  Description of phylogenetic β-diversity measurements can be found [here](https://rdrr.io/bioc/phyloseq/man/distance.html).  Description of ordinations can be found [here](https://www.rdocumentation.org/packages/phyloseq/versions/1.16.2/topics/ordinate).  
+
+
+# Overview
+
+Current implementation of β-diversity calculations and ordinations are handled through the ordinate() function from the [phyloseq package](https://joey711.github.io/phyloseq/index.html). Ordinations numerically calculate how similar or dissimilar samples are from each other and these calculations can then be graphically demonstrated in a scatterplot.  At this time, only the first two components of ordinations are available for visualization and rendered with the [scatterD3](https://github.com/juba/scatterD3) package.  Group comparisons of β-diversity is assessed with permutational multivariate ANOVA (PERMANOVA) of a dissimilarity or distance matix using the adonis2() function from the [vegan](https://github.com/vegandevs/vegan) package.
 
 # Getting Started
 
 There are 9 widgets that are initially displayed when first selecting the Beta-Diversity tab, but only the first 4 are necessary to render the 2-dimensional ordinations scatterplot and PERMANVOA table.  The remaining widgets influence the the 2-dimensional ordination plots after rendering.
 
-![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_Bdiv_getting_started.png?raw=true)
+![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_bdiv_getting_started_92517.png?raw=true)
 
 1. Select Taxonomic Level(s):
 
@@ -46,7 +53,7 @@ There are 9 widgets that are initially displayed when first selecting the Beta-D
 
 Although several plotting widgets are displayed when the β-diversity tab is first loaded, they are not functional and will reset to defaults after the Finalize β-diversity control button is pressed.  Each widget will return to its default setting when the Finalize β-diversity control button is re-pressed.
 
-![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_Bdiv_plot_widgets.png?raw=true)
+![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_bdiv_plot_widgets_92617.png?raw=true)
 
 1. Select β-Diversity Parameter(s):
 
@@ -100,7 +107,7 @@ Although several plotting widgets are displayed when the β-diversity tab is fir
 
 A hyperlink will appear below the Display/Toggle Confidence Ellipses widget after the Finalize β-diversity control button is pressed.  Clicking this hyperlink will provide 6 additional widgets that will alter the appearance of the scatterD3 plot.
 
-![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_Bdiv_adv_scat_options.png?raw=true)
+![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_bdiv_adv_scat_opt_92517.png?raw=true)
 
 1. Size Mapping Variable:
 
@@ -156,7 +163,7 @@ For each taxonomic level selected there is a 2-dimensional ordination plot and a
 
 A 2-dimensional interactive ordination plot is rendered within each taxonomic section using the scatterD3 package.  The ordination plot consists of a scatterplot where each point represents an individual sample.  Samples that cluster closer together are considered more similar, whereas samples that are separated by large distances in the plot are considered more dissimilar.  Some ordinations will have the same calculations for very similar samples and may not be distinguishable.  
 
-![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_Bdiv_ordination_plots.png?raw=true)
+![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_bdiv_ordination_plot_92517.png?raw=true)
 
 More information regarding the scatterD3 package can be found [here](https://github.com/juba/scatterD3) and [here](https://cran.r-project.org/web/packages/scatterD3/vignettes/introduction.html).  Currently, DAME only supports the first 2 dimensions of the ordinations.  Plotting interactivity (e.g., zooming, shifting, etc.) in scatterD3 plots within a taxonomic section are independent of others if multiple taxonomic levels are rendered.  Interactive functionality in DAME is described herein.
 
@@ -176,9 +183,9 @@ More information regarding the scatterD3 package can be found [here](https://git
 
 DAME uses PERMANOVA to identify group differences in dissimilarity or distance matrices.  Details of the method can be found [here](http://cc.oulu.fi/~jarioksa/softhelp/vegan/html/adonis.html).
 
-![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_Bdiv_PERMANOVA_table.png?raw=true)
+![](https://github.com/bdpiccolo/ACNC-DAME/blob/master/Instructions/Images/DAME_bdiv_PERMANOVA_92517.png?raw=true)
 
-The PERMANOVA output is generated using the [DT](https://rstudio.github.io/DT/) package and provides group calculations of Degrees of Freedom, Sequential Sums of Squares, Mean Squares, F-Statistic, Partial R-Squared, and P-value.  Residual and Total calculations are also provided in the table.  Interactive functions are provided herein.
+The PERMANOVA output is generated using the [DT](https://rstudio.github.io/DT/) package and provides group calculations of Degrees of Freedom, Sums of Squares,F-Statistic, and P-value.  Residual calculations are also provided in the table.  Interactive functions are provided herein.
 
 * The table can be downloaded as either an Excel, PDF, or CSV file.  Buttons are provided at the top of the table for each file option.
 

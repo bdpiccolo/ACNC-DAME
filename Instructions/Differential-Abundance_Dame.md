@@ -1,6 +1,6 @@
 # Differential Abundance
 
-Current implementation of differential abundance analysis of individual taxa is computed via negative binomial regression through the [DESeq2 package](https://github.com/Bioconductor-mirror/DESeq2).  Users can assess overall group differences with a likelihood ratio test comparing the full model versus a reduced model.  Pairwise comparisons of group levels are determined using Wald's Test.  Group differences of individual taxa are graphically shown as an interactive boxplot using the [highcharter package](https://github.com/jbkunst/highcharter).  DESeq2 results are presented in a tabular format using the [DT package](https://github.com/rstudio/DT).   
+Current implementation of differential abundance analysis of individual taxa is computed via negative binomial regression through the [DESeq2 package](https://github.com/Bioconductor-mirror/DESeq2).  Users can assess overall group differences with a likelihood ratio test comparing the full model versus a reduced model.  Pairwise comparisons of group levels are determined using Wald's Test.  Group differences of individual taxa are graphically shown as an interactive boxplot using the [rbokeh package](http://hafen.github.io/rbokeh/).  DESeq2 results are presented in a tabular format using the [DT package](https://github.com/rstudio/DT).   
 
 # Getting Started
 
@@ -72,7 +72,7 @@ For each taxonomic section there is a DT table providing the DESeq2 results and 
 
 DAME uses DESeq2 to calculate negative binomial regression models and post hoc tests.  A modified version of the output provided by the [results() function](https://bioconductor.org/packages/devel/bioc/manuals/DESeq2/man/DESeq2.pdf) is diplayed as a DT table.  The unaltered results() output for all pairwise comparisons within a taxonomic level is downloadable.  
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_dabund_deseq2_table.png?raw=true)
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_dabund_deseq2_table_92517.png?raw=true)
 
 1. The DT table always displays the OTU tag, taxonomic information, base mean, log2 fold change (if Wald Test is selected), original P-value, and the FDR adjusted P-value. 
 
@@ -111,9 +111,9 @@ DAME uses DESeq2 to calculate negative binomial regression models and post hoc t
 
 # Boxplots
 
-An interactive boxplot is rendered within each taxonomic section using the highcharter package.  Either 2 or 3 input widgets are rendered with the boxplot depending on how many factor levels are within the selected experimental group from the *Select Group(s)* widget.
+An interactive boxplot is rendered within each taxonomic section using the rbokeh package.  Either 2 or 3 input widgets are rendered with the boxplot depending on how many factor levels are within the selected experimental group from the *Select Group(s)* widget.
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_dabund_plot_interactivity.png?raw=true)
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_dabund_plot_interactivity_92517.png?raw=true)
 
 1. Select Bacteria
 
@@ -151,26 +151,20 @@ An interactive boxplot is rendered within each taxonomic section using the highc
 	
 	* Clicking "YES" will update the boxplot with all factor levels found within the selected experimental group.
 	
-4. Boxplot
+4. Box Plots
 
-	* More information regarding the highcharter package can be found [here](http://jkunst.com/highcharter/).  Plotting interactivity (e.g., hovering text box, group selections, etc.) in highcharter plots within a taxonomic section are independent of others if multiple taxonomic levels are rendered.  Interactive functionality in DAME is described herein.
+	* An interactive box plot(s) is rendered within each taxonomic section using the rbokeh package.  The box plot(s) consist of box-and-whisker plot(s) and are described [here](https://www.rdocumentation.org/packages/grDevices/versions/3.4.1/topics/boxplot.stats).  Raw values are overlayed on the boxplots. 
 
-	* Hovering the mouse cursor over a bar will provide additional text.  Currently, DAME will provide the name of the group level, the maximum value contained within the box and whisker, the upper quartile value, the median value, the lower quartile value, and the minimum value contained in the box and whisker.
+	* Hovering the mouse cursor over a point will provide additional text.  Currently, DAME displays the group level and either the total reads or % relative abundance.
 
-	* Click and holding the left mouse button while dragging the mouse will zoom into the highlighted graphical area.  There are no known limits to zooming.  A *Reset zoom* button will appear in the top right hand corner of the plotting area if zoomed.  Pressing that button will reset the plot to the default size.
+	* By default, click and holding the left mouse button while dragging the mouse will move the plotting canvas.  This function is designated by the arrow cross icon found on the top right hand corner of the graphic window.  A *Reset* button is also found on the upper right panel and will reset changes to all plots in the graphic window.
 
-	* Outliers are shown as black circles above or below the box and whisker.  Hovering over the outlier provides the x and y coordinates of the circle.  The y coordinate represents the value of the outlier.
+	* There are two ways to zoom.  The panel in the top right hand corner has an icon with a magnifying glass in a box and another with a magnifying glass next to an oval. Pressing The former icon will allow zooming by mouse dragging while the latter will allow zooming with the mouse wheel.  Both zooming options are plot independent, i.e., will affect a single plot within a multi plot panel.   A *Reset* button is also found on the upper right panel and will reset changes to all plots in the graphic window.
+
+	* The graphic window can be saved in PNG format by clicking the floppy disk icon on the panel in the top right hand panel.  Please note that this will save all plots within the graphic space.
 	
-	* Currently, DAME can only implement the default highcharter color setting.
-
-	* There are three horizontal lines at the very top right hand corner of the graphical area that provide downloadable options if clicked.  Current options include:
-
-		* Printing Chart
-		
-		* Download image as either PNG, JPEG, SVG, and PDF.  NOTE: Selecting PDF option tends to crash DAME.
-		
-		* Download plotting data in either CSV or XLS format.  Only provides data from selected plot.  
-		
-		* Display data table will render a HTML table below plot with plotting data.	
-		
-	* This app uses [Highsoft software](https://shop.highsoft.com/faq/non-commercial) with non-commercial packages. Highsoft software product is not free for commercial use.
+	* Plotting interactivity (e.g., hovering text box, zooming, etc.) in rbokeh plots within a taxonomic section are independent of others if multiple taxonomic levels are rendered. 
+	
+	* interactivity within a single plot is independent of multiple plots within a taxonomic section.  Resets and save functions will affect multiple plots when within a single taxonomic section.
+	
+	* More information regarding the rbokeh package and boxplots can be found [here](https://hafen.github.io/rbokeh/rd.html#ly_boxplot). 

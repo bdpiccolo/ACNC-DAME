@@ -50,18 +50,50 @@
 	})
 
 	######################################################################
-	## Render tree warning if there was a tree file loaded 
+	## Render beta diversity text
 	########################################################################	
-	output$BDIVtreewarningRENDER <- renderUI({
+	output$BDIVbdivindicetextRENDER <- renderUI({
 		req(phyloseqFINAL())	
 		if(input$bdivINDEXselect %in% phylotreeDIST){
+			list(
+				
 				HTML("
-					<p>Tree based &#946;-diversity parameters require longer computational time.</p>
+					<p>&#946;-diversity is an estimate of biodiversity, also referred to as between sample diversity. Dissimilarity and distance indices 
+					are commonly used to estimate &#946;-diversity.  Phylogenetic (Unifrac and unweighted uUnifrac) and dissimilarity (Bray-Curtis and Jaccard) 
+					based measurements are commonly used in microbial analyses. More in depth review can be found 
+					<a href=\"http://www.sciencedirect.com/science/article/pii/S0092867414008642?via%3Dihub\" target=\"_blank\">here</a> and 
+					<a href=\"https://academic.oup.com/femsre/article/32/4/557/1812950\" target=\"_blank\">here</a>.</p>
+					"
+				),
+				HTML("
+					<p>Tree based &#946;-diversity parameters, especially DPCOA, require longer computational time.</p>
 					"
 				)
+			)
 		} else {
-			NULL
+				
+				HTML("
+					<p>&#946;-diversity is an estimate of biodiversity, also referred to as between sample diversity. Dissimilarity and distance indices 
+					are commonly used to estimate &#946;-diversity.  Dissimilarity based measurements (Bray-Curtis and Jaccard) are commonly used in microbial analyses. More in depth review can be found 
+					<a href=\"http://www.sciencedirect.com/science/article/pii/S0092867414008642?via%3Dihub\" target=\"_blank\">here</a>.</p>
+					"
+				)
 		}
+	})
+
+	######################################################################
+	## Render ordination text
+	########################################################################	
+	output$BDIVbdivordinationtextRENDER <- renderUI({
+		req(phyloseqFINAL())	
+		HTML("
+			<p>Ordinations are data reduction techniques that can summarize the inherent variance found within a dataset.  The results can then be projected into
+			a two dimensional plot where similar samples will cluster together and dissimilar samples will distance themselves from one another.  Principal Co-ordinate Analysis (PCoA),
+			and Non-multi Dimensional Scaling (NMDS) are commonly used in microbial analyses. More in depth review can be found 
+			<a href=\"http://www.sciencedirect.com/science/article/pii/S0092867414008642?via%3Dihub\" target=\"_blank\">here.</p>
+			"
+		)
+			
 	})
 
 	######################################################################
@@ -76,7 +108,12 @@
 			),	
 			selectizeInput("bdivGROUPselect", label="", selected=CompGroups()$Groups[1],
 				choices=CompGroups()$Groups, options = list(minItems = 1, maxItems = 2), 
-					multiple=TRUE)
+					multiple=TRUE),
+			HTML("
+				<p>Selecting groups to be assessed by PERMANOVA.  PERMANOVA stands for PERMutational Multivariate Analysis of Variance 
+				and is similar to ANOVA, but assess group differences on distance or dissimilarity matrices rather than group averages.</p>
+				"
+			)
 		)
 	})
 
@@ -86,7 +123,7 @@
 	BDIVtaxa <- reactive({
 		if(input$goBDIV){
 			isolate({
-				input$bdivTAXAselect
+				c(taxaL,"OTU")[which(c(taxaL,"OTU") %in% input$bdivTAXAselect)]
 			})
 		} else {
 			NULL
@@ -195,10 +232,7 @@
 		names(ordDF) <- BDIVtaxa()
 		ordDF		
 	})
-		
-	# output$bdivTEXT <- renderPrint({
-
-	# })	
+	
 
 	########################################################################
 	## Create ScatterD3 object with Phylum Ordination data
@@ -544,7 +578,11 @@
 		names(bdiv) <- BDIVtaxa()
 		bdiv		
 	})
-
+	
+	# output$bdivTEXT <- renderPrint({
+	
+	# })	
+	
 	########################################################################
 	## Calculate PERMANOVA
 	########################################################################			
@@ -559,14 +597,17 @@
 			## If 1 Experimental Group
 			if(length(BDIVgroup()) == 1) {
 				## Extract Group, and run PERMANOVA
-				A <- sampleDF[,BDIVgroup()]
-				ppermA <- adonis(pdist ~ A, permutations=as.numeric(input$BDIVpermcut))
+				BDIVdf <- data.frame(list(sampleDF[,BDIVgroup()]))
+				colnames(BDIVdf) <- "A"
+				ppermA <- adonis2(pdist ~ A, data=BDIVdf, permutations=as.numeric(input$BDIVpermcut), by="margin")
+				# ppermA <- adonis(pdist ~ A, data=BDIVdf, permutations=as.numeric(input$BDIVpermcut))
 			} else {
 				## If 2 Experimental Groups
 				## Extract both groups separately, and run PERMANOVA
-				A <- sampleDF[,BDIVgroup()[1]]
-				B <- sampleDF[,BDIVgroup()[2]]
-				ppermA <- adonis(pdist ~ A + B, permutations=as.numeric(input$BDIVpermcut))
+				BDIVdf <- sampleDF[,BDIVgroup()[c(1,2)]]
+				colnames(BDIVdf) <- c("A", "B")
+				ppermA <- adonis2(pdist ~ A + B, data=BDIVdf, permutations=as.numeric(input$BDIVpermcut), by="margin")
+				# ppermA <- adonis(pdist ~ A + B, data=BDIVdf, permutations=as.numeric(input$BDIVpermcut))
 			}
 			ppermA
 		})	
@@ -585,11 +626,12 @@
 			## Select PERMANOVA results by TAXA, extract results, make column of row names,
 			## round numeric results to 5 decimal places, reset Parameter column and return
 			permres <- bdiversity_PERMANOVA()[[x]]
-			permA_DF <- data.frame(permres$aov.tab)
-			permA_DF <- data.frame(Parameter = rownames(permA_DF), permA_DF)
-			permA_DF[,3:7] <- round(permA_DF[,3:7],5)
-			permA_DF[,"Parameter"] <- c(BDIVgroup(), "Residuals", "Total")
-			permA_DF
+			data.frame(Parameter = c(BDIVgroup(), "Residuals"), 
+					DF = permres$Df,
+					SS = round(permres$SumOfSqs, 5),
+					F = round(permres$F, 5),
+					P = round(permres[,"Pr(>F)"], 5)
+			)
 		})
 		## Set names and return
 		names(perm) <- BDIVtaxa()
@@ -597,6 +639,26 @@
 		
 	})	
 
+	output$bdivTEXT <- renderPrint({
+		req(bdiversity_PERMANOVA())
+		
+		perm <- pblapply(BDIVtaxa(), function(x) {
+			## Select PERMANOVA results by TAXA, extract results, make column of row names,
+			## round numeric results to 5 decimal places, reset Parameter column and return
+			permres <- bdiversity_PERMANOVA()[[x]]
+			data.frame(Parameter = c(BDIVgroup(), "Residuals"), 
+					DF = permres$Df,
+					SS = round(permres$SumOfSqs, 5),
+					F = round(permres$F, 5),
+					P = round(permres[,"Pr(>F)"], 5)
+			)
+		})
+		## Set names and return
+		names(perm) <- BDIVtaxa()
+		perm
+			
+	})	
+	
 
 	########################################################################
 	## Create DataTable object with Phylum PERMANOVA results
@@ -614,9 +676,7 @@
 								th(colspan = 1, 'Parameter'),
 								th(colspan = 1, 'Degrees of Freedom'),
 								th(colspan = 1, 'Sequential Sums of Squares'),
-								th(colspan = 1, 'Mean Squares'),
 								th(colspan = 1, 'F Statistic'),
-								th(colspan = 1, 'Partial R-squared'),
 								th(colspan = 1, 'P')
 							)
 						)
@@ -651,9 +711,7 @@
 								th(colspan = 1, 'Parameter'),
 								th(colspan = 1, 'Degrees of Freedom'),
 								th(colspan = 1, 'Sequential Sums of Squares'),
-								th(colspan = 1, 'Mean Squares'),
 								th(colspan = 1, 'F Statistic'),
-								th(colspan = 1, 'Partial R-squared'),
 								th(colspan = 1, 'P')
 							)
 						)
@@ -688,9 +746,7 @@
 								th(colspan = 1, 'Parameter'),
 								th(colspan = 1, 'Degrees of Freedom'),
 								th(colspan = 1, 'Sequential Sums of Squares'),
-								th(colspan = 1, 'Mean Squares'),
 								th(colspan = 1, 'F Statistic'),
-								th(colspan = 1, 'Partial R-squared'),
 								th(colspan = 1, 'P')
 							)
 						)
@@ -724,9 +780,7 @@
 								th(colspan = 1, 'Parameter'),
 								th(colspan = 1, 'Degrees of Freedom'),
 								th(colspan = 1, 'Sequential Sums of Squares'),
-								th(colspan = 1, 'Mean Squares'),
 								th(colspan = 1, 'F Statistic'),
-								th(colspan = 1, 'Partial R-squared'),
 								th(colspan = 1, 'P')
 							)
 						)
@@ -760,9 +814,7 @@
 								th(colspan = 1, 'Parameter'),
 								th(colspan = 1, 'Degrees of Freedom'),
 								th(colspan = 1, 'Sequential Sums of Squares'),
-								th(colspan = 1, 'Mean Squares'),
 								th(colspan = 1, 'F Statistic'),
-								th(colspan = 1, 'Partial R-squared'),
 								th(colspan = 1, 'P')
 							)
 						)
@@ -796,9 +848,7 @@
 								th(colspan = 1, 'Parameter'),
 								th(colspan = 1, 'Degrees of Freedom'),
 								th(colspan = 1, 'Sequential Sums of Squares'),
-								th(colspan = 1, 'Mean Squares'),
 								th(colspan = 1, 'F Statistic'),
-								th(colspan = 1, 'Partial R-squared'),
 								th(colspan = 1, 'P')
 							)
 						)
@@ -1093,7 +1143,7 @@
 							 "
 						),	 
 						uiOutput("BDIVindexRENDER"),					
-						uiOutput("BDIVtreewarningRENDER")	
+						uiOutput("BDIVbdivindicetextRENDER")	
 					),
 					column(3, 
 						HTML("
@@ -1108,7 +1158,9 @@
 								selectInput("bdivORDINATEselect", label="", selected=Ordinate[1],
 									choices=c(Ordinate,TreeOrdinate))
 							}
-						}
+						},
+						
+						uiOutput("BDIVbdivordinationtextRENDER")	
 					),
 					column(3,
 						HTML("
