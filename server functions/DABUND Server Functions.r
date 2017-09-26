@@ -782,11 +782,7 @@
 			}
 		}
 	})	
-
-	# output$dabundTEXT <- renderPrint({
-
-	# })	
-			
+	
 	########################################################################	
 	## Create DataTable object with OTU NBM data
 	########################################################################	
@@ -897,8 +893,8 @@
 				OTU <- gsub("New.ReferenceOTU", "", OTU)
 				t1$OTU <- OTU
 				## Isolate non character columns and round to the 5th decimal
-				t1[,!(colnames(t1) %in% c("OTU","Domain", "Phylum", "Class", "Order", "Family", "Genus"))] <- 
-					round(t1[,!(colnames(t1) %in% c("OTU","Domain", "Phylum", "Class", "Order", "Family", "Genus"))], 5)
+				t1[,!(colnames(t1) %in% c("OTU","Kingdom", "Phylum", "Class", "Order", "Family", "Genus"))] <- 
+					round(t1[,!(colnames(t1) %in% c("OTU","Kingdom", "Phylum", "Class", "Order", "Family", "Genus"))], 5)
 				## Order data based on adjusted p value and extract OTUS
 				t1 <- t1[order(t1$padj),]
 				POTU <- as.character(t1$OTU)
@@ -935,8 +931,8 @@
 				OTU <- gsub("New.ReferenceOTU", "", OTU)
 				t1$OTU <- OTU
 				## Isolate non character columns and round to the 5th decimal
-				t1[,!(colnames(t1) %in% c("OTU","Domain", "Phylum", "Class", "Order", "Family", "Genus"))] <- 
-					round(t1[,!(colnames(t1) %in% c("OTU","Domain", "Phylum", "Class", "Order", "Family", "Genus"))], 5)
+				t1[,!(colnames(t1) %in% c("OTU","Kingdom", "Phylum", "Class", "Order", "Family", "Genus"))] <- 
+					round(t1[,!(colnames(t1) %in% c("OTU","Kingdom", "Phylum", "Class", "Order", "Family", "Genus"))], 5)
 				## Order data based on adjusted p value and extract OTUS
 				t1 <- t1[order(t1$padj),]
 				POTU <- as.character(t1$OTU)
@@ -973,8 +969,8 @@
 				OTU <- gsub("New.ReferenceOTU", "", OTU)
 				t1$OTU <- OTU
 				## Isolate non character columns and round to the 5th decimal
-				t1[,!(colnames(t1) %in% c("OTU","Domain", "Phylum", "Class", "Order", "Family", "Genus"))] <- 
-					round(t1[,!(colnames(t1) %in% c("OTU","Domain", "Phylum", "Class", "Order", "Family", "Genus"))], 5)
+				t1[,!(colnames(t1) %in% c("OTU","Kingdom", "Phylum", "Class", "Order", "Family", "Genus"))] <- 
+					round(t1[,!(colnames(t1) %in% c("OTU","Kingdom", "Phylum", "Class", "Order", "Family", "Genus"))], 5)
 				## Order data based on adjusted p value and extract OTUS
 				t1 <- t1[order(t1$padj),]
 				POTU <- as.character(t1$OTU)
@@ -1011,8 +1007,8 @@
 				OTU <- gsub("New.ReferenceOTU", "", OTU)
 				t1$OTU <- OTU
 				## Isolate non character columns and round to the 5th decimal
-				t1[,!(colnames(t1) %in% c("OTU","Domain", "Phylum", "Class", "Order", "Family", "Genus"))] <- 
-					round(t1[,!(colnames(t1) %in% c("OTU","Domain", "Phylum", "Class", "Order", "Family", "Genus"))], 5)
+				t1[,!(colnames(t1) %in% c("OTU","Kingdom", "Phylum", "Class", "Order", "Family", "Genus"))] <- 
+					round(t1[,!(colnames(t1) %in% c("OTU","Kingdom", "Phylum", "Class", "Order", "Family", "Genus"))], 5)
 				## Order data based on adjusted p value and extract OTUS
 				t1 <- t1[order(t1$padj),]
 				POTU <- as.character(t1$OTU)
@@ -1049,8 +1045,8 @@
 				OTU <- gsub("New.ReferenceOTU", "", OTU)
 				t1$OTU <- OTU
 				## Isolate non character columns and round to the 5th decimal
-				t1[,!(colnames(t1) %in% c("OTU","Domain", "Phylum", "Class", "Order", "Family", "Genus"))] <- 
-					round(t1[,!(colnames(t1) %in% c("OTU","Domain", "Phylum", "Class", "Order", "Family", "Genus"))], 5)
+				t1[,!(colnames(t1) %in% c("OTU","Kingdom", "Phylum", "Class", "Order", "Family", "Genus"))] <- 
+					round(t1[,!(colnames(t1) %in% c("OTU","Kingdom", "Phylum", "Class", "Order", "Family", "Genus"))], 5)
 				## Order data based on adjusted p value and extract OTUS
 				t1 <- t1[order(t1$padj),]
 				POTU <- as.character(t1$OTU)
@@ -1075,9 +1071,9 @@
 		} else {
 			if("OTU" %in% names(dabundNBM())) {
 				## Extract NBM based on TAXA and Pairwise comparison
-				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]][[input$dabundPAIRCOMPselect]]
+				t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]][[1]]
 				if(input$dabundNBMtest == "Wald"){
-					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]][[input$dabundPAIRCOMPselect]]
+					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]][[1]]
 				} else {
 					t1 <- dabundNBM()[[which(names(dabundNBM()) %in% "OTU")]]				
 				}	
@@ -1087,8 +1083,8 @@
 				OTU <- gsub("New.ReferenceOTU", "", OTU)
 				t1$OTU <- OTU
 				## Isolate non character columns and round to the 5th decimal
-				t1[,!(colnames(t1) %in% c("OTU","Domain", "Phylum", "Class", "Order", "Family", "Genus"))] <- 
-					round(t1[,!(colnames(t1) %in% c("OTU","Domain", "Phylum", "Class", "Order", "Family", "Genus"))], 5)
+				t1[,!(colnames(t1) %in% c("OTU","Kingdom", "Phylum", "Class", "Order", "Family", "Genus"))] <- 
+					round(t1[,!(colnames(t1) %in% c("OTU","Kingdom", "Phylum", "Class", "Order", "Family", "Genus"))], 5)
 				## Order data based on adjusted p value and extract OTUS
 				t1 <- t1[order(t1$padj),]
 				POTU <- as.character(t1$OTU)
@@ -1924,76 +1920,134 @@
 		}
 	})	
 
+	# output$dabundTEXT <- renderPrint({
+	
+	# })	
+	
 	########################################################################
 	## Create highcharter object with Phylum boxplot data
 	########################################################################	
-	output$DABUNDphylumboxplotRENDER <- renderHighchart({
+	output$DABUNDphylumboxplotRENDER <- renderRbokeh({
 		req(RABUNDphylumbpdata())
-				bpdata <- RABUNDphylumbpdata()
-				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect],name = "Phylum", color = "#000000") %>% 
-					hc_chart(type = "column", zoomType = "xy") %>% 
-					hc_exporting(enabled = TRUE) 
-
+		bpdata <- RABUNDphylumbpdata()
+		colnames(bpdata)[1] <- "Level"
+		
+		boxfig <- figure(data = bpdata, legend_location=NULL)
+		if(input$RABUNDphylumBPdatatype == "reads") {
+			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Reads" = value), 
+				xlab = "", ylab="Sequence reads") 
+		} else {
+			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Relative Abundance" = value), 
+				xlab = "", ylab="Relative abundance, %")	
+		}
+		boxfig %>% ly_boxplot(Level, value, color = Level, outlier_glyph = NA, line_color="#696969") %>%
+				set_palette(discrete_color = pal_color(c("red"))) %>% theme_axis("x", major_label_orientation = 45)		
+				
 	})
 
 	########################################################################
 	## Create highcharter object with Class boxplot data
 	########################################################################	
-	output$DABUNDclassboxplotRENDER <- renderHighchart({
+	output$DABUNDclassboxplotRENDER <- renderRbokeh({
 		req(RABUNDclassbpdata())
-				bpdata <- RABUNDclassbpdata()
-				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Class", color = "#000000") %>% 
-					hc_chart(type = "column", zoomType = "xy") %>% 
-					hc_exporting(enabled = TRUE)
-
+		bpdata <- RABUNDclassbpdata()
+		colnames(bpdata)[1] <- "Level"
+		
+		boxfig <- figure(data = bpdata, legend_location=NULL)
+		if(input$RABUNDphylumBPdatatype == "reads") {
+			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Reads" = value), 
+				xlab = "", ylab="Sequence reads") 
+		} else {
+			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Relative Abundance" = value), 
+				xlab = "", ylab="Relative abundance, %")	
+		}
+		boxfig %>% ly_boxplot(Level, value, color = Level, outlier_glyph = NA, line_color="#696969") %>%
+				set_palette(discrete_color = pal_color(c("red"))) %>% theme_axis("x", major_label_orientation = 45)		
+			
 	})
 
 	########################################################################		
 	## Create highcharter object with Order boxplot data
 	########################################################################	
-	output$DABUNDorderboxplotRENDER <- renderHighchart({
+	output$DABUNDorderboxplotRENDER <- renderRbokeh({
 		req(RABUNDorderbpdata())
-				bpdata <- RABUNDorderbpdata()
-				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Order", color = "black") %>% 
-					hc_chart(type = "column", zoomType = "xy") %>% 
-					hc_exporting(enabled = TRUE)
-
+		bpdata <- RABUNDorderbpdata()
+		colnames(bpdata)[1] <- "Level"
+		
+		boxfig <- figure(data = bpdata, legend_location=NULL)
+		if(input$RABUNDphylumBPdatatype == "reads") {
+			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Reads" = value), 
+				xlab = "", ylab="Sequence reads") 
+		} else {
+			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Relative Abundance" = value), 
+				xlab = "", ylab="Relative abundance, %")	
+		}
+		boxfig %>% ly_boxplot(Level, value, color = Level, outlier_glyph = NA, line_color="#696969") %>%
+				set_palette(discrete_color = pal_color(c("red"))) %>% theme_axis("x", major_label_orientation = 45)		
+			
 	})
 
 	########################################################################
 	## Create highcharter object with Family boxplot data
 	########################################################################	
-	output$DABUNDfamilyboxplotRENDER <- renderHighchart({
+	output$DABUNDfamilyboxplotRENDER <- renderRbokeh({
 		req(RABUNDfamilybpdata())
-				bpdata <- RABUNDfamilybpdata()
-				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Family", color = "#000000") %>% 
-					hc_chart(type = "column", zoomType = "xy") %>% 
-					hc_exporting(enabled = TRUE)
-
+		bpdata <- RABUNDfamilybpdata()
+		colnames(bpdata)[1] <- "Level"
+		
+		boxfig <- figure(data = bpdata, legend_location=NULL)
+		if(input$RABUNDphylumBPdatatype == "reads") {
+			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Reads" = value), 
+				xlab = "", ylab="Sequence reads") 
+		} else {
+			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Relative Abundance" = value), 
+				xlab = "", ylab="Relative abundance, %")	
+		}
+		boxfig %>% ly_boxplot(Level, value, color = Level, outlier_glyph = NA, line_color="#696969") %>%
+				set_palette(discrete_color = pal_color(c("red"))) %>% theme_axis("x", major_label_orientation = 45)		
+			
 	})
 
 	########################################################################
 	## Create highcharter object with Genus boxplot data
 		
-	output$DABUNDgenusboxplotRENDER <- renderHighchart({
+	output$DABUNDgenusboxplotRENDER <- renderRbokeh({
 		req(RABUNDgenusbpdata())
-				bpdata <- RABUNDgenusbpdata()
-				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "Genus", color = "#000000") %>% 
-					hc_chart(type = "column", zoomType = "xy") %>% 
-					hc_exporting(enabled = TRUE)
-
+		bpdata <- RABUNDgenusbpdata()
+		colnames(bpdata)[1] <- "Level"
+		
+		boxfig <- figure(data = bpdata, legend_location=NULL)
+		if(input$RABUNDphylumBPdatatype == "reads") {
+			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Reads" = value), 
+				xlab = "", ylab="Sequence reads") 
+		} else {
+			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Relative Abundance" = value), 
+				xlab = "", ylab="Relative abundance, %")	
+		}
+		boxfig %>% ly_boxplot(Level, value, color = Level, outlier_glyph = NA, line_color="#696969") %>%
+				set_palette(discrete_color = pal_color(c("red"))) %>% theme_axis("x", major_label_orientation = 45)		
+			
 	})
 
 	########################################################################
 	## Create highcharter object with OTU boxplot data
 	########################################################################	
-	output$DABUNDotuboxplotRENDER <- renderHighchart({
+	output$DABUNDotuboxplotRENDER <- renderRbokeh({
 		req(RABUNDotubpdata())
-				bpdata <- RABUNDotubpdata()
-				hcboxplot_v3(x = bpdata$value, var = bpdata[,input$dabundGROUPselect], name = "OTU", color = "#000000") %>% 
-					hc_chart(type = "column", zoomType = "xy") %>% 
-					hc_exporting(enabled = TRUE)
-
+		bpdata <- RABUNDotubpdata()
+		colnames(bpdata)[1] <- "Level"
+		
+		boxfig <- figure(data = bpdata, legend_location=NULL)
+		if(input$RABUNDphylumBPdatatype == "reads") {
+			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Reads" = value), 
+				xlab = "", ylab="Sequence reads") 
+		} else {
+			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Relative Abundance" = value), 
+				xlab = "", ylab="Relative abundance, %")	
+		}
+		boxfig %>% ly_boxplot(Level, value, color = Level, outlier_glyph = NA, line_color="#696969") %>%
+				set_palette(discrete_color = pal_color(c("red"))) %>% theme_axis("x", major_label_orientation = 45)		
+			
 	})
 
 	output$DABUNDphylumtesttabletextRENDER <- renderUI({
@@ -2200,7 +2254,7 @@
 							
 						),
 						column(6,
-							highchartOutput(outputId = "DABUNDphylumboxplotRENDER", height="500px", width="600px")
+							rbokehOutput("DABUNDphylumboxplotRENDER", height="700px", width="1000px")
 							
 						)
 					)
@@ -2286,7 +2340,7 @@
 							
 						),
 						column(6,
-							highchartOutput(outputId = "DABUNDclassboxplotRENDER", height="500px", width="600px")
+							rbokehOutput("DABUNDclassboxplotRENDER", height="700px", width="1000px")
 							
 						)
 					)
@@ -2373,7 +2427,7 @@
 							
 						),
 						column(6,
-							highchartOutput(outputId = "DABUNDorderboxplotRENDER", height="500px", width="600px")
+							rbokehOutput("DABUNDorderboxplotRENDER", height="700px", width="1000px")
 							
 						)
 					)
@@ -2459,7 +2513,7 @@
 							
 						),
 						column(6,
-							highchartOutput(outputId = "DABUNDfamilyboxplotRENDER", height="500px", width="600px")
+							rbokehOutput("DABUNDfamilyboxplotRENDER", height="700px", width="1000px")
 							
 						)
 					)
@@ -2545,7 +2599,7 @@
 							
 						),
 						column(6,
-							highchartOutput(outputId = "DABUNDgenusboxplotRENDER", height="500px", width="600px")
+							rbokehOutput("DABUNDgenusboxplotRENDER", height="700px", width="1000px")
 							
 						)
 					)
@@ -2557,7 +2611,7 @@
 			NULL
 		}								
 	})		
-
+	
 	########################################################################
 	## Render OTU UI after goDABUND observed
 	########################################################################	
@@ -2632,7 +2686,7 @@
 							
 						),
 						column(6,
-							highchartOutput(outputId = "DABUNDotuboxplotRENDER", height="500px", width="600px")
+							rbokehOutput("DABUNDotuboxplotRENDER", height="700px", width="1000px")
 							
 						)
 					)

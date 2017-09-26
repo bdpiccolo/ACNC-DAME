@@ -1,10 +1,9 @@
 library(scatterD3)
-# library(rAmCharts)
 library(DT)
-library(highcharter)
 library(shinyjs)
 library(V8) 
 library(markdown) 
+library(rbokeh)
 
 
 jscode <- "
@@ -34,6 +33,7 @@ shinyUI(
 	fluidPage(
 		shinyjs::useShinyjs(),
 		shinyjs::extendShinyjs(text = jscode),
+		# tags$head(includeScript("google-analytics.js")),
         tags$head(
 			tags$link(
 				rel="stylesheet", type="text/css", href="custom.css"

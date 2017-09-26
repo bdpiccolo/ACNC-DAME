@@ -1,4 +1,3 @@
-
 # Introduction
 
 Dynamic Assessment of Microbial Ecology (DAME) is an open source platform that uses the R environment to perform microbial ecology data analyses. It is specifically designed to work directly with output files from [QIIME 1](http://qiime.org/) with as minimal file processing as possible.
@@ -13,7 +12,19 @@ DAME requires two files to operate:
 
     * Use the OTU generated file that has taxonomy details (e.g. **otu_table_mc3_w_tax.biom**). DAME will fail to recognize OTU table without taxonomy details.
 
-    * DAME can accept BIOM files in HDF5 and JSON formats.
+    * BIOM files that are generated through other pipelines (which are in JSON format) must be converted to HDF5 format before loading into DAME.
+
+Convert from biom to txt:
+	
+```python
+biom convert –i table.biom –o otu_table.txt –to-tsv –header-key taxonomy
+```
+
+Convert back to biom:
+	
+```python				
+biom convert –i otu_table.txt –o new_ otu_table.biom –to-hdf5 –table-type=”OTU table"–process-obs-metadata taxonomy
+```
 
 2. BIOM Metadata File - .CSV file containing a column with exact sample labels used in QIIME analysis and experimental groupings. 
 
@@ -61,13 +72,11 @@ DAME requires two files to operate:
 
 	* Calculates observed, chao1, ACE, Shannon, Simpson, Inverse Simpson, and Fisher indices.
    
-	* Calculates 1-way or multifactor ANOVAs, t-tests, Kruskal Wallis, and Mann Whitney U tests based on meta-data.
-	
-	* Provides QQ plots and Fitted vs Residual plots to identify behaviors of parametric tests.
+	* Calculates 1-way or multifactor ANOVAs based on meta-data.
    
     * Output tables are rendered with the [DT](https://rstudio.github.io/DT/) package.
    
-    * Barplots rendered with the [rbokeh](http://hafen.github.io/rbokeh/) package.
+    * Barplots rendered with the [highcharter](http://jkunst.com/highcharter/) package.*
    
     * All data (α-diversity calculations and statistics) are downloadable.
    
@@ -87,7 +96,8 @@ DAME requires two files to operate:
    
     * DESeq2 result table rendered with [DT](https://rstudio.github.io/DT/) package.
    
-    * Boxplots displayed with either Total Reads or Percent Abundance and rendered with the [rbokeh](http://hafen.github.io/rbokeh/) package.
+    * Boxplots displayed with either Total Reads or Percent Abundance and rendered with the [highcharter](http://jkunst.com/highcharter/) package.*
    
     * All results are downloadable.
-  
+    
+\* This app uses [Highsoft](https://shop.highsoft.com/faq/non-commercial) software with non-commercial packages.  Highsoft software product is not free for commercial use.    

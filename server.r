@@ -2,7 +2,7 @@ library(shiny)
 library(shinyjs)
 library(DT)
 library(scatterD3)
-library(highcharter)
+library(rbokeh)
 
 source("global.r")
 

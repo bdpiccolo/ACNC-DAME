@@ -25,8 +25,8 @@
 			BIOM <- read_biom(fixUploadedFilesNames(input$biomINPUT)$datapath)
 			BIOMmatrix <- as(biom_data(BIOM), "matrix")
 			## Extract TAXA data and rename columns
-			BIOMtax_matrix <- as.matrix(observation_metadata(BIOM))
-			colnames(BIOMtax_matrix) <- c("Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+			BIOMtax_matrix <- observation_metadata(BIOM)
+			
 			## Return OTU and TAXA data as list
 			list(OTU=BIOMmatrix, TAXA=BIOMtax_matrix)
 			
@@ -43,7 +43,7 @@
 				BIOMmatrix <- as(biom_data(BIOM), "matrix")
 				## Extract TAXA data and rename columns
 				BIOMtax_matrix <- as.matrix(observation_metadata(BIOM))
-				colnames(BIOMtax_matrix) <- c("Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+				colnames(BIOMtax_matrix) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 				## Return OTU and TAXA data as list
 				list(OTU=BIOMmatrix, TAXA=BIOMtax_matrix)
 			} else {
@@ -63,6 +63,19 @@
 		BIOM_DAT()$OTU[,order(colnames(BIOM_DAT()$OTU))]
 	})
 
+	######################################################################
+	## Assess whether taxonomic information is in BIOM file
+	######################################################################		
+	BIOM_TAXAincluded <- reactive({
+		req(BIOM_DAT())
+		## Order columns in ascending order
+		if(is.null(BIOM_DAT()$TAXA)) {
+			"Taxonomic information is not found in BIOM"
+		} else {
+			NULL
+		}
+	})
+	
 	######################################################################
 	## Extract Example OTU data from upload 
 	######################################################################		
@@ -295,6 +308,17 @@
 	######################################################################
 	## Render mismatch label warning
 	######################################################################			
+	output$BIOMnotaxarender <- renderUI({
+		req(BIOM_OTU())
+		req(BIOM_TAXAincluded())
+		
+			p(id="nomatch", em(strong("The taxonomic assignments are not loaded on the BIOM file.  Please load BIOM file with taxonomic data.")))
+
+	})	
+		
+	######################################################################
+	## Render mismatch label warning
+	######################################################################			
 	output$BIOMMETAnomatch <- renderUI({
 		req(BIOM_OTU())
 		req(BIOMmetad_IMPORT())
@@ -345,11 +369,7 @@
 					Please re-configure BIOM MetaData .CSV files to correct.")))
 
 	})	
-	
-	# output$importTEXT <- renderPrint({
-	
-	# })	
-	
+
 	######################################################################
 	## Import .TRE file
 	######################################################################	
@@ -398,7 +418,29 @@
 		req(BIOMmetad_DAT())		
 		colnames(BIOM_OTU())
 	})
-	
+
+	######################################################################
+	## Finalize Taxa Data
+	######################################################################		
+	BIOM_TAXA <- reactive({
+		req(BIOM_DAT())
+		## Order columns in ascending order
+		if(is.null(BIOM_DAT()$TAXA)) {
+			NULL
+		} else {
+			biomtaxa <- BIOM_DAT()$TAXA
+			if(class(biomtaxa) == "data.frame") {			
+				BIOMtax_matrix <- as.matrix(biomtaxa)
+				colnames(BIOMtax_matrix) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+			} else {
+				BIOMtax_matrix <- JSONtaxa(biomtaxa)		
+				BIOMtax_matrix <- BIOMtax_matrix[,!(colnames(BIOMtax_matrix) %in% "d__")]
+				colnames(BIOMtax_matrix) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+			}
+		}
+		BIOMtax_matrix
+	})
+		
 	######################################################################
 	## Finalize metadata object
 	######################################################################		
@@ -512,7 +554,7 @@
 		}
 		
 	})	
-	
+
 	######################################################################
 	## Create initial phyloseq object
 	######################################################################		
@@ -527,7 +569,7 @@
 			req(BIOM_OTU())
 			OTU_import <- BIOM_OTU()
  			META_import <- BIOMmetad_DAT()
-			TAXA_import <- BIOM_DAT()$TAXA
+			TAXA_import <- BIOM_TAXA()
 			OTU_IMP <- OTU_import[,colnames(OTU_import) %in% rownames(META_import)]
 			if(ncol(META_import) == 1) {
 				META_IMP <- data.frame(META_import[rownames(META_import) %in% colnames(OTU_import),])
@@ -566,7 +608,11 @@
 			# }
 		# }
 	})
-	
+
+	# output$importTEXT <- renderPrint({
+
+	# })	
+			
 	output$importDIFFBIOMMETA <- renderUI({
 		req(PHYLOSEQ())
 		rawOTU <- BIOM_OTU()
@@ -676,7 +722,7 @@
 	output$tableTAXAselection_RENDER <- renderUI({ 
 		req(PHYLOSEQ())
 		selectInput(inputId="PHYLOSEQtabletaxa", label="", 
-			choices=c("Domain","Phylum","Class","Order","Family","Genus"), selected="Phylum"
+			choices=c("Kingdom","Phylum","Class","Order","Family","Genus"), selected="Phylum"
 		)
 	})
 
@@ -1005,11 +1051,11 @@
 	######################################################################
 	## Render bacteria only text
 	######################################################################		
-	output$PHYLOSEQdomainTEXT <- renderUI({
+	output$PHYLOSEQKingdomTEXT <- renderUI({
 		req(PHYLOSEQ())
 		HTML("
 			<p id=\"filterheader\"><strong>Only Analyze Bacteria</strong></p>
-			<p>Selecting yes will filter out other organisms that are not in the Bacteria domain, e.g., Archaea, etc.</p>
+			<p>Selecting yes will filter out other organisms that are not in the Bacteria Kingdom, e.g., Archaea, etc.</p>
 			"
 		)
 		
@@ -1018,9 +1064,9 @@
 	######################################################################
 	## Render bacteria only radio button
 	######################################################################	
-	output$domain_RENDER <- renderUI({ 
+	output$Kingdom_RENDER <- renderUI({ 
 		req(PHYLOSEQ())
-		radioButtons("PHYLOSEQ_domain", label = "",
+		radioButtons("PHYLOSEQ_Kingdom", label = "",
 			choices = list("NO" = 1, "YES" = 2), selected = 1)
 
 	})
@@ -1072,7 +1118,7 @@
 			# req(PHYLOSEQ())
 			# META_IMP <- BIOMmetad_DAT()
 			# OTU_IMP <- BIOM_OTU()
-			# TAXA_import <- BIOM_DAT()$TAXA
+			# TAXA_import <- BIOM_TAXA()
 		# }
 		if (is.null(input$biomINPUT) & is.null(input$biommetaINPUT) & is.null(input$treINPUT)) {
 			req(PHYLOSEQ())
@@ -1083,7 +1129,7 @@
 			req(PHYLOSEQ())
 			OTU_import <- BIOM_OTU()
  			META_import <- BIOMmetad_DAT()
-			TAXA_import <- BIOM_DAT()$TAXA
+			TAXA_import <- BIOM_TAXA()
 			OTU_IMP <- OTU_import[,colnames(OTU_import) %in% rownames(META_import)]
 			if(ncol(META_import) == 1) {
 				META_IMP <- data.frame(META_import[rownames(META_import) %in% colnames(OTU_import),])
@@ -1141,9 +1187,9 @@
 				## Filter OTUs based on minimum read and percent read threshold using phyloseq::filter_taxa() function
 				pseq_lowabundCUT <- filter_taxa(pseq_SAMPfilt_mincount, function(x) sum(x > minOTU) > (pcCUT * length(x)), TRUE)
 				## If only bacteria are to be analyzed
-				if(input$PHYLOSEQ_domain == 2) {
-					## Subset taxa on Bacteria domain using phyloseq::subset_taxa() function
-					pseq_FINALfilter <- subset_taxa(pseq_lowabundCUT, Domain=="Bacteria")
+				if(input$PHYLOSEQ_Kingdom == 2) {
+					## Subset taxa on Bacteria Kingdom using phyloseq::subset_taxa() function
+					pseq_FINALfilter <- subset_taxa(pseq_lowabundCUT, Kingdom=="Bacteria")
 				} else {
 					## Finalize phyloseq object
 					pseq_FINALfilter <- pseq_lowabundCUT
@@ -1186,7 +1232,7 @@
 	output$tableTAXAselection2_RENDER <- renderUI({ 
 		req(phyloseqFINAL())
 		selectInput(inputId="PHYLOSEQtable2taxa", label="", 
-			choices=c("Domain","Phylum","Class","Order","Family","Genus"), selected="Phylum"
+			choices=c("Kingdom","Phylum","Class","Order","Family","Genus"), selected="Phylum"
 		)
 	})
 
@@ -1516,8 +1562,8 @@
 					uiOutput("pccut_RENDER")
 				),
 				column(3,
-					uiOutput("PHYLOSEQdomainTEXT"),
-					uiOutput("domain_RENDER")
+					uiOutput("PHYLOSEQKingdomTEXT"),
+					uiOutput("Kingdom_RENDER")
 				)
 			),
 			hr(),
