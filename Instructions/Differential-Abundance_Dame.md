@@ -72,7 +72,7 @@ For each taxonomic section there is a DT table providing the DESeq2 results and 
 
 DAME uses DESeq2 to calculate negative binomial regression models and post hoc tests.  A modified version of the output provided by the [results() function](https://bioconductor.org/packages/devel/bioc/manuals/DESeq2/man/DESeq2.pdf) is diplayed as a DT table.  The unaltered results() output for all pairwise comparisons within a taxonomic level is downloadable.  
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_dabund_deseq2_table.png?raw=true)
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_dabund_deseq2_table_92517.png?raw=true)
 
 1. The DT table always displays the OTU tag, taxonomic information, base mean, log2 fold change (if Wald Test is selected), original P-value, and the FDR adjusted P-value. 
 
@@ -113,7 +113,7 @@ DAME uses DESeq2 to calculate negative binomial regression models and post hoc t
 
 An interactive boxplot is rendered within each taxonomic section using the rbokeh package.  Either 2 or 3 input widgets are rendered with the boxplot depending on how many factor levels are within the selected experimental group from the *Select Group(s)* widget.
 
-![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_dabund_plot_interactivity.png?raw=true)
+![](https://raw.githubusercontent.com/bdpiccolo/ACNC-DAME/master/Instructions/Images/DAME_dabund_plot_interactivity_92517.png?raw=true)
 
 1. Select Bacteria
 
