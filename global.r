@@ -27,8 +27,6 @@ library(tidyr)
 
 ## Functions
 
-sD3colors <- brewer.pal(12,"Paired")	
-
 fixUploadedFilesNames <- function(x) {
 	if (is.null(x)) {
 		return()
@@ -175,70 +173,7 @@ gm_mean = function(x, na.rm=TRUE){
 
 
 options(shiny.maxRequestSize=5000*1024^2)
-
- 
-get_box_values <- function(x = rt(1000, df = 10)){ 
-    boxplot.stats(x)$stats %>% 
-		t() %>% 
-		as.data.frame() %>% 
-		setNames(c("low", "q1", "median", "q3", "high"))
-}
-  
-get_outliers_values <- function(x = rt(1000, df = 10)) {
-	boxplot.stats(x)$out
-}
-  
- 		  
-parseboxFUN <- function(datav, metav) {
-	parseDAT <- lapply(levels(metav), function(x) { 
-		Fdat <- datav[metav %in% x]
-		as.list(c(name = x, get_box_values(Fdat)))
-	})
-	list(	
-		list(g1 = as.logical("NA"),
-			data= parseDAT,
-			type = "boxplot",
-			id = as.logical("NA")
-		)
-	)	
-} 
-
-parseoutFUN <- function(datav, metav) {
-	
-	parseDAT <- lapply(levels(metav), function(x) {
-		Fdat <- datav[metav %in% x]
-		out <- get_outliers_values(Fdat)
-		if(length(out) == 0){
-			out <- list(list(name=x, y=out))
-		} else {
-			if(length(out) == 1) {
-				out <- list(list(name=x, y=out))
-			} else {
-				out <- lapply(1:length(out), function(k) list(name=x, y=out[k]))
-			}
-		}
-	})	
-	parseDAT <- do.call(list, unlist(parseDAT, recursive=FALSE))
-	
-
-	listlength <- 0 %in% sapply(parseDAT, function(x) length(x[[2]]))
-	
-	if(listlength){
-		parseDAT <- parseDAT[sapply(parseDAT, function(x) length(x[[2]])) %in% 1]
 		
-	} else {
-		parseDAT <- parseDAT
-	}
-
-	list(
-		list(name = as.logical(NA),
-			data = parseDAT,
-			type = "scatter",
-			linkedTo=  as.character(NA)
-		)
-	)
-}
-
 qqlineRESULTS <- function (y, datax = FALSE, distribution = qnorm, probs = c(0.25, 
     0.75), qtype = 7, ...) 
 {

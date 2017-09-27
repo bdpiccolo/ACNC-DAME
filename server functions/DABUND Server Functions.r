@@ -1954,7 +1954,7 @@
 		colnames(bpdata)[1] <- "Level"
 		
 		boxfig <- figure(data = bpdata, legend_location=NULL)
-		if(input$RABUNDphylumBPdatatype == "reads") {
+		if(input$RABUNDclassBPdatatype == "reads") {
 			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Reads" = value), 
 				xlab = "", ylab="Sequence reads") 
 		} else {
@@ -1975,7 +1975,7 @@
 		colnames(bpdata)[1] <- "Level"
 		
 		boxfig <- figure(data = bpdata, legend_location=NULL)
-		if(input$RABUNDphylumBPdatatype == "reads") {
+		if(input$RABUNDorderBPdatatype == "reads") {
 			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Reads" = value), 
 				xlab = "", ylab="Sequence reads") 
 		} else {
@@ -1996,7 +1996,7 @@
 		colnames(bpdata)[1] <- "Level"
 		
 		boxfig <- figure(data = bpdata, legend_location=NULL)
-		if(input$RABUNDphylumBPdatatype == "reads") {
+		if(input$RABUNDfamilyBPdatatype == "reads") {
 			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Reads" = value), 
 				xlab = "", ylab="Sequence reads") 
 		} else {
@@ -2017,7 +2017,7 @@
 		colnames(bpdata)[1] <- "Level"
 		
 		boxfig <- figure(data = bpdata, legend_location=NULL)
-		if(input$RABUNDphylumBPdatatype == "reads") {
+		if(input$RABUNDgenusBPdatatype == "reads") {
 			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Reads" = value), 
 				xlab = "", ylab="Sequence reads") 
 		} else {
@@ -2038,7 +2038,7 @@
 		colnames(bpdata)[1] <- "Level"
 		
 		boxfig <- figure(data = bpdata, legend_location=NULL)
-		if(input$RABUNDphylumBPdatatype == "reads") {
+		if(input$RABUNDotuBPdatatype == "reads") {
 			boxfig <- boxfig %>% ly_points(catjitter(Level), value, color = "black", hover = list("Group" = Level, "Reads" = value), 
 				xlab = "", ylab="Sequence reads") 
 		} else {
