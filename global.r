@@ -1,5 +1,5 @@
  
-install_packages <- c("shiny","shinyjs","DT", "rbokeh", "V8","ape","pbapply",
+install_packages <- c("shiny","shinyjs","DT", "rbokeh", "V8","ape","pbapply", "tidyr",
             "tibble","reshape2", "dplyr", "vegan", "scatterD3","RColorBrewer", "markdown")
 if (length(setdiff(install_packages, rownames(installed.packages()))) > 0) {
             install.packages(setdiff(install_packages, rownames(installed.packages())))
