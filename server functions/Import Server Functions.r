@@ -100,7 +100,7 @@
 			)	
 			## Import .CSV file
 			metaD <- read.csv(input$biommetaINPUT$datapath, header=TRUE, comment.char = "", check.names = FALSE)
-			metaD <- metaD[!duplicated(lapply(metaD, summary))]
+			metaD <- metaD[!(apply(metaD, 1, function(x) { sum(is.na(x)) == ncol(metaD)})),!(apply(metaD, 2, function(x) { sum(is.na(x)) == nrow(metaD)}))]
 			metaD
 		}
 	})	
