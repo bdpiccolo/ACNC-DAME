@@ -100,10 +100,12 @@
 			)	
 			## Import .CSV file
 			metaD <- read.csv(input$biommetaINPUT$datapath, header=TRUE, comment.char = "", check.names = FALSE)
+			# metaD <- metaD[!duplicated(lapply(metaD, summary))]
 			metaD <- metaD[!(apply(metaD, 1, function(x) { sum(is.na(x)) == ncol(metaD)})),!(apply(metaD, 2, function(x) { sum(is.na(x)) == nrow(metaD)}))]
 			metaD
 		}
 	})	
+	
 
 	######################################################################
 	## Import Example .CSV Metadata file
@@ -213,9 +215,12 @@
 			## Return nothing
 			NULL
 		} else {
-
-			metaD_labels <- as.character(metaD[,sapply(metaD, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))])
-
+			metaD_col <- sapply(metaD, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))
+			if(sum(metaD_col) != 1){
+				metaD_labels <- as.character(metaD[,metaD_col][,1])
+			} else {
+				metaD_labels <- as.character(metaD[,metaD_col])			
+			}
 			if(any(duplicated(metaD_labels))) {
 				## If it doesn't then return object
 				"There is at least 1 pair of duplicate row labels in the metadata file."
@@ -440,6 +445,10 @@
 		}
 		BIOMtax_matrix
 	})
+	
+	# output$importTEXT <- renderPrint({
+
+	# })	
 		
 	######################################################################
 	## Finalize metadata object
@@ -459,7 +468,12 @@
 			NULL
 		} else {
 			## Isolate the labels from the metadata
-			metaD_labels <- as.character(metaD[,sapply(metaD, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))])
+			metaD_col <- sapply(metaD, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))
+			if(sum(metaD_col) != 1){
+				metaD_labels <- as.character(metaD[,metaD_col][,1])
+			} else {
+				metaD_labels <- as.character(metaD[,metaD_col])			
+			}
 			## Check whether there are duplicates
 			if(any(duplicated(metaD_labels))) {
 				## If it does then return object
@@ -468,8 +482,13 @@
 				
 				## set row names of the metadata as the matching column of BIOM identifiers
 				metaDAT <- metaD
-				rownames(metaDAT) <- metaDAT[,sapply(metaDAT, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))]
-				metaDAT[,sapply(metaDAT, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))] <- NULL
+				if(sum(metaD_col) != 1){
+					rownames(metaDAT) <- metaDAT[,metaD_col][,1]
+					metaDAT[,metaD_col][,1] <- NULL
+				} else {
+					rownames(metaDAT) <- metaDAT[,metaD_col]
+					metaDAT[,metaD_col] <- NULL		
+				}	
 				if(ncol(metaDAT) == 1) {
 					 
 					singleCOL <- trimws(metaDAT[,1], "r")
@@ -608,11 +627,7 @@
 			# }
 		# }
 	})
-
-	# output$importTEXT <- renderPrint({
-
-	# })	
-			
+		
 	output$importDIFFBIOMMETA <- renderUI({
 		req(PHYLOSEQ())
 		rawOTU <- BIOM_OTU()
@@ -1103,7 +1118,7 @@
 			style="color: #fff; background-color: #2c2cad; border-color: #000")
 
 	})	
-	
+
 	######################################################################
 	## Create final phyloseq object
 	######################################################################	
@@ -1551,6 +1566,8 @@
 			fluidPage(
 				column(3,
 					uiOutput("PHYLOSEQmincountTEXT"),
+							br(),
+							br(),
 					uiOutput("mincount_RENDER")
 				),
 				column(3,
