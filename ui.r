@@ -136,7 +136,7 @@ shinyUI(
 						</a>
 						
 						<p><p>
-						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:125px;left:300px;"> DAME version 0.1.3 was built using 
+						<p class="about_text" style="font: Tahoma;font-size: 130%;position:absolute;top:125px;left:300px;"> DAME version 0.2.1 was built using 
 						<a href="http://shiny.rstudio.com/", target="_blank"> Shiny </a> by 
 						<a href="https://www.rstudio.com/", target="_blank"> RStudio, </a> using open source software.  It heavily relies upon functions from 
 						<a href="https://joey711.github.io/phyloseq/", target="_blank"> phyloseq, </a> 
