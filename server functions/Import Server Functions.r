@@ -250,7 +250,12 @@
 			NULL
 		} else {
 			## Isolate the labels from the metadata
-			metaD_labels <- as.character(metaD[,sapply(metaD, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))])
+			metaD_col <- sapply(metaD, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))
+			if(sum(metaD_col) != 1){
+				metaD_labels <- as.character(metaD[,metaD_col][,1])
+			} else {
+				metaD_labels <- as.character(metaD[,metaD_col])			
+			}
 			## Check whether there are duplicates
 			if(any(duplicated(metaD_labels))) {
 				## If it does then return object
@@ -259,31 +264,45 @@
 				
 				## set row names of the metadata as the matching column of BIOM identifiers
 				metaDAT <- metaD
-				rownames(metaDAT) <- metaDAT[,sapply(metaDAT, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))]
-				metaDAT[,sapply(metaDAT, function(x) TRUE %in% (colnames(BIOM_OTU()) %in% x))] <- NULL
+				if(sum(metaD_col) != 1){
+					rownames(metaDAT) <- metaDAT[,metaD_col][,1]
+					metaDAT[,metaD_col][,1] <- NULL
+				} else {
+					rownames(metaDAT) <- metaDAT[,metaD_col]
+					metaDAT[,metaD_col] <- NULL		
+				}	
 				if(ncol(metaDAT) == 1) {
-					singleCOL <- metaDAT[,1]
+					 
+					singleCOL <- trimws(metaDAT[,1], "r")
 					names(singleCOL) <- rownames(metaDAT)
 					singleCOLordered <- singleCOL[order(names(singleCOL))]
-					singleCOLordered <- singleCOLordered[names(singleCOLordered) %in% colnames(biomDAT)]					
+					## Subset metadata to 
+					singleCOLordered <- singleCOLordered[names(singleCOLordered) %in% colnames(biomDAT)]
 					singleCOLordered <- data.frame(singleCOLordered)
 					colnames(singleCOLordered) <- colnames(metaDAT)
-					metaDAT <- singleCOLordered
+					metaDATproc <- singleCOLordered
 				} else {
 					## set metadata rows into ascending order
 					metaDAT <- metaDAT[order(rownames(metaDAT)),]	
-					metaDAT <- metaDAT[rownames(metaDAT) %in% colnames(biomDAT),]					
-				}		
-				# Filter OTU and metadata based on paired labels
-				biomDAT <- biomDAT[,colnames(biomDAT) %in% rownames(metaDAT)]		
-				# Check whether factors in metadata begin with number or special character.
-				# In each metadata column, extract the first element in the character string,
-				# test whether it is either a number or a special character and sum logical returns
-				# unlist and sum vector
+					metaDAT <- metaDAT[rownames(metaDAT) %in% colnames(biomDAT),]	
+					# Remove excess whitespaces from .csv file and coerce all metadata columns into factors
+					metaDATproc <- data.frame(
+						sapply(metaDAT, function(x) {
+							metavec <- x
+							trimws(metavec, "r")
+						})
+					)
+					rownames(metaDATproc) <- rownames(metaDAT)
+					
+				}	
 				
-				numSC <- sum(unlist(lapply(metaDAT, function(x) sum(grepl("[^[:alnum:]]", substr(x,1,1)) | grepl("\\d+", substr(x,1,1))))))
-				numSC
-
+				## Filter OTU and metadata based on paired labels		
+				## Check whether factors in metadata begin with number or special character.
+				## In each metadata column, extract the first element in the character string,
+				## test whether it is either a number or a special character and sum logical returns
+				## unlist and sum vector				
+				numSC <- sum(unlist(lapply(metaDATproc, function(x) sum(grepl("[^[:alnum:]]", substr(x,1,1)) | grepl("\\d+", substr(x,1,1))))))
+				
 				# If sum does not equal 0
 				if(numSC != 0) {
 					#return object
@@ -295,7 +314,7 @@
 			}
 		}
 	})
-
+	
 	######################################################################
 	## Render mismatch row warning
 	######################################################################		
@@ -429,26 +448,46 @@
 	######################################################################		
 	BIOM_TAXA <- reactive({
 		req(BIOM_DAT())
-		## Order columns in ascending order
 		if(is.null(BIOM_DAT()$TAXA)) {
 			NULL
 		} else {
 			biomtaxa <- BIOM_DAT()$TAXA
-			if(class(biomtaxa) == "data.frame") {			
+			if(class(biomtaxa) == "data.frame") {	
 				BIOMtax_matrix <- as.matrix(biomtaxa)
-				colnames(BIOMtax_matrix) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+				ncolTAXA <- ncol(BIOMtax_matrix)
+				colnames(BIOMtax_matrix) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")[1:ncolTAXA]		
 			} else {
-				BIOMtax_matrix <- JSONtaxa(biomtaxa)		
+				BIOMtax_matrix <- taxaFIX(biomtaxa)		
 				BIOMtax_matrix <- BIOMtax_matrix[,!(colnames(BIOMtax_matrix) %in% "d__")]
 				colnames(BIOMtax_matrix) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 			}
 		}
 		BIOMtax_matrix
 	})
-	
-	# output$importTEXT <- renderPrint({
 
-	# })	
+	######################################################################
+	## Check number of columns in TAXA table
+	######################################################################		
+	nTAXA <- reactive({
+		req(BIOM_TAXA())
+		BIOM_TAXA <- BIOM_TAXA()
+		ncolTAXA <- ncol(BIOM_TAXA)
+		if(ncolTAXA < 7) {
+			"Less than 7 taxa"
+		} else {
+			NULL
+		}
+	})	
+
+	######################################################################
+	## Render missing TAXA warning
+	######################################################################						
+	output$IMPORTmissingTAXArender <- renderUI({
+		req(nTAXA())
+		req(BIOM_TAXA())		
+		p(id="lesstaxa", em(strong("There were less than 7 TAXONOMIC LEVELS detected in the BIOM file. DAME assumes the lower taxa 
+			level in 16S rRNA data is not present")))
+	})	
 		
 	######################################################################
 	## Finalize metadata object
@@ -513,14 +552,14 @@
 					rownames(metaDATproc) <- rownames(metaDAT)
 					
 				}	
-				metaDATproc
+				
 				## Filter OTU and metadata based on paired labels		
 				## Check whether factors in metadata begin with number or special character.
 				## In each metadata column, extract the first element in the character string,
 				## test whether it is either a number or a special character and sum logical returns
 				## unlist and sum vector				
 				numSC <- sum(unlist(lapply(metaDATproc, function(x) sum(grepl("[^[:alnum:]]", substr(x,1,1)) | grepl("\\d+", substr(x,1,1))))))
-				numSC
+				
 				# If sum does not equal 0
 				if(numSC != 0) {
 					NULL				
@@ -543,6 +582,10 @@
 		}
 	})
 
+	# output$importTEXT <- renderPrint({		
+		
+	# })	
+			
 	######################################################################
 	## Process Example data
 	######################################################################
@@ -587,47 +630,46 @@
 			req(BIOMmetad_DAT())
 			req(BIOM_OTU())
 			OTU_import <- BIOM_OTU()
- 			META_import <- BIOMmetad_DAT()
+ 			BIOMmetad_DAT <- BIOMmetad_DAT()
 			TAXA_import <- BIOM_TAXA()
-			OTU_IMP <- OTU_import[,colnames(OTU_import) %in% rownames(META_import)]
-			if(ncol(META_import) == 1) {
-				META_IMP <- data.frame(META_import[rownames(META_import) %in% colnames(OTU_import),])
-				colnames(META_IMP) <- colnames(META_import)[1]
-				rownames(META_IMP) <- rownames(META_import)
+			OTU_IMP <- OTU_import[,colnames(OTU_import) %in% rownames(BIOMmetad_DAT)]
+			if(ncol(BIOMmetad_DAT) == 1) {
+				META_IMP <- data.frame(BIOMmetad_DAT[rownames(BIOMmetad_DAT) %in% colnames(OTU_import),])
+				colnames(META_IMP) <- colnames(BIOMmetad_DAT)[1]
+				rownames(META_IMP) <- rownames(BIOMmetad_DAT)
 			} else {
-				META_IMP <- META_import[rownames(META_import) %in% colnames(OTU_import),]
+				META_IMP <- BIOMmetad_DAT[rownames(BIOMmetad_DAT) %in% colnames(OTU_import),]
 			}
 		}
 				## If no tree data
-				if(is.null(TRE_DAT())){
-					# Convert OTU data into phyloseq otu_table class
-					OTU <- otu_table(OTU_IMP, taxa_are_rows = TRUE)
-					# Convert taxa data into phyloseq taxonomyTable class
-					TAXA <- tax_table(TAXA_import)
-					# Convert Sample Metadata data frame into phyloseq sample_data class
-					SAMP <- sample_data(META_IMP)	
-					## Create phyloseq object
-					pseq <- phyloseq(OTU, TAXA, SAMP)
-				} else {
-					# Convert OTU data into phyloseq otu_table class
-					OTU <- otu_table(OTU_IMP, taxa_are_rows = TRUE)
-					# Convert taxa data into phyloseq taxonomyTable class
-					TAXA <- tax_table(TAXA_import)
-					# Convert Sample Metadata data frame into phyloseq sample_data class
-					SAMP <- sample_data(META_IMP)
-					## Finalize tree data
-					tre <- TRE_DAT()
-					# TRE <- root(tre, 1, resolve.root = T)
-					## Create phyloseq object
-					pseq <- phyloseq(OTU, TAXA, SAMP, tre)
-				}
-				## Remove taxa prefixes (eg., 'g__') and add 'Unassigned' labels to all missing labels
-				tax_table(pseq) <- taxaconvert(pseq, label_UNK=TRUE)
-				pseq
-			# }
-		# }
+		if(is.null(TRE_DAT())){
+			# Convert OTU data into phyloseq otu_table class
+			OTU <- otu_table(OTU_IMP, taxa_are_rows = TRUE)
+			# Convert taxa data into phyloseq taxonomyTable class
+			TAXA <- tax_table(TAXA_import)
+			# Convert Sample Metadata data frame into phyloseq sample_data class
+			SAMP <- sample_data(META_IMP)	
+			## Create phyloseq object
+			pseq <- phyloseq(OTU, TAXA, SAMP)
+		} else {
+			# Convert OTU data into phyloseq otu_table class
+			OTU <- otu_table(OTU_IMP, taxa_are_rows = TRUE)
+			# Convert taxa data into phyloseq taxonomyTable class
+			TAXA <- tax_table(TAXA_import)
+			# Convert Sample Metadata data frame into phyloseq sample_data class
+			SAMP <- sample_data(META_IMP)
+			## Finalize tree data
+			tre <- TRE_DAT()
+			# TRE <- root(tre, 1, resolve.root = T)
+			## Create phyloseq object
+			pseq <- phyloseq(OTU, TAXA, SAMP, tre)
+		}
+		## Remove taxa prefixes (eg., 'g__') and add 'Unassigned' labels to all missing labels
+		tax_table(pseq) <- taxaconvert(pseq, label_UNK=TRUE)
+		pseq
+
 	})
-		
+
 	output$importDIFFBIOMMETA <- renderUI({
 		req(PHYLOSEQ())
 		rawOTU <- BIOM_OTU()
@@ -736,8 +778,15 @@
 	######################################################################	
 	output$tableTAXAselection_RENDER <- renderUI({ 
 		req(PHYLOSEQ())
+		if (is.null(input$biomINPUT) & is.null(input$biommetaINPUT) & is.null(input$treINPUT)) {
+			TAXA_import <- ExampleProcessing()$TAXA
+		} else {
+			req(BIOM_TAXA())
+			TAXA_import <- BIOM_TAXA()
+		}
+		TAXAchoices <- colnames(TAXA_import)
 		selectInput(inputId="PHYLOSEQtabletaxa", label="", 
-			choices=c("Kingdom","Phylum","Class","Order","Family","Genus"), selected="Phylum"
+			choices=TAXAchoices, selected="Phylum"
 		)
 	})
 
@@ -1246,8 +1295,15 @@
 	######################################################################	
 	output$tableTAXAselection2_RENDER <- renderUI({ 
 		req(phyloseqFINAL())
+		if (is.null(input$biomINPUT) & is.null(input$biommetaINPUT) & is.null(input$treINPUT)) {
+			TAXA_import <- ExampleProcessing()$TAXA
+		} else {
+			req(BIOM_TAXA())
+			TAXA_import <- BIOM_TAXA()
+		}
+		TAXAchoices <- colnames(TAXA_import)
 		selectInput(inputId="PHYLOSEQtable2taxa", label="", 
-			choices=c("Kingdom","Phylum","Class","Order","Family","Genus"), selected="Phylum"
+			choices=TAXAchoices, selected="Phylum"
 		)
 	})
 

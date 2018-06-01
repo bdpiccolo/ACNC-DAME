@@ -12,6 +12,7 @@ importTAB <- function() {
 					uiOutput("BIOMMETAduplicateIDs"),
 					uiOutput("BIOMMETAnumberstartgroup"),
 					uiOutput("importDIFFBIOMMETA"),
+					uiOutput("IMPORTmissingTAXArender"),
 					hr(),
 					fluidPage(
 						column(3,
@@ -30,6 +31,7 @@ importTAB <- function() {
 							  <h4><strong>Import Metadata (.csv):</strong></h4>
 							 "
 							),
+							br(),
 							fileInput(inputId='biommetaINPUT', label='', accept=c('.csv'))
 						),
 						column(3,
@@ -89,17 +91,7 @@ adivTAB <- function() {
 					
 					fluidPage(
 						column(3,
-							HTML("
-							  <h4><strong>Select Taxonomic Level(s):</strong></h4>
-							 "
-							),	 
-							selectizeInput("adivTAXAselect", label="", selected="Phylum",
-								choices=c(taxaL, "OTU"), options=list(placeholder = 'Click box to select parameters'), 
-								multiple=TRUE),
-							HTML("
-							  <p>Selecting multiple taxonomic levels will require longer computation time.</p>
-							 "
-							)
+							uiOutput("ADIVtaxaselectRENDER")
 						),
 						column(3,
 							HTML("
@@ -159,18 +151,7 @@ bdivTAB <- function() {
 					),
 					fluidPage(
 						column(3,
-							HTML("
-							  <h4><strong>Select Taxonomic Level(s):</strong></h4>
-							 "
-							),	 
-							br(),
-							selectizeInput("bdivTAXAselect", label="", selected="Phylum",
-								choices=c(taxaL, "OTU"), options=list(placeholder = 'Click box to select parameters'), 
-								multiple=TRUE),
-							HTML("
-							  <p>Selecting multiple taxonomic levels will require longer computation time.</p>
-							 "
-							)
+							uiOutput("BDIVtaxaselectRENDER")
 						),
 						column(3,
 							uiOutput("BDIVgroupselectRENDER")
@@ -227,17 +208,7 @@ rabundTAB <- function() {
 					br(),
 					fluidPage(
 						column(3,
-							HTML("
-								<h4><strong>Select Taxonomic Level(s):</strong></h4>
-								"
-							),
-							selectizeInput("dabundTAXAselect", label="", selected="Phylum",
-								choices=c(taxaL, "OTU"), options=list(placeholder = 'Click box to select parameters'), 
-								multiple=TRUE),
-							HTML("
-								<p>Selecting multiple taxonomic levels will require longer computation time.</p>
-								"
-							)
+							uiOutput("DABUNDtaxaselectRENDER")
 						),
 						column(3,
 							HTML("

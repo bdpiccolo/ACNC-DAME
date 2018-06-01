@@ -22,6 +22,48 @@
     })
 
 	########################################################################	
+	## Render Taxa Selections Experimental Groups options
+	########################################################################				
+	output$ADIVtaxaselectRENDER <- renderUI({
+		req(phyloseqFINAL())
+		phyloseqFINAL <- phyloseqFINAL()
+		psFtaxatab <- tax_table(phyloseqFINAL)
+		TAXAnms <- colnames(psFtaxatab)
+		TAXAnms <- TAXAnms[!(TAXAnms %in% "Kingdom")]
+		if(length(TAXAnms) != 6){
+			list(
+				HTML("
+					  <h4><strong>Select Taxonomic Level(s):</strong></h4>
+					 "
+				),	 
+				selectizeInput("adivTAXAselect", label="", selected="Phylum",
+					choices=TAXAnms, options=list(placeholder = 'Click box to select parameters'), 
+					multiple=TRUE),
+				HTML("
+					  <p>Selecting multiple taxonomic levels will require longer computation time.</p>
+					  <p>.</p>
+					 "
+				)
+			)
+		} else {
+			list(
+				HTML("
+					  <h4><strong>Select Taxonomic Level(s):</strong></h4>
+					 "
+				),	 
+				selectizeInput("adivTAXAselect", label="", selected="Phylum",
+					choices=c(taxaL, "OTU"), options=list(placeholder = 'Click box to select parameters'), 
+					multiple=TRUE),
+				HTML("
+					  <p>Selecting multiple taxonomic levels will require longer computation time.</p>
+					  <p>.</p>
+					 "
+				)
+			)
+		}
+	})
+							
+	########################################################################	
 	## Render ANOVA Experimental Groups options
 	########################################################################				
 	output$ADIVgroupselectRENDER <- renderUI({
@@ -633,6 +675,10 @@
 		phylo_TAX_aDIVnormDATA		
 	})
 
+	# output$adivTEXT <- renderPrint({
+		
+	# })	
+		
 	########################################################################
 	## Set ANOVA data for DataTable
 	########################################################################						
@@ -701,10 +747,24 @@
 				names(DispW2)[(1:length(yvars)) + ncol(DispW)] <- yvarsnopace
 				## Coerce list back into a data frame
 				DispFINAL <- as.data.frame(DispW2)
+			
+				if(setequal(yvarsnopace %in% colnames(DispFINAL), TRUE)){
+					colnameKEY <- data.frame(Original = yvarsnopace, Adjust = yvarsnopace, yvars=yvars, stringsAsFactors = FALSE)
+				} else {	
+					if(adivTEST() %in% c("anova", "MFanova", "tt")) {	
+						sFIN <- grep("SEM", colnames(DispFINAL))
+						Adjnames <- colnames(DispFINAL)[(sFIN[length(sFIN)]+1):ncol(DispFINAL)]
+						colnameKEY <- data.frame(Original = yvarsnopace, Adjust = Adjnames, yvars=yvars, stringsAsFactors = FALSE)
+					} else {
+						sFIN <- grep("75", colnames(DispFINAL))
+						Adjnames <- colnames(DispFINAL)[(sFIN[length(sFIN)]+1):ncol(DispFINAL)]					
+						colnameKEY <- data.frame(Original = yvarsnopace, Adjust = Adjnames, yvars=yvars, stringsAsFactors = FALSE)
+					}
+				}
+						
 				## For each experimental group
-				# list(DispFINAL, adivTEST(), adivTEST() %in% c("anova", "MFanova", "tt"))
 				if(adivTEST() %in% c("anova", "MFanova", "tt")) {	
-					for(i in yvarsnopace) {
+					for(i in colnameKEY$Adjust) {
 						## Determine the data frame column positions needed to extract mean and dispersion data
 						## Based on groups
 						colsLOGIC <- captureCN(colnames(DispFINAL), i)
@@ -720,7 +780,7 @@
 						DispFINAL[,colsLOGIC][,3] <- yvFinal
 					}
 				} else {
-					for(i in yvarsnopace) {
+					for(i in colnameKEY$Adjust) {
 						## Determine the data frame column positions needed to extract mean and dispersion data
 						## Based on groups
 						colsLOGIC <- captureCN(colnames(DispFINAL), i)
@@ -738,16 +798,13 @@
 						DispFINAL[,colsLOGIC][,4] <- yvFinal					
 					}
 				}
-				# Subset variable and experimental group columns presented as 'MEAN (SEM)'
-				# Leave MEAN and SEM data behind...
-				MF <- DispFINAL[,c("variable", yvarsnopace)]
-				# If spaces in factor levels
-				if(grepl(" ", yvars)){
-					# Replace column names without spaces to original
-					colnames(MF)[!(colnames(MF) %in% "variable")] <- yvars
-				} else {
-					NULL
-				}
+				## Subset variable and experimental group columns presented as 'MEAN (SEM)'
+				## Leave MEAN and SEM data behind...
+				MF <- DispFINAL[,c("variable", colnameKEY$Adjust)]
+				## If spaces or special characters in factor levels
+				colnames(MF)[colnames(MF) %in% colnameKEY$Adjust] <- colnameKEY$yvars
+				MF
+
 				# merge mean/sem data with anova return by TAXA
 				MFtest <- merge(MF, phylo_TAX_aDIVtestDOWN()[[x]], by="variable")
 				MFtest			
@@ -756,9 +813,9 @@
 		})	
 		## set names and return
 		names(phylo_TAX_aDIV_testDAT) <- adivTAXA()
-		phylo_TAX_aDIV_testDAT	
+		phylo_TAX_aDIV_testDAT		
 	})			
-	
+
 	########################################################################
 	## hide/show advanced highcharter options
 	########################################################################		
@@ -971,9 +1028,6 @@
 		}		
 	})
 
-	# output$adivTEXT <- renderPrint({	
-	# })	
-	
 	ADIVplottextRENDER <- reactive({
 		if(input$goADIV){
 			if("Class" %in% adivTAXA()){	

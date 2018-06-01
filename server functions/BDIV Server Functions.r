@@ -23,6 +23,48 @@
 		shinyjs::toggleClass("text_bdiv", "big", input$bDIVbig)
     })
 
+	########################################################################	
+	## Render Taxa Selections Experimental Groups options
+	########################################################################				
+	output$BDIVtaxaselectRENDER <- renderUI({
+		req(phyloseqFINAL())
+		phyloseqFINAL <- phyloseqFINAL()
+		psFtaxatab <- tax_table(phyloseqFINAL)
+		TAXAnms <- colnames(psFtaxatab)
+		TAXAnms <- TAXAnms[!(TAXAnms %in% "Kingdom")]
+		if(length(TAXAnms) != 6){
+			list(
+				HTML("
+					  <h4><strong>Select Taxonomic Level(s):</strong></h4>
+					 "
+				),	 
+				selectizeInput("bdivTAXAselect", label="", selected="Phylum",
+					choices=TAXAnms, options=list(placeholder = 'Click box to select parameters'), 
+					multiple=TRUE),
+				HTML("
+					  <p>Selecting multiple taxonomic levels will require longer computation time.</p>
+					  <p>.</p>
+					 "
+				)
+			)
+		} else {
+			list(
+				HTML("
+					  <h4><strong>Select Taxonomic Level(s):</strong></h4>
+					 "
+				),	 
+				selectizeInput("bdivTAXAselect", label="", selected="Phylum",
+					choices=c(taxaL, "OTU"), options=list(placeholder = 'Click box to select parameters'), 
+					multiple=TRUE),
+				HTML("
+					  <p>Selecting multiple taxonomic levels will require longer computation time.</p>
+					  <p>.</p>
+					 "
+				)
+			)
+		}
+	})
+		
 	######################################################################
 	## Render beta-diversity indices
 	########################################################################	

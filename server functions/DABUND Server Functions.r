@@ -20,7 +20,49 @@
 	observe({
 		shinyjs::toggleClass("text_dabund", "big", input$dABUNDbig)
     })
-	
+
+	########################################################################	
+	## Render Taxa Selections Experimental Groups options
+	########################################################################				
+	output$DABUNDtaxaselectRENDER <- renderUI({
+		req(phyloseqFINAL())
+		phyloseqFINAL <- phyloseqFINAL()
+		psFtaxatab <- tax_table(phyloseqFINAL)
+		TAXAnms <- colnames(psFtaxatab)
+		TAXAnms <- TAXAnms[!(TAXAnms %in% "Kingdom")]
+		if(length(TAXAnms) != 6){
+			list(
+				HTML("
+					  <h4><strong>Select Taxonomic Level(s):</strong></h4>
+					 "
+				),	 
+				selectizeInput("dabundTAXAselect", label="", selected="Phylum",
+					choices=TAXAnms, options=list(placeholder = 'Click box to select parameters'), 
+					multiple=TRUE),
+				HTML("
+					  <p>Selecting multiple taxonomic levels will require longer computation time.</p>
+					  <p>.</p>
+					 "
+				)
+			)
+		} else {
+			list(
+				HTML("
+					  <h4><strong>Select Taxonomic Level(s):</strong></h4>
+					 "
+				),	 
+				selectizeInput("dabundTAXAselect", label="", selected="Phylum",
+					choices=c(taxaL, "OTU"), options=list(placeholder = 'Click box to select parameters'), 
+					multiple=TRUE),
+				HTML("
+					  <p>Selecting multiple taxonomic levels will require longer computation time.</p>
+					  <p>.</p>
+					 "
+				)
+			)
+		}
+	})
+			
 	########################################################################	
 	## Isolate TAXA selections
 	########################################################################
@@ -1921,11 +1963,11 @@
 	})	
 
 	# output$dabundTEXT <- renderPrint({
-	
+		
 	# })	
 	
 	########################################################################
-	## Create highcharter object with Phylum boxplot data
+	## Create rbokeh object with Phylum boxplot data
 	########################################################################	
 	output$DABUNDphylumboxplotRENDER <- renderRbokeh({
 		req(RABUNDphylumbpdata())
@@ -2254,7 +2296,7 @@
 							
 						),
 						column(6,
-							rbokehOutput("DABUNDphylumboxplotRENDER", height="700px", width="1000px")
+							rbokehOutput("DABUNDphylumboxplotRENDER", height="500px", width="1000px")
 							
 						)
 					)
@@ -2599,7 +2641,7 @@
 							
 						),
 						column(6,
-							rbokehOutput("DABUNDgenusboxplotRENDER", height="700px", width="1000px")
+							rbokehOutput("DABUNDgenusboxplotRENDER", height="500px", width="1000px")
 							
 						)
 					)

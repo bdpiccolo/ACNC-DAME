@@ -1,5 +1,5 @@
  
-install_packages <- c("shiny","shinyjs","DT", "rbokeh", "V8","ape","pbapply", "tidyr",
+install_packages <- c("shiny","shinyjs","DT", "highcharter", "V8","ape","pbapply",
             "tibble","reshape2", "dplyr", "vegan", "scatterD3","RColorBrewer", "markdown")
 if (length(setdiff(install_packages, rownames(installed.packages()))) > 0) {
             install.packages(setdiff(install_packages, rownames(installed.packages())))
@@ -38,8 +38,15 @@ fixUploadedFilesNames <- function(x) {
 	x
 }
 
-JSONtaxa <- function(TAXA) {
-	# TAXA <- observation_metadata(biom)
+taxaFIX <- function(biom) {
+	# TAXAres <- observation_metadata(biom)
+	if(class(biom) == "data.frame") {
+		TAXAvec <- biom[,sapply(biom, function(x) setequal(grepl("k__", x), TRUE))]
+		TAXA <- strsplit(TAXAvec, "; ")
+		names(TAXA) <- rownames(biom)
+	} else {
+		TAXA <- biom
+	}	
 	TAXAMAT <- as.data.frame(matrix(NA, ncol=8, nrow=length(TAXA)))
 	colnames(TAXAMAT) <- c("d__", "k__", "p__", "c__", "o__", "f__", "g__", "s__")
 	rownames(TAXAMAT) <- names(TAXA)
@@ -108,25 +115,12 @@ JSONtaxa <- function(TAXA) {
 	TAXAMAT
 }
 
+
 taxaconvert <- function(phyloO, label_UNK=FALSE) {
 	taxT <- tax_table(phyloO)
-	# taxT[,"Domain"] <- gsub("d__", "", taxT[,"Domain"])
-	taxT[,"Kingdom"] <- gsub("k__", "", taxT[,"Kingdom"])
-	taxT[,"Phylum"] <- gsub("p__", "", taxT[,"Phylum"])
-	taxT[,"Class"] <- gsub("c__", "", taxT[,"Class"])
-	taxT[,"Order"] <- gsub("o__", "", taxT[,"Order"])
-	taxT[,"Family"] <- gsub("f__", "", taxT[,"Family"])
-	taxT[,"Genus"] <- gsub("g__", "", taxT[,"Genus"])
-	taxT[,"Species"] <- gsub("s__", "", taxT[,"Species"])
+	for(i in colnames(taxT)) for(i in colnames(taxT)) taxT[,i] <- gsub("k__", "", taxT[,i])
 	if(label_UNK == TRUE) {
-		# taxT[,"Domain"][which(taxT[,"Domain"] %in% "")] <- "Unassigned"
-		taxT[,"Kingdom"][which(taxT[,"Kingdom"] %in% "")] <- "Unassigned"
-		taxT[,"Phylum"][which(taxT[,"Phylum"] %in% "")] <- "Unassigned"
-		taxT[,"Class"][which(taxT[,"Class"] %in% "")] <- "Unassigned"
-		taxT[,"Order"][which(taxT[,"Order"] %in% "")] <- "Unassigned"
-		taxT[,"Family"][which(taxT[,"Family"] %in% "")] <- "Unassigned"
-		taxT[,"Genus"][which(taxT[,"Genus"] %in% "")] <- "Unassigned"
-		taxT[,"Species"][which(taxT[,"Species"] %in% "")] <- "Unassigned"
+		for(i in colnames(taxT)) for(i in colnames(taxT)) taxT[,i][which(taxT[,i] %in% "")] <- "Unassigned"
 	}
 	taxT
 }
