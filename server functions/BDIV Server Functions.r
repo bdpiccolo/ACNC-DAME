@@ -668,7 +668,7 @@
 			## Select PERMANOVA results by TAXA, extract results, make column of row names,
 			## round numeric results to 5 decimal places, reset Parameter column and return
 			permres <- bdiversity_PERMANOVA()[[x]]
-			data.frame(Parameter = c(BDIVgroup(), "Residuals"), 
+			data.frame(Parameter = c(BDIVgroup(), "Residuals", "Total"), 
 					DF = permres$Df,
 					SS = round(permres$SumOfSqs, 5),
 					F = round(permres$F, 5),
@@ -680,27 +680,6 @@
 		perm
 		
 	})	
-
-	output$bdivTEXT <- renderPrint({
-		req(bdiversity_PERMANOVA())
-		
-		perm <- pblapply(BDIVtaxa(), function(x) {
-			## Select PERMANOVA results by TAXA, extract results, make column of row names,
-			## round numeric results to 5 decimal places, reset Parameter column and return
-			permres <- bdiversity_PERMANOVA()[[x]]
-			data.frame(Parameter = c(BDIVgroup(), "Residuals"), 
-					DF = permres$Df,
-					SS = round(permres$SumOfSqs, 5),
-					F = round(permres$F, 5),
-					P = round(permres[,"Pr(>F)"], 5)
-			)
-		})
-		## Set names and return
-		names(perm) <- BDIVtaxa()
-		perm
-			
-	})	
-	
 
 	########################################################################
 	## Create DataTable object with Phylum PERMANOVA results
