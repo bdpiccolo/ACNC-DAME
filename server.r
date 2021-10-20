@@ -8,7 +8,7 @@ source("global.r")
 
 options(shiny.maxRequestSize=5000*1024^2)
 
-shinyServer(function(input, output, session) {
+server <- function(input, output, session) {
 
 	######################################################################
 	## Toggle regular/larger text 
@@ -35,6 +35,5 @@ shinyServer(function(input, output, session) {
     })
 		
 	
-})
-
+}
 

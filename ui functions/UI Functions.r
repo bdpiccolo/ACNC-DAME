@@ -8,7 +8,7 @@ importTAB <- function() {
 					uiOutput("BIOMnotaxarender"),
 					uiOutput("BIOMMETArowlengthmatch"),
 					uiOutput("BIOMMETAnomatch"),
-					# uiOutput("BIOMMETAnomatchingIDs"),
+					########## uiOutput("BIOMMETAnomatchingIDs"),
 					uiOutput("BIOMMETAduplicateIDs"),
 					uiOutput("BIOMMETAnumberstartgroup"),
 					uiOutput("importDIFFBIOMMETA"),

@@ -1,16 +1,20 @@
  
-install_packages <- c("shiny","shinyjs","DT", "highcharter", "V8","ape","pbapply",
+install_packages <- c("shiny","shinyjs","DT", "rbokeh", "V8","ape","pbapply",
             "tibble","reshape2", "dplyr", "vegan", "scatterD3","RColorBrewer", "markdown")
 if (length(setdiff(install_packages, rownames(installed.packages()))) > 0) {
             install.packages(setdiff(install_packages, rownames(installed.packages())))
 }
  
 bioconductor_packages <- c("biomformat", "phyloseq", "DESeq2")
+# if (length(setdiff(bioconductor_packages, rownames(installed.packages()))) > 0) {
+            # source("https://bioconductor.org/biocLite.R")
+            # biocLite(setdiff(bioconductor_packages, rownames(installed.packages())), suppressUpdates = TRUE)
+# }
+
 if (length(setdiff(bioconductor_packages, rownames(installed.packages()))) > 0) {
-            source("https://bioconductor.org/biocLite.R")
-            biocLite(setdiff(bioconductor_packages, rownames(installed.packages())), suppressUpdates = TRUE)
-}
- 
+
+			BiocManager::install(setdiff(bioconductor_packages, rownames(installed.packages())), ask = FALSE)
+} 
 
 library(biomformat)
 library(ape)
@@ -47,7 +51,7 @@ taxaFIX <- function(biom) {
 	} else {
 		TAXA <- biom
 	}	
-	TAXAMAT <- as.data.frame(matrix(NA, ncol=8, nrow=length(TAXA)))
+	TAXAMAT <- as.data.frame(matrix(NA, ncol=8, nrow=length(TAXA)), stringsAsFactors = TRUE)
 	colnames(TAXAMAT) <- c("d__", "k__", "p__", "c__", "o__", "f__", "g__", "s__")
 	rownames(TAXAMAT) <- names(TAXA)
 	for(i in 1:length(TAXA)){

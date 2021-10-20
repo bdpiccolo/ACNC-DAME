@@ -251,24 +251,36 @@
 		## Select TAXA
 		ordDF <- pblapply(BDIVtaxa(), function(x) {
 			## Ordinate phyloseq object with method and distance selections
-			Ord <- ordinate(bdiversity()[[x]], 
-				method = input$bdivORDINATEselect,
-				distance = input$bdivINDEXselect
-			)
+			tryCatch({
+				ordinate(bdiversity()[[x]], 
+					method = input$bdivORDINATEselect,
+					distance = input$bdivINDEXselect
+				)
+				}, error=function(e) { }
+			) 
+		})
+		names(ordDF) <- BDIVtaxa()
+		
+		ordDF <- lapply(names(ordDF), function(x) {
+			if(is.null(ordDF[[x]])){
+				"NULL return"
+			} else {
+				Ord <- ordDF[[x]]
 			## Extract first 2 components based on ordination method and add SAMPLE data
-			Ord_DF <- switch(input$bdivORDINATEselect,
-				"DCA" = data.frame(sample_data(phyloseqFINAL()),Ord$rproj[,1:2]),
-				"CCA" = data.frame(sample_data(phyloseqFINAL()),Ord$CA$u[,1:2]),
-				"NMDS" = data.frame(sample_data(phyloseqFINAL()),Ord$points[,1:2]),
-				"MDS" = data.frame(sample_data(phyloseqFINAL()),Ord$vectors[,1:2]),
-				"PCoA" = data.frame(sample_data(phyloseqFINAL()),Ord$vectors[,1:2]),
-				"RDA" = data.frame(sample_data(phyloseqFINAL()),Ord$CA$u[,1:2]),
-				"DPCoA" = data.frame(sample_data(phyloseqFINAL()),Ord$li[,1:2])
-			)
-			## Make similar column names and return
-			colnames(Ord_DF)[!(colnames(Ord_DF) %in% colnames(sample_data(phyloseqFINAL())))] <- 
-				c("Component1", "Component2")
-			Ord_DF
+				Ord_DF <- switch(input$bdivORDINATEselect,
+					"DCA" = data.frame(sample_data(phyloseqFINAL()),Ord$rproj[,1:2]),
+					"CCA" = data.frame(sample_data(phyloseqFINAL()),Ord$CA$u[,1:2]),
+					"NMDS" = data.frame(sample_data(phyloseqFINAL()),Ord$points[,1:2]),
+					"MDS" = data.frame(sample_data(phyloseqFINAL()),Ord$vectors[,1:2]),
+					"PCoA" = data.frame(sample_data(phyloseqFINAL()),Ord$vectors[,1:2]),
+					"RDA" = data.frame(sample_data(phyloseqFINAL()),Ord$CA$u[,1:2]),
+					"DPCoA" = data.frame(sample_data(phyloseqFINAL()),Ord$li[,1:2])
+				)
+				## Make similar column names and return
+				colnames(Ord_DF)[!(colnames(Ord_DF) %in% colnames(sample_data(phyloseqFINAL())))] <- 
+					c("Component1", "Component2")
+				Ord_DF
+			}
 		})
 		## Set names and return
 		names(ordDF) <- BDIVtaxa()
@@ -281,47 +293,51 @@
 	########################################################################
 	output$PHYLUMbdivSCATD3_RENDER <- renderScatterD3({
 		if(input$goBDIV){
-			if("Phylum" %in% BDIVtaxa()){	
+			if("Phylum" %in% BDIVtaxa()){
 				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "Phylum")]]
-				scatD3_DF$IDs <- rownames(scatD3_DF)
-				col_var <- if (input$bdiv_PCA_col == "None") {
-					NULL 
+				if(scatD3_DF == "NULL return") {
+					NULL
 				} else {
-					scatD3_DF[,input$bdiv_PCA_col]
+					scatD3_DF$IDs <- rownames(scatD3_DF)
+					col_var <- if (input$bdiv_PCA_col == "None") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_col]
+					}
+					symbol_var <- if (input$bdiv_PCA_shape == "None") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_shape]
+					}				
+					lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_labeltype]
+					}
+					scatterD3(x = scatD3_DF[,"Component1"],
+							  y = scatD3_DF[,"Component2"],
+							  lab = lab_var,
+							  xlab = "Component1",
+							  ylab = "Component2",
+							  col_var = col_var,
+							  col_lab = input$bdiv_PCA_col,
+							  point_size = input$bdiv_PCA_size,
+							  ellipses = input$bdiv_PCA_ellipses,
+							  symbol_var = symbol_var,
+							  symbol_lab = input$bdiv_PCA_shape,
+							  ####size_var = input$bdiv_PCA_size,
+							  ####size_lab = input$bdiv_PCA_size,
+							  ####key_var = rownames(scatterD3_DAT()),
+							  point_opacity = input$bdiv_PCA_opacity,
+							  labels_size = input$bdiv_PCA_labsize,
+							  transitions = input$bdiv_PCA_transitions,
+							  dom_id_svg_export = "PHYLUMscatD3export",
+							  dom_id_reset_zoom = "PHYLUMscatD3resetzoom",
+							  # dom_id_lasso_toggle = "PHYLUMscatD3lassotoggle"
+							  ####lasso = TRUE,
+							  ####lasso_callback = "function(sel) {alert(sel.data().map(function(d) {return d.lab}).join('\\n'));}"
+					 )
 				}
-				symbol_var <- if (input$bdiv_PCA_shape == "None") {
-					NULL 
-				} else {
-					scatD3_DF[,input$bdiv_PCA_shape]
-				}				
-				lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
-					NULL 
-				} else {
-					scatD3_DF[,input$bdiv_PCA_labeltype]
-				}
-				scatterD3(x = scatD3_DF[,"Component1"],
-						  y = scatD3_DF[,"Component2"],
-						  lab = lab_var,
-						  xlab = "Component1",
-						  ylab = "Component2",
-						  col_var = col_var,
-						  col_lab = input$bdiv_PCA_col,
-						  point_size = input$bdiv_PCA_size,
-						  ellipses = input$bdiv_PCA_ellipses,
-						  symbol_var = symbol_var,
-						  symbol_lab = input$bdiv_PCA_shape,
-						  ####size_var = input$bdiv_PCA_size,
-						  ####size_lab = input$bdiv_PCA_size,
-						  ####key_var = rownames(scatterD3_DAT()),
-						  point_opacity = input$bdiv_PCA_opacity,
-						  labels_size = input$bdiv_PCA_labsize,
-						  transitions = input$bdiv_PCA_transitions,
-						  dom_id_svg_export = "PHYLUMscatD3export",
-						  dom_id_reset_zoom = "PHYLUMscatD3resetzoom",
-						  # dom_id_lasso_toggle = "PHYLUMscatD3lassotoggle"
-						  ####lasso = TRUE,
-						  ####lasso_callback = "function(sel) {alert(sel.data().map(function(d) {return d.lab}).join('\\n'));}"
-				 )
 			} else {
 				NULL
 			}
@@ -337,45 +353,49 @@
 		if(input$goBDIV){
 			if("Class" %in% BDIVtaxa()){	
 				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "Class")]]
-				scatD3_DF$IDs <- rownames(scatD3_DF)
-				col_var <- if (input$bdiv_PCA_col == "None") {
-					NULL 
+				if(scatD3_DF == "NULL return") {
+					NULL
 				} else {
-					scatD3_DF[,input$bdiv_PCA_col]
+					scatD3_DF$IDs <- rownames(scatD3_DF)
+					col_var <- if (input$bdiv_PCA_col == "None") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_col]
+					}
+					symbol_var <- if (input$bdiv_PCA_shape == "None") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_shape]
+					}			
+					lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_labeltype]
+					}
+					scatterD3(x = scatD3_DF[,"Component1"],
+							  y = scatD3_DF[,"Component2"],
+							  lab = lab_var,
+							  xlab = "Component1",
+							  ylab = "Component2",
+							  col_var = col_var,
+							  col_lab = input$bdiv_PCA_col,
+							  point_size = input$bdiv_PCA_size,
+							  ellipses = input$bdiv_PCA_ellipses,
+							  symbol_var = symbol_var,
+							  symbol_lab = input$bdiv_PCA_shape,
+							  # size_var = input$bdiv_PCA_size,
+							  # size_lab = input$bdiv_PCA_size,
+							  # key_var = rownames(scatterD3_DAT()),
+							  point_opacity = input$bdiv_PCA_opacity,
+							  labels_size = input$bdiv_PCA_labsize,
+							  transitions = input$bdiv_PCA_transitions,
+							  dom_id_svg_export = "CLASSscatD3export",
+							  dom_id_reset_zoom = "CLASSscatD3resetzoom"
+							  # dom_id_lasso_toggle = "CLASSscatD3lassotoggle"
+							  # lasso = TRUE,
+							  # lasso_callback = "function(sel) {alert(sel.data().map(function(d) {return d.lab}).join('\\n'));}"
+					 )
 				}
-				symbol_var <- if (input$bdiv_PCA_shape == "None") {
-					NULL 
-				} else {
-					scatD3_DF[,input$bdiv_PCA_shape]
-				}			
-				lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
-					NULL 
-				} else {
-					scatD3_DF[,input$bdiv_PCA_labeltype]
-				}
-				scatterD3(x = scatD3_DF[,"Component1"],
-						  y = scatD3_DF[,"Component2"],
-						  lab = lab_var,
-						  xlab = "Component1",
-						  ylab = "Component2",
-						  col_var = col_var,
-						  col_lab = input$bdiv_PCA_col,
-						  point_size = input$bdiv_PCA_size,
-						  ellipses = input$bdiv_PCA_ellipses,
-						  symbol_var = symbol_var,
-						  symbol_lab = input$bdiv_PCA_shape,
-						  # size_var = input$bdiv_PCA_size,
-						  # size_lab = input$bdiv_PCA_size,
-						  # key_var = rownames(scatterD3_DAT()),
-						  point_opacity = input$bdiv_PCA_opacity,
-						  labels_size = input$bdiv_PCA_labsize,
-						  transitions = input$bdiv_PCA_transitions,
-						  dom_id_svg_export = "CLASSscatD3export",
-						  dom_id_reset_zoom = "CLASSscatD3resetzoom"
-						  # dom_id_lasso_toggle = "CLASSscatD3lassotoggle"
-						  # lasso = TRUE,
-						  # lasso_callback = "function(sel) {alert(sel.data().map(function(d) {return d.lab}).join('\\n'));}"
-				 )
 			} else {
 				NULL
 			}
@@ -391,45 +411,49 @@
 		if(input$goBDIV){
 			if("Order" %in% BDIVtaxa()){	
 				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "Order")]]
-				scatD3_DF$IDs <- rownames(scatD3_DF)
-				col_var <- if (input$bdiv_PCA_col == "None") {
-					NULL 
+				if(scatD3_DF == "NULL return") {
+					NULL
 				} else {
-					scatD3_DF[,input$bdiv_PCA_col]
+					scatD3_DF$IDs <- rownames(scatD3_DF)
+					col_var <- if (input$bdiv_PCA_col == "None") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_col]
+					}
+					symbol_var <- if (input$bdiv_PCA_shape == "None") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_shape]
+					}			
+					lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_labeltype]
+					}
+					scatterD3(x = scatD3_DF[,"Component1"],
+							  y = scatD3_DF[,"Component2"],
+							  lab = lab_var,
+							  xlab = "Component1",
+							  ylab = "Component2",
+							  col_var = col_var,
+							  col_lab = input$bdiv_PCA_col,
+							  point_size = input$bdiv_PCA_size,
+							  ellipses = input$bdiv_PCA_ellipses,
+							  symbol_var = symbol_var,
+							  symbol_lab = input$bdiv_PCA_shape,
+							  # size_var = input$bdiv_PCA_size,
+							  # size_lab = input$bdiv_PCA_size,
+							  # key_var = rownames(scatterD3_DAT()),
+							  point_opacity = input$bdiv_PCA_opacity,
+							  labels_size = input$bdiv_PCA_labsize,
+							  transitions = input$bdiv_PCA_transitions,
+							  dom_id_svg_export = "ORDERscatD3export",
+							  dom_id_reset_zoom = "ORDERscatD3resetzoom"
+							  # dom_id_lasso_toggle = "ORDERscatD3lassotoggle"
+							  # lasso = TRUE,
+							  # lasso_callback = "function(sel) {alert(sel.data().map(function(d) {return d.lab}).join('\\n'));}"
+					 )
 				}
-				symbol_var <- if (input$bdiv_PCA_shape == "None") {
-					NULL 
-				} else {
-					scatD3_DF[,input$bdiv_PCA_shape]
-				}			
-				lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
-					NULL 
-				} else {
-					scatD3_DF[,input$bdiv_PCA_labeltype]
-				}
-				scatterD3(x = scatD3_DF[,"Component1"],
-						  y = scatD3_DF[,"Component2"],
-						  lab = lab_var,
-						  xlab = "Component1",
-						  ylab = "Component2",
-						  col_var = col_var,
-						  col_lab = input$bdiv_PCA_col,
-						  point_size = input$bdiv_PCA_size,
-						  ellipses = input$bdiv_PCA_ellipses,
-						  symbol_var = symbol_var,
-						  symbol_lab = input$bdiv_PCA_shape,
-						  # size_var = input$bdiv_PCA_size,
-						  # size_lab = input$bdiv_PCA_size,
-						  # key_var = rownames(scatterD3_DAT()),
-						  point_opacity = input$bdiv_PCA_opacity,
-						  labels_size = input$bdiv_PCA_labsize,
-						  transitions = input$bdiv_PCA_transitions,
-						  dom_id_svg_export = "ORDERscatD3export",
-						  dom_id_reset_zoom = "ORDERscatD3resetzoom"
-						  # dom_id_lasso_toggle = "ORDERscatD3lassotoggle"
-						  # lasso = TRUE,
-						  # lasso_callback = "function(sel) {alert(sel.data().map(function(d) {return d.lab}).join('\\n'));}"
-				 )
 			} else {
 				NULL
 			}
@@ -445,45 +469,49 @@
 		if(input$goBDIV){
 			if("Family" %in% BDIVtaxa()){	
 				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "Family")]]
-				scatD3_DF$IDs <- rownames(scatD3_DF)
-				col_var <- if (input$bdiv_PCA_col == "None") {
-					NULL 
+				if(scatD3_DF == "NULL return") {
+					NULL
 				} else {
-					scatD3_DF[,input$bdiv_PCA_col]
-				}
-				symbol_var <- if (input$bdiv_PCA_shape == "None") {
-					NULL 
-				} else {
-					scatD3_DF[,input$bdiv_PCA_shape]
-				}			
-				lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
-					NULL 
-				} else {
-					scatD3_DF[,input$bdiv_PCA_labeltype]
-				}
-				scatterD3(x = scatD3_DF[,"Component1"],
-						  y = scatD3_DF[,"Component2"],
-						  lab = lab_var,
-						  xlab = "Component1",
-						  ylab = "Component2",
-						  col_var = col_var,
-						  col_lab = input$bdiv_PCA_col,
-						  point_size = input$bdiv_PCA_size,
-						  ellipses = input$bdiv_PCA_ellipses,
-						  symbol_var = symbol_var,
-						  symbol_lab = input$bdiv_PCA_shape,
-						  # size_var = input$bdiv_PCA_size,
-						  # size_lab = input$bdiv_PCA_size,
-						  # key_var = rownames(scatterD3_DAT()),
-						  point_opacity = input$bdiv_PCA_opacity,
-						  labels_size = input$bdiv_PCA_labsize,
-						  transitions = input$bdiv_PCA_transitions,
-						  dom_id_svg_export = "FAMILYscatD3export",
-						  dom_id_reset_zoom = "FAMILYscatD3resetzoom"
-						  # dom_id_lasso_toggle = "FAMILYscatD3lassotoggle"
-						  # lasso = TRUE,
-						  # lasso_callback = "function(sel) {alert(sel.data().map(function(d) {return d.lab}).join('\\n'));}"
-				 )
+					scatD3_DF$IDs <- rownames(scatD3_DF)
+					col_var <- if (input$bdiv_PCA_col == "None") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_col]
+					}
+					symbol_var <- if (input$bdiv_PCA_shape == "None") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_shape]
+					}			
+					lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_labeltype]
+					}
+					scatterD3(x = scatD3_DF[,"Component1"],
+							  y = scatD3_DF[,"Component2"],
+							  lab = lab_var,
+							  xlab = "Component1",
+							  ylab = "Component2",
+							  col_var = col_var,
+							  col_lab = input$bdiv_PCA_col,
+							  point_size = input$bdiv_PCA_size,
+							  ellipses = input$bdiv_PCA_ellipses,
+							  symbol_var = symbol_var,
+							  symbol_lab = input$bdiv_PCA_shape,
+							  # size_var = input$bdiv_PCA_size,
+							  # size_lab = input$bdiv_PCA_size,
+							  # key_var = rownames(scatterD3_DAT()),
+							  point_opacity = input$bdiv_PCA_opacity,
+							  labels_size = input$bdiv_PCA_labsize,
+							  transitions = input$bdiv_PCA_transitions,
+							  dom_id_svg_export = "FAMILYscatD3export",
+							  dom_id_reset_zoom = "FAMILYscatD3resetzoom"
+							  # dom_id_lasso_toggle = "FAMILYscatD3lassotoggle"
+							  # lasso = TRUE,
+							  # lasso_callback = "function(sel) {alert(sel.data().map(function(d) {return d.lab}).join('\\n'));}"
+					 )
+				}	 
 			} else {
 				NULL
 			}
@@ -499,45 +527,49 @@
 		if(input$goBDIV){
 			if("Genus" %in% BDIVtaxa()){	
 				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "Genus")]]
-				scatD3_DF$IDs <- rownames(scatD3_DF)
-				col_var <- if (input$bdiv_PCA_col == "None") {
-					NULL 
+				if(scatD3_DF == "NULL return") {
+					NULL
 				} else {
-					scatD3_DF[,input$bdiv_PCA_col]
-				}
-				symbol_var <- if (input$bdiv_PCA_shape == "None") {
-					NULL 
-				} else {
-					scatD3_DF[,input$bdiv_PCA_shape]
-				}			
-				lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
-					NULL 
-				} else {
-					scatD3_DF[,input$bdiv_PCA_labeltype]
-				}
-				scatterD3(x = scatD3_DF[,"Component1"],
-						  y = scatD3_DF[,"Component2"],
-						  lab = lab_var,
-						  xlab = "Component1",
-						  ylab = "Component2",
-						  col_var = col_var,
-						  col_lab = input$bdiv_PCA_col,
-						  point_size = input$bdiv_PCA_size,
-						  ellipses = input$bdiv_PCA_ellipses,
-						  symbol_var = symbol_var,
-						  symbol_lab = input$bdiv_PCA_shape,
-						  # size_var = input$bdiv_PCA_size,
-						  # size_lab = input$bdiv_PCA_size,
-						  # key_var = rownames(scatterD3_DAT()),
-						  point_opacity = input$bdiv_PCA_opacity,
-						  labels_size = input$bdiv_PCA_labsize,
-						  transitions = input$bdiv_PCA_transitions,
-						  dom_id_svg_export = "GENUSscatD3export",
-						  dom_id_reset_zoom = "GENUSscatD3resetzoom"
-						  # dom_id_lasso_toggle = "GENUSscatD3lassotoggle"
-						  # lasso = TRUE,
-						  # lasso_callback = "function(sel) {alert(sel.data().map(function(d) {return d.lab}).join('\\n'));}"
-				 )
+					scatD3_DF$IDs <- rownames(scatD3_DF)
+					col_var <- if (input$bdiv_PCA_col == "None") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_col]
+					}
+					symbol_var <- if (input$bdiv_PCA_shape == "None") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_shape]
+					}			
+					lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_labeltype]
+					}
+					scatterD3(x = scatD3_DF[,"Component1"],
+							  y = scatD3_DF[,"Component2"],
+							  lab = lab_var,
+							  xlab = "Component1",
+							  ylab = "Component2",
+							  col_var = col_var,
+							  col_lab = input$bdiv_PCA_col,
+							  point_size = input$bdiv_PCA_size,
+							  ellipses = input$bdiv_PCA_ellipses,
+							  symbol_var = symbol_var,
+							  symbol_lab = input$bdiv_PCA_shape,
+							  # size_var = input$bdiv_PCA_size,
+							  # size_lab = input$bdiv_PCA_size,
+							  # key_var = rownames(scatterD3_DAT()),
+							  point_opacity = input$bdiv_PCA_opacity,
+							  labels_size = input$bdiv_PCA_labsize,
+							  transitions = input$bdiv_PCA_transitions,
+							  dom_id_svg_export = "GENUSscatD3export",
+							  dom_id_reset_zoom = "GENUSscatD3resetzoom"
+							  # dom_id_lasso_toggle = "GENUSscatD3lassotoggle"
+							  # lasso = TRUE,
+							  # lasso_callback = "function(sel) {alert(sel.data().map(function(d) {return d.lab}).join('\\n'));}"
+					 )
+				}	 
 			} else {
 				NULL
 			}
@@ -553,45 +585,49 @@
 		if(input$goBDIV){
 			if("OTU" %in% BDIVtaxa()){	
 				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "OTU")]]
-				scatD3_DF$IDs <- rownames(scatD3_DF)
-				if (input$bdiv_PCA_col == "None") {
-					col_var <- NULL 
+				if(scatD3_DF == "NULL return") {
+					NULL
 				} else {
-					col_var <- scatD3_DF[,input$bdiv_PCA_col]
-				}
-				if (input$bdiv_PCA_shape == "None") {
-					symbol_var <- NULL 
-				} else {
-					symbol_var <- scatD3_DF[,input$bdiv_PCA_shape]
-				}			
-				lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
-					NULL 
-				} else {
-					scatD3_DF[,input$bdiv_PCA_labeltype]
-				}
-				scatterD3(x = scatD3_DF[,"Component1"],
-						  y = scatD3_DF[,"Component2"],
-						  lab = lab_var,
-						  xlab = "Component1",
-						  ylab = "Component2",
-						  col_var = col_var,
-						  col_lab = input$bdiv_PCA_col,
-						  point_size = input$bdiv_PCA_size,
-						  ellipses = input$bdiv_PCA_ellipses,
-						  symbol_var = symbol_var,
-						  symbol_lab = input$bdiv_PCA_shape,
-						  # size_var = input$bdiv_PCA_size,
-						  # size_lab = input$bdiv_PCA_size,
-						  # key_var = rownames(scatterD3_DAT()),
-						  point_opacity = input$bdiv_PCA_opacity,
-						  labels_size = input$bdiv_PCA_labsize,
-						  transitions = input$bdiv_PCA_transitions,
-						  dom_id_svg_export = "OTUscatD3export",
-						  dom_id_reset_zoom = "OTUscatD3resetzoom"
-						  # dom_id_lasso_toggle = "GENUSscatD3lassotoggle"
-						  # lasso = TRUE,
-						  # lasso_callback = "function(sel) {alert(sel.data().map(function(d) {return d.lab}).join('\\n'));}"
-				 )
+					scatD3_DF$IDs <- rownames(scatD3_DF)
+					if (input$bdiv_PCA_col == "None") {
+						col_var <- NULL 
+					} else {
+						col_var <- scatD3_DF[,input$bdiv_PCA_col]
+					}
+					if (input$bdiv_PCA_shape == "None") {
+						symbol_var <- NULL 
+					} else {
+						symbol_var <- scatD3_DF[,input$bdiv_PCA_shape]
+					}			
+					lab_var <- if (input$bdiv_PCA_labels == "FALSE") {
+						NULL 
+					} else {
+						scatD3_DF[,input$bdiv_PCA_labeltype]
+					}
+					scatterD3(x = scatD3_DF[,"Component1"],
+							  y = scatD3_DF[,"Component2"],
+							  lab = lab_var,
+							  xlab = "Component1",
+							  ylab = "Component2",
+							  col_var = col_var,
+							  col_lab = input$bdiv_PCA_col,
+							  point_size = input$bdiv_PCA_size,
+							  ellipses = input$bdiv_PCA_ellipses,
+							  symbol_var = symbol_var,
+							  symbol_lab = input$bdiv_PCA_shape,
+							  # size_var = input$bdiv_PCA_size,
+							  # size_lab = input$bdiv_PCA_size,
+							  # key_var = rownames(scatterD3_DAT()),
+							  point_opacity = input$bdiv_PCA_opacity,
+							  labels_size = input$bdiv_PCA_labsize,
+							  transitions = input$bdiv_PCA_transitions,
+							  dom_id_svg_export = "OTUscatD3export",
+							  dom_id_reset_zoom = "OTUscatD3resetzoom"
+							  # dom_id_lasso_toggle = "GENUSscatD3lassotoggle"
+							  # lasso = TRUE,
+							  # lasso_callback = "function(sel) {alert(sel.data().map(function(d) {return d.lab}).join('\\n'));}"
+					 )
+				}	 
 			} else {
 				NULL
 			}
@@ -620,10 +656,6 @@
 		names(bdiv) <- BDIVtaxa()
 		bdiv		
 	})
-	
-	# output$bdivTEXT <- renderPrint({
-	
-	# })	
 	
 	########################################################################
 	## Calculate PERMANOVA
@@ -680,6 +712,7 @@
 		perm
 		
 	})	
+
 
 	########################################################################
 	## Create DataTable object with Phylum PERMANOVA results
@@ -887,41 +920,72 @@
 		}				
 	})	
 
+	# output$bdivTEXT <- renderPrint({
+
+
+	# })	
+	
 	########################################################################
 	## Render Phylum UI after goBDIV observed
 	########################################################################
 	output$BDIVphylumgraphicsRENDER <- renderUI({
 		if(input$goBDIV){
 			if("Phylum" %in% BDIVtaxa()){	
-				list(
-					hr(class="hr_SINGLE_sep"),
-					fluidPage(
-						column(6,
-							HTML("
-								<h4><strong>&#946;-Diversity Graphics at <em>Phylum</em> level.</strong></h4>
-								"
-							),
-							scatterD3::scatterD3Output("PHYLUMbdivSCATD3_RENDER", height="600px", width="750px"),
-							tags$p(
-								actionButton("PHYLUMscatD3resetzoom", "Reset Zoom", icon("icon-zoom-in"), 
-										style="color: #fff; background-color: #2c2cad; border-color: #000"),
-								# actionButton("PHYLUMscatD3lassotoggle", "Toggle Lasso", icon("crosshairs"), 
-										# style="color: #fff; background-color: #2c2cad; border-color: #000"),	
-								tags$a(id = "PHYLUMscatD3export", href = "#", class = "btn btn-default", 
-									style="color: #fff; background-color: #2c2cad; border-color: #000;",
-									HTML("<span class='glyphicon glyphicon-save' aria-hidden='true'></span> Download SVG")
+				scatD3_DF <- ordinationDF()[[which(names(ordinationDF()) %in% "Phylum")]]
+				if(scatD3_DF == "NULL return") {
+					list(
+						hr(class="hr_SINGLE_sep"),
+						fluidPage(
+							column(6,
+								HTML("
+									<h4><strong>&#946;-Diversity Graphics at <em>Phylum</em> level.</strong></h4>
+									"
+								),
+								HTML("
+									 <h4><strong>Unable to calculate Ordination.  Likely not enough taxa to compute.</strong></h4>
+									 "
 								)
+							),
+							column(6,
+								HTML("
+									<h4><strong>&#946;-Diversity PERMANOVA at <em>Phylum</em> level.</strong></h4>
+									"
+								),						
+								DT::dataTableOutput("BDIVphylumPERMANOVAtableRENDER")
 							)
-						),
-						column(6,
-							HTML("
-								<h4><strong>&#946;-Diversity PERMANOVA at <em>Phylum</em> level.</strong></h4>
-								"
-							),						
-							DT::dataTableOutput("BDIVphylumPERMANOVAtableRENDER")
 						)
 					)
-				)
+				} else {
+					list(
+						hr(class="hr_SINGLE_sep"),
+						fluidPage(
+							column(6,
+								HTML("
+									<h4><strong>&#946;-Diversity Graphics at <em>Phylum</em> level.</strong></h4>
+									"
+								),
+								scatterD3::scatterD3Output("PHYLUMbdivSCATD3_RENDER", height="600px", width="750px"),
+								tags$p(
+									actionButton("PHYLUMscatD3resetzoom", "Reset Zoom", icon("icon-zoom-in"), 
+											style="color: #fff; background-color: #2c2cad; border-color: #000"),
+									# actionButton("PHYLUMscatD3lassotoggle", "Toggle Lasso", icon("crosshairs"), 
+											# style="color: #fff; background-color: #2c2cad; border-color: #000"),	
+									tags$a(id = "PHYLUMscatD3export", href = "#", class = "btn btn-default", 
+										style="color: #fff; background-color: #2c2cad; border-color: #000;",
+										HTML("<span class='glyphicon glyphicon-save' aria-hidden='true'></span> Download SVG")
+									)
+								)
+							),
+							column(6,
+								HTML("
+									<h4><strong>&#946;-Diversity PERMANOVA at <em>Phylum</em> level.</strong></h4>
+									"
+								),						
+								DT::dataTableOutput("BDIVphylumPERMANOVAtableRENDER")
+							)
+						)
+					)
+				}
 			} else {
 				return(NULL)
 			}

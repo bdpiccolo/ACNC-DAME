@@ -32,13 +32,27 @@ tabPanelrabund <- rabundTAB
 shinyUI(
 	fluidPage(
 		shinyjs::useShinyjs(),
-		shinyjs::extendShinyjs(text = jscode),
+		shinyjs::extendShinyjs(text = jscode, functions = c("disableTab","enableTab")),
 		# tags$head(includeScript("google-analytics.js")),
         tags$head(
 			tags$link(
 				rel="stylesheet", type="text/css", href="custom.css"
 			)
+			# ,
+			# tags$style(
+				## Hides warnings on web browser
+				# type="text/css",
+					# ".shiny-output-error { visibility: hidden; }",
+					# ".shiny-output-error:before { visibility: hidden; }"
+				
+			# )
 		), 
+		tags$head(
+			tags$style(
+				HTML(".shiny-output-error-validation {color: #c41e3a;font-size: 30px;}"
+				)
+			)
+		),
 		navbarPage("DAME", id="navbar_title",
 			tabPanel(title = "Introduction", id = "intropage",
 				div(id = "text_intro",

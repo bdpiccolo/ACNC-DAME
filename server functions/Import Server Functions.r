@@ -99,7 +99,7 @@
 				), "Wrong File Format Uploaded")
 			)	
 			## Import .CSV file
-			metaD <- read.csv(input$biommetaINPUT$datapath, header=TRUE, comment.char = "", check.names = FALSE)
+			metaD <- read.csv(input$biommetaINPUT$datapath, header=TRUE, comment.char = "", check.names = FALSE, stringsAsFactors = TRUE)
 			# metaD <- metaD[!duplicated(lapply(metaD, summary))]
 			metaD <- metaD[!(apply(metaD, 1, function(x) { sum(is.na(x)) == ncol(metaD)})),!(apply(metaD, 2, function(x) { sum(is.na(x)) == nrow(metaD)}))]
 			metaD
@@ -113,7 +113,7 @@
 	Example_BIOMmetad_IMPORT <- reactive({
 		if (is.null(input$biomINPUT) & is.null(input$biommetaINPUT) & is.null(input$treINPUT)) {
 			if(as.numeric(input$loadexample) == 2){		
-				metaD <- read.csv("./Example/Example_BIOM_Metadata_csv.csv", header=TRUE, comment.char = "", check.names = FALSE)
+				metaD <- read.csv("./Example/Example_BIOM_Metadata_csv.csv", header=TRUE, comment.char = "", check.names = FALSE, stringsAsFactors = TRUE)
 				metaD		
 			} else {
 				return(NULL)
@@ -278,7 +278,7 @@
 					singleCOLordered <- singleCOL[order(names(singleCOL))]
 					## Subset metadata to 
 					singleCOLordered <- singleCOLordered[names(singleCOLordered) %in% colnames(biomDAT)]
-					singleCOLordered <- data.frame(singleCOLordered)
+					singleCOLordered <- data.frame(singleCOLordered, stringsAsFactors = TRUE)
 					colnames(singleCOLordered) <- colnames(metaDAT)
 					metaDATproc <- singleCOLordered
 				} else {
@@ -290,7 +290,7 @@
 						sapply(metaDAT, function(x) {
 							metavec <- x
 							trimws(metavec, "r")
-						})
+						}), stringsAsFactors = TRUE
 					)
 					rownames(metaDATproc) <- rownames(metaDAT)
 					
@@ -535,7 +535,7 @@
 					singleCOLordered <- singleCOL[order(names(singleCOL))]
 					## Subset metadata to 
 					singleCOLordered <- singleCOLordered[names(singleCOLordered) %in% colnames(biomDAT)]
-					singleCOLordered <- data.frame(singleCOLordered)
+					singleCOLordered <- data.frame(singleCOLordered, stringsAsFactors = TRUE)
 					colnames(singleCOLordered) <- colnames(metaDAT)
 					metaDATproc <- singleCOLordered
 				} else {
@@ -547,7 +547,7 @@
 						sapply(metaDAT, function(x) {
 							metavec <- x
 							trimws(metavec, "r")
-						})
+						}), stringsAsFactors = TRUE
 					)
 					rownames(metaDATproc) <- rownames(metaDAT)
 					
@@ -572,7 +572,7 @@
 						BIOMmetad_DAT
 					} else {
 						# Set names and return
-						BIOMmetad_DAT <- data.frame(sapply(metaDATproc, function(x) as.factor(x)))						
+						BIOMmetad_DAT <- data.frame(sapply(metaDATproc, function(x) as.factor(x)), stringsAsFactors = TRUE)						
 						rownames(BIOMmetad_DAT) <- rownames(metaDATproc)
 						BIOMmetad_DAT
 					}
@@ -581,11 +581,7 @@
 			}	
 		}
 	})
-
-	# output$importTEXT <- renderPrint({		
-		
-	# })	
-			
+	
 	######################################################################
 	## Process Example data
 	######################################################################
@@ -606,7 +602,7 @@
 			## Subset metadata to match column IDs
 			BIOMmetad_DAT <- metaDAT[rownames(metaDAT) %in% colnames(EBOTU),]
 			## Coerce all metadata columns into factors
-			BIOMmetad_DAT <- data.frame(sapply(BIOMmetad_DAT, as.factor))
+			BIOMmetad_DAT <- data.frame(sapply(BIOMmetad_DAT, as.factor), stringsAsFactors = TRUE)
 			## Set names and return
 			rownames(BIOMmetad_DAT) <- colnames(EBOTU)
 			# BIOMmetad_DAT
@@ -634,7 +630,7 @@
 			TAXA_import <- BIOM_TAXA()
 			OTU_IMP <- OTU_import[,colnames(OTU_import) %in% rownames(BIOMmetad_DAT)]
 			if(ncol(BIOMmetad_DAT) == 1) {
-				META_IMP <- data.frame(BIOMmetad_DAT[rownames(BIOMmetad_DAT) %in% colnames(OTU_import),])
+				META_IMP <- data.frame(BIOMmetad_DAT[rownames(BIOMmetad_DAT) %in% colnames(OTU_import),], stringsAsFactors = TRUE)
 				colnames(META_IMP) <- colnames(BIOMmetad_DAT)[1]
 				rownames(META_IMP) <- rownames(BIOMmetad_DAT)
 			} else {
@@ -760,7 +756,7 @@
 		# metaFINAL
 
 	})
-
+		
 	######################################################################
 	## Render Taxonomic level text for original data description
 	######################################################################			
@@ -794,31 +790,38 @@
 	## Create object with data description
 	######################################################################		
 	PHYLOSEQ1desc <- reactive({
+		req(PHYLOSEQ())
+		pseq <- PHYLOSEQ()
+		PHYLOSEQtabletaxa <- input$PHYLOSEQtabletaxa
 		# Compute prevalence of each feature, store as data.frame
-		preval = apply(X = otu_table(PHYLOSEQ()),
-						 MARGIN = ifelse(taxa_are_rows(PHYLOSEQ()), yes = 1, no = 2),
+		preval = apply(X = otu_table(pseq),
+						 MARGIN = ifelse(taxa_are_rows(pseq), yes = 1, no = 2),
 						 FUN = function(x){sum(x > 0)})
 		# Add taxonomy and total read counts to this data.frame
 		prevdf = data.frame(Prevalence = preval, # Number of samples (rats) that contain a specific OTU
-							  TotalAbundance = taxa_sums(PHYLOSEQ()), # total number of OTUs found across all samples
-							  tax_table(PHYLOSEQ()))
+							  TotalAbundance = taxa_sums(pseq), # total number of OTUs found across all samples
+							  tax_table(pseq), stringsAsFactors = TRUE)
 						  
 		## Group by taxa level, and then calculate, mean, median, max, min of sample prevalance, and sum of total reads
 		## and remove any data with no reads
-		SAMPLE_prevalence_stats <- prevdf %>% group_by_(input$PHYLOSEQtabletaxa) %>% 
+		SAMPLE_prevalence_stats <- prevdf %>% group_by_at(PHYLOSEQtabletaxa) %>% 
 			summarise(MEAN_READS=round(mean(Prevalence),1), MEDIAN_READS=median(Prevalence), MAX_READ=max(Prevalence), 
 				MIN_READ=min(Prevalence),TOTALREADS=sum(TotalAbundance)) %>%
-				subset(TOTALREADS > 0) 
+				subset(TOTALREADS > 0)  %>%
+				mutate(PC_TR = (round(TOTALREADS/sum(TOTALREADS), 5))*100) #%>% as.data.frame()
 		## Subset Taxonomic level and coerce to data frame		
-		SAMPLE_taxa <- as.data.frame(SAMPLE_prevalence_stats[,input$PHYLOSEQtabletaxa])[,1]
+		# SAMPLE_taxa <- SAMPLE_prevalence_stats[,PHYLOSEQtabletaxa]
 		## Sum the amount of TAXA for selected level
-		ps0p <- table(tax_table(PHYLOSEQ())[, input$PHYLOSEQtabletaxa], exclude = NULL)[SAMPLE_taxa]
+		ps0p <- summary(factor(tax_table(pseq)@.Data[,PHYLOSEQtabletaxa]))
+		ps0pDF <- data.frame(Taxa = names(ps0p), N = ps0p, PC_ABUND = (round(ps0p/sum(ps0p), 5))*100)
+		colnames(ps0pDF)[colnames(ps0pDF) %in% "Taxa"] <- PHYLOSEQtabletaxa
 		## Add columns with percent reads, total taxa, and percent taxa. 
 		## Return
-		SAMPLE_prevalence_stats <- SAMPLE_prevalence_stats %>%
-			mutate(PC_TR = (round(TOTALREADS/sum(TOTALREADS), 5))*100)  %>%
-			mutate(N = ps0p) %>%
-			mutate(PC_ABUND = (round(N/sum(N), 5))*100)
+		validate(
+			need(PHYLOSEQtabletaxa != "", "Table is loading.  Please wait...")
+		)
+		# SAMPLE_prevalence_stats <- full_join(SAMPLE_prevalence_stats, ps0pDF, by=quo_name(PHYLOSEQtabletaxa))
+		SAMPLE_prevalence_stats <- full_join(SAMPLE_prevalence_stats, ps0pDF, by=PHYLOSEQtabletaxa)
 		SAMPLE_prevalence_stats
 	})
 
@@ -826,10 +829,12 @@
 	## Create DataTable object with original data description
 	######################################################################	
 	output$PHYLOSEQinitialdescRENDER <- DT::renderDataTable({
-		req(PHYLOSEQ())	
-		t1 <- as.data.frame(PHYLOSEQ1desc())
-		t1[,!(colnames(t1) %in% input$PHYLOSEQtabletaxa)] <- 
-			apply(PHYLOSEQ1desc()[,!(colnames(PHYLOSEQ1desc()) %in% input$PHYLOSEQtabletaxa)], 2, as.numeric)
+		req(PHYLOSEQ1desc())	
+		PHYLOSEQ1desc <- PHYLOSEQ1desc()
+		PHYLOSEQtabletaxa <- input$PHYLOSEQtabletaxa
+		t1 <- as.data.frame(PHYLOSEQ1desc(), stringsAsFactors = TRUE)
+		# t1[,!(colnames(t1) %in% PHYLOSEQtabletaxa)] <- 
+			# apply(PHYLOSEQ1desc()[,!(colnames(PHYLOSEQ1desc()) %in% PHYLOSEQtabletaxa)], 2, as.numeric)
 		datatable(t1, extensions='Buttons', rownames = FALSE,
 			container = htmltools::withTags(table(
 				class = 'display',
@@ -942,7 +947,7 @@
 			otu <- otu_table(pdglomtransf)@.Data
 			taxa <- tax_table(pdglomtransf)@.Data
 
-			data.frame(taxa, otu)
+			data.frame(taxa, otu, stringsAsFactors = TRUE)
 	})
 
 	######################################################################
@@ -1196,13 +1201,16 @@
 			TAXA_import <- BIOM_TAXA()
 			OTU_IMP <- OTU_import[,colnames(OTU_import) %in% rownames(META_import)]
 			if(ncol(META_import) == 1) {
-				META_IMP <- data.frame(META_import[rownames(META_import) %in% colnames(OTU_import),])
+				META_IMP <- data.frame(META_import[rownames(META_import) %in% colnames(OTU_import),], stringsAsFactors = TRUE)
 				colnames(META_IMP) <- colnames(META_import)[1]
 				rownames(META_IMP) <- rownames(META_import)
 			} else {
 				META_IMP <- META_import[rownames(META_import) %in% colnames(OTU_import),]
 			}
-		}		
+		}			
+		validate(
+			need(input$goIMPORT != "", "")
+		)
 		if(input$goIMPORT){
 			isolate({	
 				## Extract filtered metadata selections into a list and set name of list to experimental groups
@@ -1212,7 +1220,7 @@
 				metaDAT <- META_IMP
 				## Filter metadata based on filtered metadata selections
 				if(ncol(metaDAT) == 1) {
-					metaDAT <- data.frame(droplevels(metaDAT[metaDAT[,1] %in% metaselectionsREACTIVE[[1]] ,]))
+					metaDAT <- data.frame(droplevels(metaDAT[metaDAT[,1] %in% metaselectionsREACTIVE[[1]] ,]), stringsAsFactors = TRUE)
 					colnames(metaDAT)[1] <- colnames(META_IMP)[1]
 					rownames(metaDAT) <- rownames(META_IMP)[META_IMP[,1] %in% metaselectionsREACTIVE[[1]]]
 				} else {
@@ -1373,7 +1381,7 @@
 			filtotu <- otu_table(filtpdglomtransf)@.Data
 			filttaxa <- tax_table(filtpdglomtransf)@.Data
 
-			data.frame(filttaxa, filtotu)
+			data.frame(filttaxa, filtotu, stringsAsFactors = TRUE)
 	})
 		
 	######################################################################
@@ -1430,43 +1438,57 @@
 	######################################################################		
 	PHYLOSEQFINALdesc <- reactive({
 		req(phyloseqFINAL())
+		pseqFINAL <- phyloseqFINAL()
+		PHYLOSEQtable2taxa <- input$PHYLOSEQtable2taxa
 		# Compute prevalence of each feature, store as data.frame
-		preval = apply(X = otu_table(phyloseqFINAL()),
-						 MARGIN = ifelse(taxa_are_rows(phyloseqFINAL()), yes = 1, no = 2),
+		preval = apply(X = otu_table(pseqFINAL),
+						 MARGIN = ifelse(taxa_are_rows(pseqFINAL), yes = 1, no = 2),
 						 FUN = function(x){sum(x > 0)}
 		)
 		# Add taxonomy and total read counts to this data.frame
 		prevdf = data.frame(Prevalence = preval, # Number of samples (rats) that contain a specific OTU
-			TotalAbundance = taxa_sums(phyloseqFINAL()), # total number of OTUs found across all samples
-			tax_table(phyloseqFINAL())
+			TotalAbundance = taxa_sums(pseqFINAL), # total number of OTUs found across all samples
+			tax_table(pseqFINAL), stringsAsFactors = TRUE
 		)	
 		## Group by taxa level, and then calculate, mean, median, max, min of sample prevalance, and sum of total reads
 		## and remove any data with no reads
-		SAMPLE_prevalence_stats <- prevdf %>% group_by_(input$PHYLOSEQtable2taxa) %>% 
-			summarise(MEAN_READS=round(mean(Prevalence),1), MEDIAN_READS=median(Prevalence), MAX_READ=max(Prevalence), MIN_READ=min(Prevalence),TOTALREADS=sum(TotalAbundance)) %>%
-			subset(TOTALREADS > 0) 
+		SAMPLE_prevalence_stats <- prevdf %>% group_by_at(PHYLOSEQtable2taxa) %>% 
+			summarise(MEAN_READS=round(mean(Prevalence),1), MEDIAN_READS=median(Prevalence), MAX_READ=max(Prevalence),
+				MIN_READ=min(Prevalence),TOTALREADS=sum(TotalAbundance)) %>%
+				subset(TOTALREADS > 0)   %>%
+				mutate(PC_TR = (round(TOTALREADS/sum(TOTALREADS), 5))*100)
 		## Subset Taxonomic level and coerce to data frame	
-		SAMPLE_taxa <- as.data.frame(SAMPLE_prevalence_stats[,input$PHYLOSEQtable2taxa])[,1]
+		# SAMPLE_taxa <- as.data.frame(SAMPLE_prevalence_stats[,PHYLOSEQtable2taxa], stringsAsFactors = TRUE)[,1]
 		## Sum the amount of TAXA for selected level
-		ps0p <- table(tax_table(phyloseqFINAL())[, input$PHYLOSEQtable2taxa], exclude = NULL)[SAMPLE_taxa]
+		ps0p <- summary(factor(tax_table(pseqFINAL)@.Data[,PHYLOSEQtable2taxa]))
+		ps0pDF <- data.frame(Taxa = names(ps0p), N = ps0p, PC_ABUND = (round(ps0p/sum(ps0p), 5))*100)
+		colnames(ps0pDF)[colnames(ps0pDF) %in% "Taxa"] <- PHYLOSEQtable2taxa
 		## Add columns with percent reads, total taxa, and percent taxa. 
 		## Return
-		SAMPLE_prevalence_stats <- SAMPLE_prevalence_stats %>%
-			mutate(PC_TR = (round(TOTALREADS/sum(TOTALREADS), 5))*100)  %>%
-			mutate(N = ps0p) %>%
-			mutate(PC_ABUND = (round(N/sum(N), 5))*100)
+		validate(
+			need(PHYLOSEQtable2taxa != "", "Table is loading.  Please wait...")
+		)
+		# SAMPLE_prevalence_stats <- full_join(SAMPLE_prevalence_stats, ps0pDF, by=quo_name(PHYLOSEQtable2taxa))
+		SAMPLE_prevalence_stats <- full_join(SAMPLE_prevalence_stats, ps0pDF, by=PHYLOSEQtable2taxa)
 		SAMPLE_prevalence_stats
+				
 	})
 
+	# output$importTEXT <- renderPrint({
+	
+			
+	# })	
+	
 	######################################################################
 	## Create DataTable object with final data description
 	######################################################################		
 	output$PHYLOSEQFINALinitialdescRENDER <- DT::renderDataTable({
 		req(phyloseqFINAL())	
-		t1 <- as.data.frame(PHYLOSEQFINALdesc())
-		t1[,!(colnames(t1) %in% input$PHYLOSEQtable2taxa)] <- 
-			apply(PHYLOSEQFINALdesc()[,!(colnames(PHYLOSEQFINALdesc()) %in% input$PHYLOSEQtable2taxa)], 2, as.numeric)
-		datatable(t1, extensions='Buttons', rownames = FALSE,
+		PHYLOSEQFINALdesc <- PHYLOSEQFINALdesc()
+		t2 <- as.data.frame(PHYLOSEQFINALdesc, stringsAsFactors = TRUE)
+		# t2[,!(colnames(t2) %in% input$PHYLOSEQtable2taxa)] <- 
+			# apply(PHYLOSEQFINALdesc()[,!(colnames(PHYLOSEQFINALdesc()) %in% input$PHYLOSEQtable2taxa)], 2, as.numeric)
+		datatable(t2, extensions='Buttons', rownames = FALSE,
 			container = htmltools::withTags(table(
 				class = 'display',
 					thead(
@@ -1496,7 +1518,7 @@
 				buttons = c('excel', 'pdf', 'csv'),
 				searching = TRUE,
 				pageLength = 5,
-				lengthMenu = c(5, nrow(t1))
+				lengthMenu = c(5, nrow(t2))
 			)
 		) 
 		
@@ -1515,7 +1537,7 @@
 		}	
 
 		## Extract SAMPLE data, coerce into data frame, and set names
-		sd_DF <- data.frame(sample_data(phyloseqFINAL())@.Data)
+		sd_DF <- data.frame(sample_data(phyloseqFINAL())@.Data, stringsAsFactors = TRUE)
 		names(sd_DF) <- sample_data(phyloseqFINAL())@names
 		## Remove column of OTU labels from metadata
 		sdfilt_DF <- sd_DF[,!(colnames(sd_DF) %in% key)]

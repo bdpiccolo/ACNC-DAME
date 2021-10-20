@@ -315,20 +315,25 @@
 	########################################################################	
 	dabundNBM <- reactive({
 		req(daTAXALEVEL())
-		
+		daTAXALEVEL <- daTAXALEVEL()
+		DABUNDtaxa <- DABUNDtaxa()
+		dabundGROUPselect <- input$dabundGROUPselect
 		## Make formula for phyloseq::phyloseq_to_deseq2()
-		deseqform <- formula(paste0("~ ", input$dabundGROUPselect))
+		validate(
+			need(dabundGROUPselect != "", "")
+		)
+		deseqform <- formula(paste0("~ ", dabundGROUPselect))
 		
 		## using pblapply() to render status boxes
 		withProgress(message = "Running NBM", value=0, { 
 			percentage <- 0 
-			deseq2ob <- pblapply(DABUNDtaxa(), function(x) {
+			deseq2ob <- pblapply(DABUNDtaxa, function(x) {
 				Sys.sleep(0.05); 
-				percentage <<- percentage + 1/length(DABUNDtaxa())*100
-				incProgress(1/length(DABUNDtaxa()), detail = paste0("Progress: ", round(percentage,2),"%"))
+				percentage <<- percentage + 1/length(DABUNDtaxa)*100
+				incProgress(1/length(DABUNDtaxa), detail = paste0("Progress: ", round(percentage,2),"%"))
 				
 				## Isolate phyloseq object based on TAXA level 
-				pob <- daTAXALEVEL()[[x]]
+				pob <- daTAXALEVEL[[x]]
 				## Convert to DESeq2's DESeqDataSet class
 				deseqob <- phyloseq_to_deseq2(pob, deseqform)
 				## Calculate Geometric Means
@@ -336,7 +341,7 @@
 				## Estimate size factors
 				deseqobESF = estimateSizeFactors(deseqob, geoMeans = deseqob_GM)
 				
-				fullMODEL <- paste0("~ ", input$dabundGROUPselect)
+				fullMODEL <- paste0("~ ", dabundGROUPselect)
 				reducedMODEL <- "~ 1"
 				
 				if(input$dabundNBMtest == "Wald"){
@@ -349,7 +354,7 @@
 						## Isolate pairs and then set vector for comparison extraction
 						Cpair1 <- DABUNDpaircompNBM()[1,pair]
 						Cpair2 <- DABUNDpaircompNBM()[2,pair]				
-						NBMcontrasts <- c(input$dabundGROUPselect, Cpair1, Cpair2)
+						NBMcontrasts <- c(dabundGROUPselect, Cpair1, Cpair2)
 						
 						## Extract comparison from DESeq object
 						deseqob_pairres <- results(deseqob_NB, contrast=NBMcontrasts, test="Wald")
@@ -381,10 +386,15 @@
 			})
 		})
 		## Set list element names and return
-		names(deseq2ob) <- DABUNDtaxa()
+		names(deseq2ob) <- DABUNDtaxa
 		deseq2ob
 	})	
-	
+
+	# output$dabundTEXT <- renderPrint({
+
+
+	# })	
+		
 	########################################################################
 	## Create DataTable object with Phylum NBM data
 	########################################################################	
@@ -1962,10 +1972,6 @@
 		}
 	})	
 
-	# output$dabundTEXT <- renderPrint({
-		
-	# })	
-	
 	########################################################################
 	## Create rbokeh object with Phylum boxplot data
 	########################################################################	
